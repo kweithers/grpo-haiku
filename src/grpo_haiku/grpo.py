@@ -1,0 +1,646 @@
+"""Memory-safe GRPO (Group Relative Policy Optimization) trainer in Apple MLX.
+
+Engineered for 16GB Unified Memory (Apple Silicon M5):
+- 4-bit quantized base model + LoRA adapters (rank 8).
+- Zero-copy reference model KL (`beta > 0`): temporarily sets LoRA `scale = 0.0`
+  to compute frozen reference log-probs without loading a second model copy.
+- Micro-batch=1 gradient accumulation over the G completions in each group so
+  large `(G, seq_len, vocab_size)` logit tensors are never materialized at once.
+- Scoped gradient checkpointing active ONLY during backward passes so KV-cached
+  batched rollout generation runs at full native speed.
+- Explicit Metal cache limit + `mx.clear_cache()` + live peak-memory telemetry.
+"""
+
+from __future__ import annotations
+
+import argparse
+import contextlib
+import json
+import random
+import time
+from dataclasses import asdict
+from pathlib import Path
+from typing import Iterator
+
+import mlx.core as mx
+import mlx.nn as nn
+import mlx.optimizers as optim
+from mlx.utils import tree_flatten, tree_map
+from mlx_lm import batch_generate, load
+from mlx_lm.sample_utils import make_sampler
+from mlx_lm.tuner.lora import LoRAEmbedding, LoRALinear, LoRASwitchLinear
+from mlx_lm.tuner.utils import linear_to_lora_layers, print_trainable_parameters
+
+from grpo_haiku.config import GRPOConfig, ModelConfig, RewardConfig
+from grpo_haiku.data import HaikuPromptExample, format_chat_prompt, load_jsonl
+from grpo_haiku.relevance import MLXEmbeddingRelevanceScorer, RelevanceScorer
+from grpo_haiku.rewards import RewardBreakdown, score_group
+
+_LORA_TYPES = (LoRALinear, LoRASwitchLinear, LoRAEmbedding)
+
+
+# ---------------------------------------------------------------------------
+# Pure GRPO math helpers (independently unit-tested)
+# ---------------------------------------------------------------------------
+
+
+def compute_group_advantages(
+    rewards: list[float], eps: float = 1e-6
+) -> tuple[list[float], bool]:
+    """Normalize rewards within a GRPO group; return (advantages, has_variance)."""
+    if not rewards:
+        return [], False
+    mean_r = sum(rewards) / len(rewards)
+    var_r = sum((r - mean_r) ** 2 for r in rewards) / len(rewards)
+    std_r = var_r**0.5
+    if std_r < eps:
+        return [0.0 for _ in rewards], False
+    return [(r - mean_r) / (std_r + eps) for r in rewards], True
+
+
+def kl_k3(new_logprobs: mx.array, ref_logprobs: mx.array) -> mx.array:
+    """Unbiased, non-negative Schulman k3 KL estimator: exp(r) - r - 1, r = log(p_ref / p_new)."""
+    log_ratio = mx.clip(ref_logprobs - new_logprobs, -20.0, 20.0)
+    return mx.exp(log_ratio) - log_ratio - 1.0
+
+
+def grpo_token_loss(
+    new_logprobs: mx.array,
+    old_logprobs: mx.array,
+    ref_logprobs: mx.array,
+    advantage: float,
+    kl_beta: float = 0.04,
+    clip_eps: float = 0.2,
+) -> tuple[mx.array, mx.array]:
+    """Compute mean per-token GRPO clipped surrogate + k3 KL loss and mean KL."""
+    log_ratio = mx.clip(new_logprobs - old_logprobs, -20.0, 20.0)
+    ratio = mx.exp(log_ratio)
+    adv = mx.array(advantage, dtype=mx.float32)
+
+    surr1 = ratio * adv
+    surr2 = mx.clip(ratio, 1.0 - clip_eps, 1.0 + clip_eps) * adv
+    policy_loss = -mx.minimum(surr1, surr2)
+
+    kl = kl_k3(new_logprobs, ref_logprobs)
+    total_loss = mx.mean(policy_loss + kl_beta * kl)
+    return total_loss, mx.mean(kl)
+
+
+# ---------------------------------------------------------------------------
+# Zero-copy reference toggle & scoped gradient checkpointing
+# ---------------------------------------------------------------------------
+
+
+@contextlib.contextmanager
+def no_lora(model: nn.Module) -> Iterator[None]:
+    """Temporarily zero out all LoRA scales to evaluate the frozen base reference model."""
+    saved: list[tuple[nn.Module, float]] = []
+    for _, module in model.named_modules():
+        if isinstance(module, _LORA_TYPES):
+            saved.append((module, module.scale))
+            module.scale = 0.0
+    try:
+        yield
+    finally:
+        for module, orig_scale in saved:
+            module.scale = orig_scale
+
+
+@contextlib.contextmanager
+def gradient_checkpointing(model: nn.Module, enabled: bool = True) -> Iterator[None]:
+    """Enable MLX gradient checkpointing ONLY within this context (never during KV-cached rollouts)."""
+    if not enabled or not hasattr(model, "layers") or not model.layers:
+        yield
+        return
+
+    layer_cls = type(model.layers[0])
+    orig_call = layer_cls.__call__
+
+    def checkpointed_call(self, *args, **kwargs):
+        def inner_fn(params, *inner_args, **inner_kwargs):
+            self.update(params)
+            return orig_call(self, *inner_args, **inner_kwargs)
+
+        return mx.checkpoint(inner_fn)(self.trainable_parameters(), *args, **kwargs)
+
+    layer_cls.__call__ = checkpointed_call
+    try:
+        yield
+    finally:
+        layer_cls.__call__ = orig_call
+
+
+def clip_grad_norm(grads: dict, max_norm: float) -> tuple[dict, float]:
+    """Clip global L2 norm of a nested gradient pytree."""
+    flat = tree_flatten(grads)
+    if not flat:
+        return grads, 0.0
+    sq_norm = sum(mx.sum(g.astype(mx.float32) ** 2) for _, g in flat)
+    total_norm = mx.sqrt(sq_norm)
+    norm_val = float(total_norm.item())
+    if max_norm > 0.0 and norm_val > max_norm:
+        scale = mx.array(max_norm / (norm_val + 1e-6), dtype=mx.float32)
+        grads = tree_map(lambda g: (g * scale).astype(g.dtype), grads)
+    return grads, norm_val
+
+
+def sequence_completion_logprobs(
+    model: nn.Module,
+    prompt_ids: list[int],
+    completion_ids: list[int],
+) -> mx.array:
+    """Compute per-token log-probabilities for `completion_ids` given `prompt_ids`.
+
+    Runs on a single sequence (batch=1) so peak activation & logits memory stay tiny.
+    """
+    full_ids = prompt_ids + completion_ids
+    tokens = mx.array(full_ids, dtype=mx.int32)[None, :]  # (1, L)
+    inputs = tokens[:, :-1]  # (1, L-1)
+    targets = tokens[:, 1:]  # (1, L-1)
+
+    logits = model(inputs)  # (1, L-1, V)
+    start = len(prompt_ids) - 1
+    comp_logits = logits[:, start:, :].astype(mx.float32)  # (1, T_comp, V)
+    comp_targets = targets[:, start:]  # (1, T_comp)
+
+    # -cross_entropy gives exact log_softmax(logits)[target] without keeping full log_probs graph
+    nll = nn.losses.cross_entropy(comp_logits, comp_targets, reduction="none")
+    return -nll[0]  # (T_comp,)
+
+
+# ---------------------------------------------------------------------------
+# Adapter persistence (100% compatible with `mlx_lm.load(..., adapter_path=...)`)
+# ---------------------------------------------------------------------------
+
+
+def save_adapter(
+    model: nn.Module,
+    model_cfg: ModelConfig,
+    out_dir: str | Path,
+) -> Path:
+    """Save trainable LoRA weights and adapter_config.json in mlx-lm standard format."""
+    save_dir = Path(out_dir)
+    save_dir.mkdir(parents=True, exist_ok=True)
+
+    adapter_weights = dict(tree_flatten(model.trainable_parameters()))
+    mx.save_safetensors(str(save_dir / "adapters.safetensors"), adapter_weights)
+
+    num_layers = model_cfg.lora_layers
+    if num_layers < 0 and hasattr(model, "layers"):
+        num_layers = len(model.layers)
+
+    adapter_config = {
+        "fine_tune_type": "lora",
+        "num_layers": num_layers,
+        "lora_parameters": {
+            "rank": model_cfg.lora_rank,
+            "scale": model_cfg.lora_scale,
+            "dropout": model_cfg.lora_dropout,
+            "keys": list(model_cfg.lora_keys),
+        },
+    }
+    with (save_dir / "adapter_config.json").open("w", encoding="utf-8") as f:
+        json.dump(adapter_config, f, indent=2)
+    return save_dir
+
+
+def normalize_completion_text(prompt_text: str, completion_text: str) -> str:
+    """Restore any unclosed `<think>` prefill from `prompt_text` so tag parsing is uniform."""
+    idx = prompt_text.rfind("<think>")
+    if idx != -1 and "</think>" not in prompt_text[idx:]:
+        prefix = prompt_text[idx:]
+        if not completion_text.lstrip().lower().startswith("<think>"):
+            return prefix + completion_text
+    return completion_text
+
+
+def truncate_after_haiku_close(
+    text: str, token_ids: list[int], tokenizer
+) -> tuple[str, list[int]]:
+    """Trim trailing gibberish if the model already closed `</haiku>` cleanly (optional safety)."""
+    # We intentionally do NOT strip trailing text during training scoring so trailing text
+    # gets penalized by `trailing_text_penalty`; we only guarantee non-empty token_ids.
+    return text, token_ids
+
+
+# ---------------------------------------------------------------------------
+# Trainer setup & main GRPO loop
+# ---------------------------------------------------------------------------
+
+
+def build_lora_model(model_cfg: ModelConfig):
+    """Load 4-bit base model, freeze base weights, and inject LoRA layers."""
+    model, tokenizer = load(model_cfg.model_name)
+    model.freeze()
+
+    num_layers = model_cfg.lora_layers
+    if num_layers < 0:
+        num_layers = len(model.layers)
+    num_layers = min(num_layers, len(model.layers))
+
+    lora_params = {
+        "rank": model_cfg.lora_rank,
+        "scale": model_cfg.lora_scale,
+        "dropout": model_cfg.lora_dropout,
+        "keys": list(model_cfg.lora_keys),
+    }
+    linear_to_lora_layers(model, num_layers=num_layers, config=lora_params)
+    model.train()
+    print_trainable_parameters(model)
+    return model, tokenizer
+
+
+def run_quick_eval(
+    model: nn.Module,
+    tokenizer,
+    eval_examples: list[HaikuPromptExample],
+    reward_cfg: RewardConfig,
+    relevance_scorer: RelevanceScorer | None,
+    max_tokens: int,
+    subset_size: int = 20,
+) -> dict[str, float]:
+    """Run a fast greedy evaluation snapshot on a held-out subset."""
+    subset = eval_examples[:subset_size]
+    prompt_texts = [format_chat_prompt(tokenizer, ex.prompt) for ex in subset]
+    prompt_ids_list = [
+        tokenizer.encode(pt, add_special_tokens=False) for pt in prompt_texts
+    ]
+
+    model.eval()
+    resp = batch_generate(
+        model,
+        tokenizer,
+        prompts=prompt_ids_list,
+        max_tokens=max_tokens,
+        sampler=make_sampler(temp=0.0),
+        return_token_ids=False,
+    )
+    model.train()
+
+    breakdowns: list[RewardBreakdown] = []
+    for ex, pt, raw_text in zip(subset, prompt_texts, resp.texts):
+        full_text = normalize_completion_text(pt, raw_text)
+        bd = score_group(
+            topic=ex.topic,
+            completions=[full_text],
+            cfg=reward_cfg,
+            relevance_scorer=relevance_scorer,
+        )[0]
+        breakdowns.append(bd)
+
+    n = max(1, len(breakdowns))
+    return {
+        "eval_reward": sum(b.total_reward for b in breakdowns) / n,
+        "eval_exact_575": sum(1 for b in breakdowns if b.is_exact_575) / n,
+        "eval_valid_format": sum(1 for b in breakdowns if b.is_valid_format) / n,
+        "eval_relevance": sum(b.raw_cosine_sim for b in breakdowns) / n,
+        "eval_oov_rate": sum(1 for b in breakdowns if b.oov_words) / n,
+    }
+
+
+def train_grpo(
+    model_cfg: ModelConfig,
+    reward_cfg: RewardConfig,
+    grpo_cfg: GRPOConfig,
+) -> Path:
+    """Execute the full MLX GRPO training run and return the final adapter path."""
+    random.seed(grpo_cfg.seed)
+    mx.random.seed(grpo_cfg.seed)
+
+    # Cap Metal buffer cache to stay comfortably inside 16GB unified memory
+    if hasattr(mx, "set_cache_limit") and grpo_cfg.metal_cache_limit_gb > 0:
+        mx.set_cache_limit(int(grpo_cfg.metal_cache_limit_gb * (1024**3)))
+
+    run_dir = Path(grpo_cfg.runs_dir) / grpo_cfg.run_name
+    adapters_dir = run_dir / "adapters"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    adapters_dir.mkdir(parents=True, exist_ok=True)
+
+    # Persist exact run config for reproducibility
+    with (run_dir / "run_config.json").open("w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "model": asdict(model_cfg),
+                "reward": asdict(reward_cfg),
+                "grpo": asdict(grpo_cfg),
+            },
+            f,
+            indent=2,
+        )
+
+    train_examples = load_jsonl(grpo_cfg.train_file)
+    eval_examples = load_jsonl(grpo_cfg.eval_file) if Path(grpo_cfg.eval_file).exists() else []
+    if not train_examples:
+        raise ValueError(f"No training examples found in {grpo_cfg.train_file}")
+
+    print(f"Loading model: {model_cfg.model_name}")
+    model, tokenizer = build_lora_model(model_cfg)
+
+    relevance_scorer: RelevanceScorer | None = None
+    if reward_cfg.relevance_weight > 0.0:
+        print(f"Loading local MLX relevance embedder: {reward_cfg.embedding_model}")
+        relevance_scorer = MLXEmbeddingRelevanceScorer(reward_cfg.embedding_model)
+
+    optimizer = optim.AdamW(
+        learning_rate=grpo_cfg.learning_rate,
+        weight_decay=grpo_cfg.weight_decay,
+    )
+    sampler = make_sampler(temp=grpo_cfg.temperature, top_p=grpo_cfg.top_p)
+
+    # Single-sequence value_and_grad function for micro-batch=1 accumulation
+    def _single_seq_loss(
+        model_arg: nn.Module,
+        prompt_ids: list[int],
+        completion_ids: list[int],
+        old_lp: mx.array,
+        ref_lp: mx.array,
+        advantage: float,
+    ) -> tuple[mx.array, mx.array]:
+        new_lp = sequence_completion_logprobs(model_arg, prompt_ids, completion_ids)
+        return grpo_token_loss(
+            new_logprobs=new_lp,
+            old_logprobs=old_lp,
+            ref_logprobs=ref_lp,
+            advantage=advantage,
+            kl_beta=grpo_cfg.kl_beta,
+            clip_eps=grpo_cfg.clip_eps,
+        )
+
+    loss_and_grad_fn = nn.value_and_grad(model, _single_seq_loss)
+    metrics_path = run_dir / "metrics.jsonl"
+
+    rng = random.Random(grpo_cfg.seed)
+    order = list(range(len(train_examples)))
+    rng.shuffle(order)
+
+    print(
+        f"Starting GRPO training: steps={grpo_cfg.num_steps}, G={grpo_cfg.group_size}, "
+        f"kl_beta={grpo_cfg.kl_beta}, relevance_w={reward_cfg.relevance_weight}, "
+        f"max_tokens={grpo_cfg.max_completion_tokens}"
+    )
+
+    for step in range(1, grpo_cfg.num_steps + 1):
+        t0 = time.perf_counter()
+        if hasattr(mx, "reset_peak_memory"):
+            mx.reset_peak_memory()
+
+        ex = train_examples[order[(step - 1) % len(order)]]
+        if step % len(order) == 0:
+            rng.shuffle(order)
+
+        prompt_text = format_chat_prompt(tokenizer, ex.prompt)
+        prompt_ids = tokenizer.encode(prompt_text, add_special_tokens=False)
+
+        # 1. Parallel batched rollout of G completions (no grad checkpointing during KV decode!)
+        model.eval()
+        rollout = batch_generate(
+            model,
+            tokenizer,
+            prompts=[prompt_ids] * grpo_cfg.group_size,
+            max_tokens=grpo_cfg.max_completion_tokens,
+            sampler=sampler,
+            return_token_ids=True,
+            return_logprobs=False,
+        )
+        model.train()
+
+        completions = [normalize_completion_text(prompt_text, txt) for txt in rollout.texts]
+        comp_token_ids = rollout.token_ids or [
+            tokenizer.encode(txt, add_special_tokens=False) for txt in rollout.texts
+        ]
+
+        # 2. Deterministic verifiable reward + semantic relevance scoring
+        breakdowns = score_group(
+            topic=ex.topic,
+            completions=completions,
+            cfg=reward_cfg,
+            relevance_scorer=relevance_scorer,
+        )
+        rewards = [b.total_reward for b in breakdowns]
+        advantages, has_variance = compute_group_advantages(rewards, eps=grpo_cfg.adv_eps)
+
+        # Filter out degenerate empty token rollouts
+        valid_indices = [i for i, tids in enumerate(comp_token_ids) if len(tids) > 0]
+
+        loss_val = 0.0
+        kl_val = 0.0
+        grad_norm_val = 0.0
+        skipped_update = (not has_variance) or (len(valid_indices) == 0)
+
+        if not skipped_update:
+            # 3. Zero-copy reference log-probs (LoRA scale temporarily set to 0.0)
+            ref_logprobs_list: dict[int, mx.array] = {}
+            with no_lora(model):
+                for idx in valid_indices:
+                    ref_lp = mx.stop_gradient(
+                        sequence_completion_logprobs(model, prompt_ids, comp_token_ids[idx])
+                    )
+                    mx.eval(ref_lp)
+                    ref_logprobs_list[idx] = ref_lp
+
+            # Capture exact old_logprobs on current policy before inner epochs
+            old_logprobs_list: dict[int, mx.array] = {}
+            for idx in valid_indices:
+                old_lp = mx.stop_gradient(
+                    sequence_completion_logprobs(model, prompt_ids, comp_token_ids[idx])
+                )
+                mx.eval(old_lp)
+                old_logprobs_list[idx] = old_lp
+
+            # 4. Micro-batch=1 gradient accumulation with scoped gradient checkpointing
+            epoch_losses: list[float] = []
+            epoch_kls: list[float] = []
+            inv_n = 1.0 / len(valid_indices)
+
+            with gradient_checkpointing(model, enabled=model_cfg.grad_checkpoint):
+                for _epoch in range(grpo_cfg.grpo_epochs):
+                    accum_grads = None
+                    step_loss = 0.0
+                    step_kl = 0.0
+
+                    for idx in valid_indices:
+                        (seq_loss, seq_kl), grads = loss_and_grad_fn(
+                            model,
+                            prompt_ids,
+                            comp_token_ids[idx],
+                            old_logprobs_list[idx],
+                            ref_logprobs_list[idx],
+                            advantages[idx],
+                        )
+                        scaled_grads = tree_map(lambda g: g * inv_n, grads)
+                        if accum_grads is None:
+                            accum_grads = scaled_grads
+                        else:
+                            accum_grads = tree_map(lambda a, b: a + b, accum_grads, scaled_grads)
+
+                        mx.eval(accum_grads, seq_loss, seq_kl)
+                        step_loss += float(seq_loss.item()) * inv_n
+                        step_kl += float(seq_kl.item()) * inv_n
+
+                    if accum_grads is not None:
+                        accum_grads, grad_norm_val = clip_grad_norm(
+                            accum_grads, grpo_cfg.grad_clip_norm
+                        )
+                        optimizer.update(model, accum_grads)
+                        mx.eval(model.parameters(), optimizer.state)
+
+                    epoch_losses.append(step_loss)
+                    epoch_kls.append(step_kl)
+
+            loss_val = sum(epoch_losses) / max(1, len(epoch_losses))
+            kl_val = sum(epoch_kls) / max(1, len(epoch_kls))
+
+        if hasattr(mx, "clear_cache"):
+            mx.clear_cache()
+
+        step_sec = time.perf_counter() - t0
+        peak_mem_gb = (
+            mx.get_peak_memory() / (1024**3) if hasattr(mx, "get_peak_memory") else 0.0
+        )
+
+        # Telemetry
+        n_g = len(breakdowns)
+        reward_mean = sum(rewards) / n_g
+        reward_max = max(rewards)
+        exact_rate = sum(1 for b in breakdowns if b.is_exact_575) / n_g
+        format_rate = sum(1 for b in breakdowns if b.is_valid_format) / n_g
+        rel_mean = sum(b.raw_cosine_sim for b in breakdowns) / n_g
+        oov_rate = sum(1 for b in breakdowns if b.oov_words) / n_g
+        avg_comp_len = sum(len(t) for t in comp_token_ids) / n_g
+
+        row = {
+            "step": step,
+            "topic": ex.topic,
+            "reward_mean": round(reward_mean, 4),
+            "reward_max": round(reward_max, 4),
+            "exact_575_rate": round(exact_rate, 4),
+            "format_rate": round(format_rate, 4),
+            "relevance_sim": round(rel_mean, 4),
+            "oov_rate": round(oov_rate, 4),
+            "loss": round(loss_val, 5),
+            "kl": round(kl_val, 5),
+            "grad_norm": round(grad_norm_val, 4),
+            "avg_tokens": round(avg_comp_len, 1),
+            "skipped": skipped_update,
+            "peak_mem_gb": round(peak_mem_gb, 3),
+            "step_sec": round(step_sec, 2),
+        }
+
+        print(
+            f"[step {step:04d}/{grpo_cfg.num_steps}] "
+            f"r={reward_mean:+.3f} (max={reward_max:+.3f}) | "
+            f"575={exact_rate*100:5.1f}% fmt={format_rate*100:5.1f}% rel={rel_mean:.2f} | "
+            f"kl={kl_val:.4f} gnorm={grad_norm_val:.2f} | "
+            f"toks={avg_comp_len:5.1f} mem={peak_mem_gb:.2f}GB ({step_sec:.1f}s)"
+            + (" [skip:0var]" if skipped_update else "")
+        )
+
+        if grpo_cfg.sample_every > 0 and (step == 1 or step % grpo_cfg.sample_every == 0):
+            best_idx = max(range(n_g), key=lambda i: rewards[i])
+            best = breakdowns[best_idx]
+            print(f"  ── Sample (topic: {ex.topic!r}, counts={best.line_counts}, r={best.total_reward:+.2f}) ──")
+            if best.haiku_lines:
+                for line in best.haiku_lines:
+                    print(f"    {line}")
+            else:
+                print(f"    [unparsed] {completions[best_idx][:140]!r}")
+
+        if (
+            eval_examples
+            and grpo_cfg.eval_every > 0
+            and step % grpo_cfg.eval_every == 0
+        ):
+            eval_stats = run_quick_eval(
+                model=model,
+                tokenizer=tokenizer,
+                eval_examples=eval_examples,
+                reward_cfg=reward_cfg,
+                relevance_scorer=relevance_scorer,
+                max_tokens=grpo_cfg.max_completion_tokens,
+                subset_size=grpo_cfg.eval_subset_size,
+            )
+            row.update({k: round(v, 4) for k, v in eval_stats.items()})
+            print(
+                f"  ★ Eval@{step} ({min(len(eval_examples), grpo_cfg.eval_subset_size)} held-out): "
+                f"r={eval_stats['eval_reward']:+.3f} | "
+                f"575={eval_stats['eval_exact_575']*100:.1f}% | "
+                f"fmt={eval_stats['eval_valid_format']*100:.1f}% | "
+                f"rel={eval_stats['eval_relevance']:.2f}"
+            )
+            if hasattr(mx, "clear_cache"):
+                mx.clear_cache()
+
+        with metrics_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(row) + "\n")
+
+        if grpo_cfg.save_every > 0 and step % grpo_cfg.save_every == 0:
+            ckpt = save_adapter(model, model_cfg, adapters_dir / f"step_{step:04d}")
+            print(f"  Saved checkpoint -> {ckpt}")
+
+    final_path = save_adapter(model, model_cfg, adapters_dir / "final")
+    print(f"Training complete! Final LoRA adapter saved to: {final_path}")
+    return final_path
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Train a small MLX LLM with GRPO to write 5-7-5 haikus.")
+    parser.add_argument("--model", type=str, default=ModelConfig.model_name)
+    parser.add_argument("--train-file", type=str, default=GRPOConfig.train_file)
+    parser.add_argument("--eval-file", type=str, default=GRPOConfig.eval_file)
+    parser.add_argument("--run-name", type=str, default=GRPOConfig.run_name)
+    parser.add_argument("--runs-dir", type=str, default=GRPOConfig.runs_dir)
+    parser.add_argument("--steps", type=int, default=GRPOConfig.num_steps)
+    parser.add_argument("--group-size", type=int, default=GRPOConfig.group_size)
+    parser.add_argument("--grpo-epochs", type=int, default=GRPOConfig.grpo_epochs)
+    parser.add_argument("--max-tokens", type=int, default=GRPOConfig.max_completion_tokens)
+    parser.add_argument("--temp", type=float, default=GRPOConfig.temperature)
+    parser.add_argument("--top-p", type=float, default=GRPOConfig.top_p)
+    parser.add_argument("--lr", type=float, default=GRPOConfig.learning_rate)
+    parser.add_argument("--kl-beta", type=float, default=GRPOConfig.kl_beta)
+    parser.add_argument("--relevance-weight", type=float, default=RewardConfig.relevance_weight)
+    parser.add_argument("--lora-rank", type=int, default=ModelConfig.lora_rank)
+    parser.add_argument("--lora-scale", type=float, default=ModelConfig.lora_scale)
+    parser.add_argument("--lora-layers", type=int, default=ModelConfig.lora_layers)
+    parser.add_argument("--no-grad-checkpoint", action="store_true")
+    parser.add_argument("--eval-every", type=int, default=GRPOConfig.eval_every)
+    parser.add_argument("--eval-subset", type=int, default=GRPOConfig.eval_subset_size)
+    parser.add_argument("--save-every", type=int, default=GRPOConfig.save_every)
+    parser.add_argument("--sample-every", type=int, default=GRPOConfig.sample_every)
+    parser.add_argument("--seed", type=int, default=GRPOConfig.seed)
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    model_cfg = ModelConfig(
+        model_name=args.model,
+        lora_rank=args.lora_rank,
+        lora_scale=args.lora_scale,
+        lora_layers=args.lora_layers,
+        grad_checkpoint=not args.no_grad_checkpoint,
+    )
+    reward_cfg = RewardConfig(relevance_weight=args.relevance_weight)
+    grpo_cfg = GRPOConfig(
+        train_file=args.train_file,
+        eval_file=args.eval_file,
+        run_name=args.run_name,
+        runs_dir=args.runs_dir,
+        num_steps=args.steps,
+        group_size=args.group_size,
+        grpo_epochs=args.grpo_epochs,
+        max_completion_tokens=args.max_tokens,
+        temperature=args.temp,
+        top_p=args.top_p,
+        learning_rate=args.lr,
+        kl_beta=args.kl_beta,
+        eval_every=args.eval_every,
+        eval_subset_size=args.eval_subset,
+        save_every=args.save_every,
+        sample_every=args.sample_every,
+        seed=args.seed,
+    )
+    train_grpo(model_cfg, reward_cfg, grpo_cfg)
+
+
+if __name__ == "__main__":
+    main()
