@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "grpo-haiku"
+version = "0.1.0"
+description = "RLVR (GRPO) fine-tuning of small open-weights LLMs for 5-7-5 haikus on Apple Silicon via MLX"
+requires-python = ">=3.12"
+dependencies = [
+    "mlx>=0.25.0",
+    "mlx-lm>=0.24.0",
+    "mlx-embedding-models>=0.0.11",
+    "cmudict>=1.0.32",
+    "numpy>=1.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/grpo_haiku"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
