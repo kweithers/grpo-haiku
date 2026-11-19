@@ -1,0 +1,900 @@
+{"id": "ocean_mountains_027", "domain": "ocean_mountains", "topic": "a sunlit fishing boat entering harbor", "prompt": "Write a vivid haiku inspired by a sunlit fishing boat entering harbor."}
+{"id": "emotions_memory_067", "domain": "emotions_memory", "topic": "a peaceful courage before starting over", "prompt": "Write a vivid haiku inspired by a peaceful courage before starting over."}
+{"id": "nature_wildlife_004", "domain": "nature_wildlife", "topic": "a solitary hummingbird near wild sage", "prompt": "Write a poetic haiku describing a solitary hummingbird near wild sage."}
+{"id": "ocean_mountains_065", "domain": "ocean_mountains", "topic": "a salt-sprayed glacier valley in silence", "prompt": "Write a haiku about a salt-sprayed glacier valley in silence."}
+{"id": "travel_transit_069", "domain": "travel_transit", "topic": "a slow suitcase waiting by stairs", "prompt": "Craft a haiku about a slow suitcase waiting by stairs."}
+{"id": "emotions_memory_011", "domain": "emotions_memory", "topic": "a quiet childhood summer afternoon", "prompt": "Compose a 5-7-5 haiku capturing a quiet childhood summer afternoon."}
+{"id": "nature_wildlife_084", "domain": "nature_wildlife", "topic": "a darting hummingbird near wild sage", "prompt": "Write a poetic haiku describing a darting hummingbird near wild sage."}
+{"id": "nature_wildlife_031", "domain": "nature_wildlife", "topic": "a hidden red fox crossing fresh snow", "prompt": "Compose a 5-7-5 haiku capturing a hidden red fox crossing fresh snow."}
+{"id": "food_kitchen_045", "domain": "food_kitchen", "topic": "a quiet slice of ripe summer peach", "prompt": "Write a vivid haiku inspired by a quiet slice of ripe summer peach."}
+{"id": "ocean_mountains_067", "domain": "ocean_mountains", "topic": "a salt-sprayed fishing boat entering harbor", "prompt": "Write a vivid haiku inspired by a salt-sprayed fishing boat entering harbor."}
+{"id": "home_objects_039", "domain": "home_objects", "topic": "a forgotten glass marble catching sunlight", "prompt": "Compose a 5-7-5 haiku capturing a forgotten glass marble catching sunlight."}
+{"id": "nature_wildlife_021", "domain": "nature_wildlife", "topic": "a restless red fox crossing fresh snow", "prompt": "Compose a 5-7-5 haiku capturing a restless red fox crossing fresh snow."}
+{"id": "home_objects_060", "domain": "home_objects", "topic": "a worn brass pocket watch", "prompt": "Write a vivid haiku inspired by a worn brass pocket watch."}
+{"id": "emotions_memory_018", "domain": "emotions_memory", "topic": "a quiet gratitude at sunset", "prompt": "Craft a haiku about a quiet gratitude at sunset."}
+{"id": "food_kitchen_017", "domain": "food_kitchen", "topic": "a fragrant espresso poured in silence", "prompt": "Write a poetic haiku describing a fragrant espresso poured in silence."}
+{"id": "emotions_memory_077", "domain": "emotions_memory", "topic": "a restless courage before starting over", "prompt": "Write a vivid haiku inspired by a restless courage before starting over."}
+{"id": "nature_wildlife_073", "domain": "nature_wildlife", "topic": "a silent owl perched in old pines", "prompt": "Craft a haiku about a silent owl perched in old pines."}
+{"id": "urban_moments_089", "domain": "urban_moments", "topic": "a steam-filled pigeon strutting on brick", "prompt": "Write a vivid haiku inspired by a steam-filled pigeon strutting on brick."}
+{"id": "home_objects_042", "domain": "home_objects", "topic": "a handmade quilted blanket on oak", "prompt": "Write a poetic haiku describing a handmade quilted blanket on oak."}
+{"id": "seasons_weather_005", "domain": "seasons_weather", "topic": "a quiet melting icicle drip", "prompt": "Write a haiku about a quiet melting icicle drip."}
+{"id": "coding_tech_073", "domain": "coding_tech", "topic": "a patient green test suite passing", "prompt": "Write a poetic haiku describing a patient green test suite passing."}
+{"id": "night_cosmos_020", "domain": "night_cosmos", "topic": "a sprawling full moon over pine trees", "prompt": "Write a vivid haiku inspired by a sprawling full moon over pine trees."}
+{"id": "food_kitchen_050", "domain": "food_kitchen", "topic": "a bitter bowl of miso soup", "prompt": "Write a vivid haiku inspired by a bitter bowl of miso soup."}
+{"id": "home_objects_079", "domain": "home_objects", "topic": "a cracked glass marble catching sunlight", "prompt": "Compose a 5-7-5 haiku capturing a cracked glass marble catching sunlight."}
+{"id": "ocean_mountains_001", "domain": "ocean_mountains", "topic": "a distant granite ridge above clouds", "prompt": "Compose a 5-7-5 haiku capturing a distant granite ridge above clouds."}
+{"id": "emotions_memory_088", "domain": "emotions_memory", "topic": "a hopeful gratitude at sunset", "prompt": "Craft a haiku about a hopeful gratitude at sunset."}
+{"id": "food_kitchen_014", "domain": "food_kitchen", "topic": "a fragrant skillet of roasted chestnuts", "prompt": "Compose a 5-7-5 haiku capturing a fragrant skillet of roasted chestnuts."}
+{"id": "nature_wildlife_029", "domain": "nature_wildlife", "topic": "a restless whale surfacing in mist", "prompt": "Write a poetic haiku describing a restless whale surfacing in mist."}
+{"id": "coding_tech_097", "domain": "coding_tech", "topic": "a minimalist neural network training slowly", "prompt": "Craft a haiku about a minimalist neural network training slowly."}
+{"id": "travel_transit_037", "domain": "travel_transit", "topic": "a lonely stone stair climbing a hill", "prompt": "Compose a 5-7-5 haiku capturing a lonely stone stair climbing a hill."}
+{"id": "home_objects_092", "domain": "home_objects", "topic": "a ticking quilted blanket on oak", "prompt": "Write a poetic haiku describing a ticking quilted blanket on oak."}
+{"id": "urban_moments_000", "domain": "urban_moments", "topic": "a rainy subway platform at dusk", "prompt": "Craft a haiku about a rainy subway platform at dusk."}
+{"id": "night_cosmos_060", "domain": "night_cosmos", "topic": "a crescent full moon over pine trees", "prompt": "Write a vivid haiku inspired by a crescent full moon over pine trees."}
+{"id": "seasons_weather_031", "domain": "seasons_weather", "topic": "a golden autumn rainstorm on glass", "prompt": "Compose a 5-7-5 haiku capturing a golden autumn rainstorm on glass."}
+{"id": "urban_moments_039", "domain": "urban_moments", "topic": "a hushed pigeon strutting on brick", "prompt": "Write a vivid haiku inspired by a hushed pigeon strutting on brick."}
+{"id": "coding_tech_002", "domain": "coding_tech", "topic": "a quiet server rack in cold air", "prompt": "Craft a haiku about a quiet server rack in cold air."}
+{"id": "home_objects_081", "domain": "home_objects", "topic": "a cherished ceramic mug by a window", "prompt": "Craft a haiku about a cherished ceramic mug by a window."}
+{"id": "travel_transit_067", "domain": "travel_transit", "topic": "a slow stone stair climbing a hill", "prompt": "Compose a 5-7-5 haiku capturing a slow stone stair climbing a hill."}
+{"id": "emotions_memory_096", "domain": "emotions_memory", "topic": "a distant laughter heard through walls", "prompt": "Compose a 5-7-5 haiku capturing a distant laughter heard through walls."}
+{"id": "emotions_memory_053", "domain": "emotions_memory", "topic": "a fragile moment of quiet forgiveness", "prompt": "Craft a haiku about a fragile moment of quiet forgiveness."}
+{"id": "travel_transit_004", "domain": "travel_transit", "topic": "a rattling footbridge over a creek", "prompt": "Craft a haiku about a rattling footbridge over a creek."}
+{"id": "seasons_weather_065", "domain": "seasons_weather", "topic": "a bright melting icicle drip", "prompt": "Write a haiku about a bright melting icicle drip."}
+{"id": "travel_transit_071", "domain": "travel_transit", "topic": "a winding ferry cutting silver wake", "prompt": "Write a haiku about a winding ferry cutting silver wake."}
+{"id": "home_objects_070", "domain": "home_objects", "topic": "a cracked brass pocket watch", "prompt": "Write a vivid haiku inspired by a cracked brass pocket watch."}
+{"id": "coding_tech_092", "domain": "coding_tech", "topic": "a minimalist server rack in cold air", "prompt": "Craft a haiku about a minimalist server rack in cold air."}
+{"id": "night_cosmos_006", "domain": "night_cosmos", "topic": "a pale constellation above desert sand", "prompt": "Craft a haiku about a pale constellation above desert sand."}
+{"id": "urban_moments_035", "domain": "urban_moments", "topic": "a hushed laundromat spinning late", "prompt": "Craft a haiku about a hushed laundromat spinning late."}
+{"id": "coding_tech_048", "domain": "coding_tech", "topic": "a clean old floppy disk in drawer", "prompt": "Write a poetic haiku describing a clean old floppy disk in drawer."}
+{"id": "night_cosmos_055", "domain": "night_cosmos", "topic": "a radiant firefly meadow under stars", "prompt": "Write a vivid haiku inspired by a radiant firefly meadow under stars."}
+{"id": "seasons_weather_036", "domain": "seasons_weather", "topic": "a golden thunderstorm rolling east", "prompt": "Compose a 5-7-5 haiku capturing a golden thunderstorm rolling east."}
+{"id": "urban_moments_008", "domain": "urban_moments", "topic": "a rainy jazz note drifting outdoors", "prompt": "Compose a 5-7-5 haiku capturing a rainy jazz note drifting outdoors."}
+{"id": "travel_transit_063", "domain": "travel_transit", "topic": "a slow gravel road through orchards", "prompt": "Write a vivid haiku inspired by a slow gravel road through orchards."}
+{"id": "urban_moments_098", "domain": "urban_moments", "topic": "a windy jazz note drifting outdoors", "prompt": "Compose a 5-7-5 haiku capturing a windy jazz note drifting outdoors."}
+{"id": "travel_transit_011", "domain": "travel_transit", "topic": "a night ferry cutting silver wake", "prompt": "Write a haiku about a night ferry cutting silver wake."}
+{"id": "seasons_weather_096", "domain": "seasons_weather", "topic": "a bitter thunderstorm rolling east", "prompt": "Compose a 5-7-5 haiku capturing a bitter thunderstorm rolling east."}
+{"id": "travel_transit_089", "domain": "travel_transit", "topic": "a foggy suitcase waiting by stairs", "prompt": "Craft a haiku about a foggy suitcase waiting by stairs."}
+{"id": "travel_transit_043", "domain": "travel_transit", "topic": "a sunlit gravel road through orchards", "prompt": "Write a vivid haiku inspired by a sunlit gravel road through orchards."}
+{"id": "food_kitchen_031", "domain": "food_kitchen", "topic": "a simmering kettle whistling at dawn", "prompt": "Craft a haiku about a simmering kettle whistling at dawn."}
+{"id": "coding_tech_028", "domain": "coding_tech", "topic": "a stubborn old floppy disk in drawer", "prompt": "Write a poetic haiku describing a stubborn old floppy disk in drawer."}
+{"id": "home_objects_023", "domain": "home_objects", "topic": "a sun-warmed fountain pen on linen paper", "prompt": "Write a haiku about a sun-warmed fountain pen on linen paper."}
+{"id": "food_kitchen_061", "domain": "food_kitchen", "topic": "a sweet kettle whistling at dawn", "prompt": "Craft a haiku about a sweet kettle whistling at dawn."}
+{"id": "emotions_memory_076", "domain": "emotions_memory", "topic": "a restless laughter heard through walls", "prompt": "Compose a 5-7-5 haiku capturing a restless laughter heard through walls."}
+{"id": "emotions_memory_089", "domain": "emotions_memory", "topic": "a hopeful solitude without loneliness", "prompt": "Write a poetic haiku describing a hopeful solitude without loneliness."}
+{"id": "emotions_memory_064", "domain": "emotions_memory", "topic": "a peaceful longing for familiar hills", "prompt": "Write a poetic haiku describing a peaceful longing for familiar hills."}
+{"id": "night_cosmos_093", "domain": "night_cosmos", "topic": "a shimmering eclipse darkening midday sky", "prompt": "Write a haiku about a shimmering eclipse darkening midday sky."}
+{"id": "coding_tech_020", "domain": "coding_tech", "topic": "a stubborn cursor blinking on black", "prompt": "Compose a 5-7-5 haiku capturing a stubborn cursor blinking on black."}
+{"id": "coding_tech_014", "domain": "coding_tech", "topic": "a glowing mechanical keyboard clicking", "prompt": "Write a haiku about a glowing mechanical keyboard clicking."}
+{"id": "urban_moments_003", "domain": "urban_moments", "topic": "a rainy alleyway after rainfall", "prompt": "Compose a 5-7-5 haiku capturing a rainy alleyway after rainfall."}
+{"id": "ocean_mountains_083", "domain": "ocean_mountains", "topic": "a tide-carved alpine meadow in July", "prompt": "Craft a haiku about a tide-carved alpine meadow in July."}
+{"id": "ocean_mountains_059", "domain": "ocean_mountains", "topic": "a tranquil waterfall hidden in moss", "prompt": "Write a poetic haiku describing a tranquil waterfall hidden in moss."}
+{"id": "home_objects_038", "domain": "home_objects", "topic": "a forgotten key hanging by the door", "prompt": "Write a haiku about a forgotten key hanging by the door."}
+{"id": "home_objects_040", "domain": "home_objects", "topic": "a handmade brass pocket watch", "prompt": "Write a vivid haiku inspired by a handmade brass pocket watch."}
+{"id": "coding_tech_084", "domain": "coding_tech", "topic": "a humming mechanical keyboard clicking", "prompt": "Write a haiku about a humming mechanical keyboard clicking."}
+{"id": "food_kitchen_007", "domain": "food_kitchen", "topic": "a steaming espresso poured in silence", "prompt": "Write a poetic haiku describing a steaming espresso poured in silence."}
+{"id": "seasons_weather_002", "domain": "seasons_weather", "topic": "a quiet spring cherry blossom breeze", "prompt": "Write a vivid haiku inspired by a quiet spring cherry blossom breeze."}
+{"id": "nature_wildlife_006", "domain": "nature_wildlife", "topic": "a solitary salmon leaping cold rapids", "prompt": "Compose a 5-7-5 haiku capturing a solitary salmon leaping cold rapids."}
+{"id": "coding_tech_013", "domain": "coding_tech", "topic": "a glowing green test suite passing", "prompt": "Write a poetic haiku describing a glowing green test suite passing."}
+{"id": "nature_wildlife_042", "domain": "nature_wildlife", "topic": "a patient koi swimming under lilies", "prompt": "Write a vivid haiku inspired by a patient koi swimming under lilies."}
+{"id": "night_cosmos_091", "domain": "night_cosmos", "topic": "a shimmering meteor streaking past Orion", "prompt": "Craft a haiku about a shimmering meteor streaking past Orion."}
+{"id": "urban_moments_054", "domain": "urban_moments", "topic": "a midnight crosswalk under amber lights", "prompt": "Write a vivid haiku inspired by a midnight crosswalk under amber lights."}
+{"id": "coding_tech_045", "domain": "coding_tech", "topic": "a clean git merge without conflict", "prompt": "Compose a 5-7-5 haiku capturing a clean git merge without conflict."}
+{"id": "travel_transit_078", "domain": "travel_transit", "topic": "a winding empty highway at daybreak", "prompt": "Write a vivid haiku inspired by a winding empty highway at daybreak."}
+{"id": "emotions_memory_066", "domain": "emotions_memory", "topic": "a peaceful laughter heard through walls", "prompt": "Compose a 5-7-5 haiku capturing a peaceful laughter heard through walls."}
+{"id": "food_kitchen_020", "domain": "food_kitchen", "topic": "a freshly baked bowl of miso soup", "prompt": "Write a vivid haiku inspired by a freshly baked bowl of miso soup."}
+{"id": "seasons_weather_040", "domain": "seasons_weather", "topic": "a sudden winter snowy morning", "prompt": "Write a haiku about a sudden winter snowy morning."}
+{"id": "emotions_memory_078", "domain": "emotions_memory", "topic": "a restless gratitude at sunset", "prompt": "Craft a haiku about a restless gratitude at sunset."}
+{"id": "seasons_weather_044", "domain": "seasons_weather", "topic": "a sudden first frost on green grass", "prompt": "Write a poetic haiku describing a sudden first frost on green grass."}
+{"id": "emotions_memory_099", "domain": "emotions_memory", "topic": "a distant solitude without loneliness", "prompt": "Write a poetic haiku describing a distant solitude without loneliness."}
+{"id": "travel_transit_092", "domain": "travel_transit", "topic": "a departing bicycle coasting downhill", "prompt": "Compose a 5-7-5 haiku capturing a departing bicycle coasting downhill."}
+{"id": "emotions_memory_091", "domain": "emotions_memory", "topic": "a distant childhood summer afternoon", "prompt": "Compose a 5-7-5 haiku capturing a distant childhood summer afternoon."}
+{"id": "seasons_weather_085", "domain": "seasons_weather", "topic": "a gentle melting icicle drip", "prompt": "Write a haiku about a gentle melting icicle drip."}
+{"id": "emotions_memory_086", "domain": "emotions_memory", "topic": "a hopeful laughter heard through walls", "prompt": "Compose a 5-7-5 haiku capturing a hopeful laughter heard through walls."}
+{"id": "emotions_memory_082", "domain": "emotions_memory", "topic": "a hopeful letter left unopened", "prompt": "Write a vivid haiku inspired by a hopeful letter left unopened."}
+{"id": "coding_tech_072", "domain": "coding_tech", "topic": "a patient server rack in cold air", "prompt": "Craft a haiku about a patient server rack in cold air."}
+{"id": "seasons_weather_011", "domain": "seasons_weather", "topic": "an early autumn rainstorm on glass", "prompt": "Compose a 5-7-5 haiku capturing an early autumn rainstorm on glass."}
+{"id": "emotions_memory_016", "domain": "emotions_memory", "topic": "a quiet laughter heard through walls", "prompt": "Compose a 5-7-5 haiku capturing a quiet laughter heard through walls."}
+{"id": "coding_tech_077", "domain": "coding_tech", "topic": "a patient neural network training slowly", "prompt": "Craft a haiku about a patient neural network training slowly."}
+{"id": "night_cosmos_045", "domain": "night_cosmos", "topic": "a drifting firefly meadow under stars", "prompt": "Write a vivid haiku inspired by a drifting firefly meadow under stars."}
+{"id": "coding_tech_032", "domain": "coding_tech", "topic": "a midnight server rack in cold air", "prompt": "Craft a haiku about a midnight server rack in cold air."}
+{"id": "seasons_weather_073", "domain": "seasons_weather", "topic": "a fading summer heatwave at noon", "prompt": "Craft a haiku about a fading summer heatwave at noon."}
+{"id": "urban_moments_045", "domain": "urban_moments", "topic": "a sunlit laundromat spinning late", "prompt": "Craft a haiku about a sunlit laundromat spinning late."}
+{"id": "nature_wildlife_092", "domain": "nature_wildlife", "topic": "a drowsy koi swimming under lilies", "prompt": "Write a vivid haiku inspired by a drowsy koi swimming under lilies."}
+{"id": "home_objects_014", "domain": "home_objects", "topic": "a dusty record spinning softly", "prompt": "Compose a 5-7-5 haiku capturing a dusty record spinning softly."}
+{"id": "home_objects_093", "domain": "home_objects", "topic": "a ticking fountain pen on linen paper", "prompt": "Write a haiku about a ticking fountain pen on linen paper."}
+{"id": "nature_wildlife_044", "domain": "nature_wildlife", "topic": "a patient hummingbird near wild sage", "prompt": "Write a poetic haiku describing a patient hummingbird near wild sage."}
+{"id": "nature_wildlife_062", "domain": "nature_wildlife", "topic": "a wandering koi swimming under lilies", "prompt": "Write a vivid haiku inspired by a wandering koi swimming under lilies."}
+{"id": "ocean_mountains_054", "domain": "ocean_mountains", "topic": "a tranquil driftwood beach at low tide", "prompt": "Write a poetic haiku describing a tranquil driftwood beach at low tide."}
+{"id": "home_objects_099", "domain": "home_objects", "topic": "a ticking glass marble catching sunlight", "prompt": "Compose a 5-7-5 haiku capturing a ticking glass marble catching sunlight."}
+{"id": "coding_tech_052", "domain": "coding_tech", "topic": "a tangled server rack in cold air", "prompt": "Craft a haiku about a tangled server rack in cold air."}
+{"id": "food_kitchen_073", "domain": "food_kitchen", "topic": "a warm cup of green tea", "prompt": "Write a haiku about a warm cup of green tea."}
+{"id": "seasons_weather_037", "domain": "seasons_weather", "topic": "a golden foggy October dawn", "prompt": "Write a vivid haiku inspired by a golden foggy October dawn."}
+{"id": "urban_moments_047", "domain": "urban_moments", "topic": "a sunlit bus stop in gray drizzle", "prompt": "Write a haiku about a sunlit bus stop in gray drizzle."}
+{"id": "night_cosmos_064", "domain": "night_cosmos", "topic": "a crescent comet tail in deep black", "prompt": "Compose a 5-7-5 haiku capturing a crescent comet tail in deep black."}
+{"id": "nature_wildlife_045", "domain": "nature_wildlife", "topic": "a patient spider spinning dawn silk", "prompt": "Write a haiku about a patient spider spinning dawn silk."}
+{"id": "food_kitchen_052", "domain": "food_kitchen", "topic": "a bitter loaf of sourdough cooling", "prompt": "Write a poetic haiku describing a bitter loaf of sourdough cooling."}
+{"id": "travel_transit_061", "domain": "travel_transit", "topic": "a slow ferry cutting silver wake", "prompt": "Write a haiku about a slow ferry cutting silver wake."}
+{"id": "seasons_weather_028", "domain": "seasons_weather", "topic": "a crisp April hail on rooftops", "prompt": "Craft a haiku about a crisp April hail on rooftops."}
+{"id": "nature_wildlife_085", "domain": "nature_wildlife", "topic": "a darting spider spinning dawn silk", "prompt": "Write a haiku about a darting spider spinning dawn silk."}
+{"id": "coding_tech_021", "domain": "coding_tech", "topic": "a stubborn bug solved before sunrise", "prompt": "Write a vivid haiku inspired by a stubborn bug solved before sunrise."}
+{"id": "coding_tech_071", "domain": "coding_tech", "topic": "a patient bug solved before sunrise", "prompt": "Write a vivid haiku inspired by a patient bug solved before sunrise."}
+{"id": "travel_transit_025", "domain": "travel_transit", "topic": "a coastal window seat above clouds", "prompt": "Write a poetic haiku describing a coastal window seat above clouds."}
+{"id": "home_objects_059", "domain": "home_objects", "topic": "a flickering glass marble catching sunlight", "prompt": "Compose a 5-7-5 haiku capturing a flickering glass marble catching sunlight."}
+{"id": "nature_wildlife_046", "domain": "nature_wildlife", "topic": "a patient salmon leaping cold rapids", "prompt": "Compose a 5-7-5 haiku capturing a patient salmon leaping cold rapids."}
+{"id": "emotions_memory_050", "domain": "emotions_memory", "topic": "a fragile farewell at the gate", "prompt": "Write a haiku about a fragile farewell at the gate."}
+{"id": "emotions_memory_003", "domain": "emotions_memory", "topic": "a lingering moment of quiet forgiveness", "prompt": "Craft a haiku about a lingering moment of quiet forgiveness."}
+{"id": "night_cosmos_002", "domain": "night_cosmos", "topic": "a pale aurora rippling above snow", "prompt": "Write a poetic haiku describing a pale aurora rippling above snow."}
+{"id": "ocean_mountains_031", "domain": "ocean_mountains", "topic": "a shadowed granite ridge above clouds", "prompt": "Compose a 5-7-5 haiku capturing a shadowed granite ridge above clouds."}
+{"id": "coding_tech_039", "domain": "coding_tech", "topic": "a midnight coffee cooling beside code", "prompt": "Write a haiku about a midnight coffee cooling beside code."}
+{"id": "home_objects_000", "domain": "home_objects", "topic": "an antique brass pocket watch", "prompt": "Write a vivid haiku inspired by an antique brass pocket watch."}
+{"id": "emotions_memory_069", "domain": "emotions_memory", "topic": "a peaceful solitude without loneliness", "prompt": "Write a poetic haiku describing a peaceful solitude without loneliness."}
+{"id": "seasons_weather_025", "domain": "seasons_weather", "topic": "a crisp melting icicle drip", "prompt": "Write a haiku about a crisp melting icicle drip."}
+{"id": "nature_wildlife_037", "domain": "nature_wildlife", "topic": "a hidden deer stepping through ferns", "prompt": "Write a vivid haiku inspired by a hidden deer stepping through ferns."}
+{"id": "seasons_weather_015", "domain": "seasons_weather", "topic": "an early melting icicle drip", "prompt": "Write a haiku about an early melting icicle drip."}
+{"id": "travel_transit_049", "domain": "travel_transit", "topic": "a sunlit suitcase waiting by stairs", "prompt": "Craft a haiku about a sunlit suitcase waiting by stairs."}
+{"id": "food_kitchen_085", "domain": "food_kitchen", "topic": "a rustic slice of ripe summer peach", "prompt": "Write a vivid haiku inspired by a rustic slice of ripe summer peach."}
+{"id": "night_cosmos_043", "domain": "night_cosmos", "topic": "a drifting eclipse darkening midday sky", "prompt": "Write a haiku about a drifting eclipse darkening midday sky."}
+{"id": "travel_transit_099", "domain": "travel_transit", "topic": "a departing suitcase waiting by stairs", "prompt": "Craft a haiku about a departing suitcase waiting by stairs."}
+{"id": "coding_tech_008", "domain": "coding_tech", "topic": "a quiet old floppy disk in drawer", "prompt": "Write a poetic haiku describing a quiet old floppy disk in drawer."}
+{"id": "nature_wildlife_002", "domain": "nature_wildlife", "topic": "a solitary koi swimming under lilies", "prompt": "Write a vivid haiku inspired by a solitary koi swimming under lilies."}
+{"id": "seasons_weather_039", "domain": "seasons_weather", "topic": "a golden late November sunset", "prompt": "Write a poetic haiku describing a golden late November sunset."}
+{"id": "ocean_mountains_022", "domain": "ocean_mountains", "topic": "a sunlit tidepool teeming with crabs", "prompt": "Write a vivid haiku inspired by a sunlit tidepool teeming with crabs."}
+{"id": "travel_transit_030", "domain": "travel_transit", "topic": "a lonely train crossing rice fields", "prompt": "Write a poetic haiku describing a lonely train crossing rice fields."}
+{"id": "food_kitchen_038", "domain": "food_kitchen", "topic": "a simmering honeycomb dripping on toast", "prompt": "Write a haiku about a simmering honeycomb dripping on toast."}
+{"id": "seasons_weather_030", "domain": "seasons_weather", "topic": "a golden winter snowy morning", "prompt": "Write a haiku about a golden winter snowy morning."}
+{"id": "coding_tech_074", "domain": "coding_tech", "topic": "a patient mechanical keyboard clicking", "prompt": "Write a haiku about a patient mechanical keyboard clicking."}
+{"id": "coding_tech_031", "domain": "coding_tech", "topic": "a midnight bug solved before sunrise", "prompt": "Write a vivid haiku inspired by a midnight bug solved before sunrise."}
+{"id": "night_cosmos_022", "domain": "night_cosmos", "topic": "a sprawling aurora rippling above snow", "prompt": "Write a poetic haiku describing a sprawling aurora rippling above snow."}
+{"id": "coding_tech_035", "domain": "coding_tech", "topic": "a midnight git merge without conflict", "prompt": "Compose a 5-7-5 haiku capturing a midnight git merge without conflict."}
+{"id": "nature_wildlife_074", "domain": "nature_wildlife", "topic": "a silent hummingbird near wild sage", "prompt": "Write a poetic haiku describing a silent hummingbird near wild sage."}
+{"id": "seasons_weather_084", "domain": "seasons_weather", "topic": "a gentle first frost on green grass", "prompt": "Write a poetic haiku describing a gentle first frost on green grass."}
+{"id": "night_cosmos_017", "domain": "night_cosmos", "topic": "a silver satellite gliding through dusk", "prompt": "Write a poetic haiku describing a silver satellite gliding through dusk."}
+{"id": "ocean_mountains_057", "domain": "ocean_mountains", "topic": "a tranquil fishing boat entering harbor", "prompt": "Write a vivid haiku inspired by a tranquil fishing boat entering harbor."}
+{"id": "home_objects_061", "domain": "home_objects", "topic": "a worn ceramic mug by a window", "prompt": "Craft a haiku about a worn ceramic mug by a window."}
+{"id": "urban_moments_087", "domain": "urban_moments", "topic": "a steam-filled bus stop in gray drizzle", "prompt": "Write a haiku about a steam-filled bus stop in gray drizzle."}
+{"id": "ocean_mountains_008", "domain": "ocean_mountains", "topic": "a distant cedar cliff overlooking sea", "prompt": "Craft a haiku about a distant cedar cliff overlooking sea."}
+{"id": "urban_moments_033", "domain": "urban_moments", "topic": "a hushed alleyway after rainfall", "prompt": "Compose a 5-7-5 haiku capturing a hushed alleyway after rainfall."}
+{"id": "emotions_memory_087", "domain": "emotions_memory", "topic": "a hopeful courage before starting over", "prompt": "Write a vivid haiku inspired by a hopeful courage before starting over."}
+{"id": "night_cosmos_052", "domain": "night_cosmos", "topic": "a radiant aurora rippling above snow", "prompt": "Write a poetic haiku describing a radiant aurora rippling above snow."}
+{"id": "night_cosmos_070", "domain": "night_cosmos", "topic": "a cold full moon over pine trees", "prompt": "Write a vivid haiku inspired by a cold full moon over pine trees."}
+{"id": "urban_moments_073", "domain": "urban_moments", "topic": "a bustling alleyway after rainfall", "prompt": "Compose a 5-7-5 haiku capturing a bustling alleyway after rainfall."}
+{"id": "ocean_mountains_045", "domain": "ocean_mountains", "topic": "a rugged glacier valley in silence", "prompt": "Write a haiku about a rugged glacier valley in silence."}
+{"id": "coding_tech_093", "domain": "coding_tech", "topic": "a minimalist green test suite passing", "prompt": "Write a poetic haiku describing a minimalist green test suite passing."}
+{"id": "nature_wildlife_057", "domain": "nature_wildlife", "topic": "a silver deer stepping through ferns", "prompt": "Write a vivid haiku inspired by a silver deer stepping through ferns."}
+{"id": "night_cosmos_095", "domain": "night_cosmos", "topic": "a shimmering firefly meadow under stars", "prompt": "Write a vivid haiku inspired by a shimmering firefly meadow under stars."}
+{"id": "seasons_weather_032", "domain": "seasons_weather", "topic": "a golden spring cherry blossom breeze", "prompt": "Write a vivid haiku inspired by a golden spring cherry blossom breeze."}
+{"id": "ocean_mountains_019", "domain": "ocean_mountains", "topic": "a windblown waterfall hidden in moss", "prompt": "Write a poetic haiku describing a windblown waterfall hidden in moss."}
+{"id": "home_objects_097", "domain": "home_objects", "topic": "a ticking cast-iron teapot on embers", "prompt": "Write a poetic haiku describing a ticking cast-iron teapot on embers."}
+{"id": "travel_transit_033", "domain": "travel_transit", "topic": "a lonely gravel road through orchards", "prompt": "Write a vivid haiku inspired by a lonely gravel road through orchards."}
+{"id": "urban_moments_085", "domain": "urban_moments", "topic": "a steam-filled laundromat spinning late", "prompt": "Craft a haiku about a steam-filled laundromat spinning late."}
+{"id": "home_objects_067", "domain": "home_objects", "topic": "a worn cast-iron teapot on embers", "prompt": "Write a poetic haiku describing a worn cast-iron teapot on embers."}
+{"id": "night_cosmos_053", "domain": "night_cosmos", "topic": "a radiant eclipse darkening midday sky", "prompt": "Write a haiku about a radiant eclipse darkening midday sky."}
+{"id": "ocean_mountains_066", "domain": "ocean_mountains", "topic": "a salt-sprayed canyon river at twilight", "prompt": "Compose a 5-7-5 haiku capturing a salt-sprayed canyon river at twilight."}
+{"id": "emotions_memory_080", "domain": "emotions_memory", "topic": "a hopeful farewell at the gate", "prompt": "Write a haiku about a hopeful farewell at the gate."}
+{"id": "food_kitchen_064", "domain": "food_kitchen", "topic": "a sweet skillet of roasted chestnuts", "prompt": "Compose a 5-7-5 haiku capturing a sweet skillet of roasted chestnuts."}
+{"id": "travel_transit_058", "domain": "travel_transit", "topic": "a wooden empty highway at daybreak", "prompt": "Write a vivid haiku inspired by a wooden empty highway at daybreak."}
+{"id": "urban_moments_019", "domain": "urban_moments", "topic": "a neon pigeon strutting on brick", "prompt": "Write a vivid haiku inspired by a neon pigeon strutting on brick."}
+{"id": "home_objects_047", "domain": "home_objects", "topic": "a handmade cast-iron teapot on embers", "prompt": "Write a poetic haiku describing a handmade cast-iron teapot on embers."}
+{"id": "seasons_weather_081", "domain": "seasons_weather", "topic": "a gentle autumn rainstorm on glass", "prompt": "Compose a 5-7-5 haiku capturing a gentle autumn rainstorm on glass."}
+{"id": "home_objects_057", "domain": "home_objects", "topic": "a flickering cast-iron teapot on embers", "prompt": "Write a poetic haiku describing a flickering cast-iron teapot on embers."}
+{"id": "urban_moments_006", "domain": "urban_moments", "topic": "a rainy baker opening wooden shutters", "prompt": "Write a poetic haiku describing a rainy baker opening wooden shutters."}
+{"id": "emotions_memory_035", "domain": "emotions_memory", "topic": "a sudden relief after a hard week", "prompt": "Write a haiku about a sudden relief after a hard week."}
+{"id": "ocean_mountains_080", "domain": "ocean_mountains", "topic": "a tide-carved lighthouse above dark waves", "prompt": "Write a haiku about a tide-carved lighthouse above dark waves."}
+{"id": "seasons_weather_052", "domain": "seasons_weather", "topic": "a misty spring cherry blossom breeze", "prompt": "Write a vivid haiku inspired by a misty spring cherry blossom breeze."}
+{"id": "emotions_memory_030", "domain": "emotions_memory", "topic": "a sudden farewell at the gate", "prompt": "Write a haiku about a sudden farewell at the gate."}
+{"id": "food_kitchen_084", "domain": "food_kitchen", "topic": "a rustic skillet of roasted chestnuts", "prompt": "Compose a 5-7-5 haiku capturing a rustic skillet of roasted chestnuts."}
+{"id": "travel_transit_057", "domain": "travel_transit", "topic": "a wooden stone stair climbing a hill", "prompt": "Compose a 5-7-5 haiku capturing a wooden stone stair climbing a hill."}
+{"id": "home_objects_096", "domain": "home_objects", "topic": "a ticking wooden rocking chair", "prompt": "Craft a haiku about a ticking wooden rocking chair."}
+{"id": "home_objects_058", "domain": "home_objects", "topic": "a flickering key hanging by the door", "prompt": "Write a haiku about a flickering key hanging by the door."}
+{"id": "nature_wildlife_026", "domain": "nature_wildlife", "topic": "a restless salmon leaping cold rapids", "prompt": "Compose a 5-7-5 haiku capturing a restless salmon leaping cold rapids."}
+{"id": "food_kitchen_026", "domain": "food_kitchen", "topic": "a freshly baked pot of spiced apple cider", "prompt": "Craft a haiku about a freshly baked pot of spiced apple cider."}
+{"id": "nature_wildlife_034", "domain": "nature_wildlife", "topic": "a hidden hummingbird near wild sage", "prompt": "Write a poetic haiku describing a hidden hummingbird near wild sage."}
+{"id": "emotions_memory_042", "domain": "emotions_memory", "topic": "a tender letter left unopened", "prompt": "Write a vivid haiku inspired by a tender letter left unopened."}
+{"id": "food_kitchen_001", "domain": "food_kitchen", "topic": "a steaming kettle whistling at dawn", "prompt": "Craft a haiku about a steaming kettle whistling at dawn."}
+{"id": "night_cosmos_039", "domain": "night_cosmos", "topic": "a silent dawn star fading in blue", "prompt": "Compose a 5-7-5 haiku capturing a silent dawn star fading in blue."}
+{"id": "travel_transit_042", "domain": "travel_transit", "topic": "a sunlit bicycle coasting downhill", "prompt": "Compose a 5-7-5 haiku capturing a sunlit bicycle coasting downhill."}
+{"id": "food_kitchen_028", "domain": "food_kitchen", "topic": "a freshly baked honeycomb dripping on toast", "prompt": "Write a haiku about a freshly baked honeycomb dripping on toast."}
+{"id": "home_objects_007", "domain": "home_objects", "topic": "an antique cast-iron teapot on embers", "prompt": "Write a poetic haiku describing an antique cast-iron teapot on embers."}
+{"id": "coding_tech_087", "domain": "coding_tech", "topic": "a humming neural network training slowly", "prompt": "Craft a haiku about a humming neural network training slowly."}
+{"id": "night_cosmos_090", "domain": "night_cosmos", "topic": "a shimmering full moon over pine trees", "prompt": "Write a vivid haiku inspired by a shimmering full moon over pine trees."}
+{"id": "urban_moments_027", "domain": "urban_moments", "topic": "a crowded bus stop in gray drizzle", "prompt": "Write a haiku about a crowded bus stop in gray drizzle."}
+{"id": "nature_wildlife_060", "domain": "nature_wildlife", "topic": "a wandering heron beside still reeds", "prompt": "Write a haiku about a wandering heron beside still reeds."}
+{"id": "night_cosmos_038", "domain": "night_cosmos", "topic": "a silent milky way over dark lake", "prompt": "Write a haiku about a silent milky way over dark lake."}
+{"id": "seasons_weather_020", "domain": "seasons_weather", "topic": "a crisp winter snowy morning", "prompt": "Write a haiku about a crisp winter snowy morning."}
+{"id": "ocean_mountains_042", "domain": "ocean_mountains", "topic": "a rugged tidepool teeming with crabs", "prompt": "Write a vivid haiku inspired by a rugged tidepool teeming with crabs."}
+{"id": "seasons_weather_054", "domain": "seasons_weather", "topic": "a misty first frost on green grass", "prompt": "Write a poetic haiku describing a misty first frost on green grass."}
+{"id": "night_cosmos_047", "domain": "night_cosmos", "topic": "a drifting satellite gliding through dusk", "prompt": "Write a poetic haiku describing a drifting satellite gliding through dusk."}
+{"id": "urban_moments_031", "domain": "urban_moments", "topic": "a hushed corner bookstore window", "prompt": "Write a poetic haiku describing a hushed corner bookstore window."}
+{"id": "coding_tech_026", "domain": "coding_tech", "topic": "a stubborn laptop screen in dark room", "prompt": "Write a vivid haiku inspired by a stubborn laptop screen in dark room."}
+{"id": "ocean_mountains_047", "domain": "ocean_mountains", "topic": "a rugged fishing boat entering harbor", "prompt": "Write a vivid haiku inspired by a rugged fishing boat entering harbor."}
+{"id": "seasons_weather_091", "domain": "seasons_weather", "topic": "a bitter autumn rainstorm on glass", "prompt": "Compose a 5-7-5 haiku capturing a bitter autumn rainstorm on glass."}
+{"id": "urban_moments_012", "domain": "urban_moments", "topic": "a neon rooftop garden in summer", "prompt": "Write a haiku about a neon rooftop garden in summer."}
+{"id": "food_kitchen_046", "domain": "food_kitchen", "topic": "a quiet pot of spiced apple cider", "prompt": "Craft a haiku about a quiet pot of spiced apple cider."}
+{"id": "travel_transit_003", "domain": "travel_transit", "topic": "a rattling gravel road through orchards", "prompt": "Write a vivid haiku inspired by a rattling gravel road through orchards."}
+{"id": "home_objects_051", "domain": "home_objects", "topic": "a flickering ceramic mug by a window", "prompt": "Craft a haiku about a flickering ceramic mug by a window."}
+{"id": "food_kitchen_080", "domain": "food_kitchen", "topic": "a rustic bowl of miso soup", "prompt": "Write a vivid haiku inspired by a rustic bowl of miso soup."}
+{"id": "ocean_mountains_034", "domain": "ocean_mountains", "topic": "a shadowed driftwood beach at low tide", "prompt": "Write a poetic haiku describing a shadowed driftwood beach at low tide."}
+{"id": "nature_wildlife_052", "domain": "nature_wildlife", "topic": "a silver koi swimming under lilies", "prompt": "Write a vivid haiku inspired by a silver koi swimming under lilies."}
+{"id": "ocean_mountains_075", "domain": "ocean_mountains", "topic": "a cloud-wrapped glacier valley in silence", "prompt": "Write a haiku about a cloud-wrapped glacier valley in silence."}
+{"id": "travel_transit_087", "domain": "travel_transit", "topic": "a foggy stone stair climbing a hill", "prompt": "Compose a 5-7-5 haiku capturing a foggy stone stair climbing a hill."}
+{"id": "home_objects_044", "domain": "home_objects", "topic": "a handmade record spinning softly", "prompt": "Compose a 5-7-5 haiku capturing a handmade record spinning softly."}
+{"id": "urban_moments_017", "domain": "urban_moments", "topic": "a neon bus stop in gray drizzle", "prompt": "Write a haiku about a neon bus stop in gray drizzle."}
+{"id": "ocean_mountains_040", "domain": "ocean_mountains", "topic": "a rugged lighthouse above dark waves", "prompt": "Write a haiku about a rugged lighthouse above dark waves."}
+{"id": "travel_transit_098", "domain": "travel_transit", "topic": "a departing empty highway at daybreak", "prompt": "Write a vivid haiku inspired by a departing empty highway at daybreak."}
+{"id": "ocean_mountains_092", "domain": "ocean_mountains", "topic": "a moonlit tidepool teeming with crabs", "prompt": "Write a vivid haiku inspired by a moonlit tidepool teeming with crabs."}
+{"id": "ocean_mountains_053", "domain": "ocean_mountains", "topic": "a tranquil alpine meadow in July", "prompt": "Craft a haiku about a tranquil alpine meadow in July."}
+{"id": "seasons_weather_009", "domain": "seasons_weather", "topic": "a quiet late November sunset", "prompt": "Write a poetic haiku describing a quiet late November sunset."}
+{"id": "food_kitchen_058", "domain": "food_kitchen", "topic": "a bitter honeycomb dripping on toast", "prompt": "Write a haiku about a bitter honeycomb dripping on toast."}
+{"id": "ocean_mountains_085", "domain": "ocean_mountains", "topic": "a tide-carved glacier valley in silence", "prompt": "Write a haiku about a tide-carved glacier valley in silence."}
+{"id": "coding_tech_033", "domain": "coding_tech", "topic": "a midnight green test suite passing", "prompt": "Write a poetic haiku describing a midnight green test suite passing."}
+{"id": "urban_moments_022", "domain": "urban_moments", "topic": "a crowded rooftop garden in summer", "prompt": "Write a haiku about a crowded rooftop garden in summer."}
+{"id": "home_objects_071", "domain": "home_objects", "topic": "a cracked ceramic mug by a window", "prompt": "Craft a haiku about a cracked ceramic mug by a window."}
+{"id": "nature_wildlife_081", "domain": "nature_wildlife", "topic": "a darting red fox crossing fresh snow", "prompt": "Compose a 5-7-5 haiku capturing a darting red fox crossing fresh snow."}
+{"id": "food_kitchen_000", "domain": "food_kitchen", "topic": "a steaming bowl of miso soup", "prompt": "Write a vivid haiku inspired by a steaming bowl of miso soup."}
+{"id": "travel_transit_017", "domain": "travel_transit", "topic": "a night stone stair climbing a hill", "prompt": "Compose a 5-7-5 haiku capturing a night stone stair climbing a hill."}
+{"id": "travel_transit_045", "domain": "travel_transit", "topic": "a sunlit window seat above clouds", "prompt": "Write a poetic haiku describing a sunlit window seat above clouds."}
+{"id": "ocean_mountains_062", "domain": "ocean_mountains", "topic": "a salt-sprayed tidepool teeming with crabs", "prompt": "Write a vivid haiku inspired by a salt-sprayed tidepool teeming with crabs."}
+{"id": "night_cosmos_079", "domain": "night_cosmos", "topic": "a cold dawn star fading in blue", "prompt": "Compose a 5-7-5 haiku capturing a cold dawn star fading in blue."}
+{"id": "ocean_mountains_038", "domain": "ocean_mountains", "topic": "a shadowed cedar cliff overlooking sea", "prompt": "Craft a haiku about a shadowed cedar cliff overlooking sea."}
+{"id": "night_cosmos_042", "domain": "night_cosmos", "topic": "a drifting aurora rippling above snow", "prompt": "Write a poetic haiku describing a drifting aurora rippling above snow."}
+{"id": "coding_tech_000", "domain": "coding_tech", "topic": "a quiet cursor blinking on black", "prompt": "Compose a 5-7-5 haiku capturing a quiet cursor blinking on black."}
+{"id": "travel_transit_008", "domain": "travel_transit", "topic": "a rattling empty highway at daybreak", "prompt": "Write a vivid haiku inspired by a rattling empty highway at daybreak."}
+{"id": "urban_moments_014", "domain": "urban_moments", "topic": "a neon crosswalk under amber lights", "prompt": "Write a vivid haiku inspired by a neon crosswalk under amber lights."}
+{"id": "emotions_memory_071", "domain": "emotions_memory", "topic": "a restless childhood summer afternoon", "prompt": "Compose a 5-7-5 haiku capturing a restless childhood summer afternoon."}
+{"id": "food_kitchen_083", "domain": "food_kitchen", "topic": "a rustic cup of green tea", "prompt": "Write a haiku about a rustic cup of green tea."}
+{"id": "food_kitchen_087", "domain": "food_kitchen", "topic": "a rustic espresso poured in silence", "prompt": "Write a poetic haiku describing a rustic espresso poured in silence."}
+{"id": "seasons_weather_041", "domain": "seasons_weather", "topic": "a sudden autumn rainstorm on glass", "prompt": "Compose a 5-7-5 haiku capturing a sudden autumn rainstorm on glass."}
+{"id": "travel_transit_015", "domain": "travel_transit", "topic": "a night window seat above clouds", "prompt": "Write a poetic haiku describing a night window seat above clouds."}
+{"id": "food_kitchen_036", "domain": "food_kitchen", "topic": "a simmering pot of spiced apple cider", "prompt": "Craft a haiku about a simmering pot of spiced apple cider."}
+{"id": "nature_wildlife_001", "domain": "nature_wildlife", "topic": "a solitary red fox crossing fresh snow", "prompt": "Compose a 5-7-5 haiku capturing a solitary red fox crossing fresh snow."}
+{"id": "seasons_weather_072", "domain": "seasons_weather", "topic": "a fading spring cherry blossom breeze", "prompt": "Write a vivid haiku inspired by a fading spring cherry blossom breeze."}
+{"id": "home_objects_073", "domain": "home_objects", "topic": "a cracked fountain pen on linen paper", "prompt": "Write a haiku about a cracked fountain pen on linen paper."}
+{"id": "seasons_weather_070", "domain": "seasons_weather", "topic": "a fading winter snowy morning", "prompt": "Write a haiku about a fading winter snowy morning."}
+{"id": "travel_transit_031", "domain": "travel_transit", "topic": "a lonely ferry cutting silver wake", "prompt": "Write a haiku about a lonely ferry cutting silver wake."}
+{"id": "urban_moments_067", "domain": "urban_moments", "topic": "a sleepy bus stop in gray drizzle", "prompt": "Write a haiku about a sleepy bus stop in gray drizzle."}
+{"id": "seasons_weather_050", "domain": "seasons_weather", "topic": "a misty winter snowy morning", "prompt": "Write a haiku about a misty winter snowy morning."}
+{"id": "seasons_weather_034", "domain": "seasons_weather", "topic": "a golden first frost on green grass", "prompt": "Write a poetic haiku describing a golden first frost on green grass."}
+{"id": "coding_tech_094", "domain": "coding_tech", "topic": "a minimalist mechanical keyboard clicking", "prompt": "Write a haiku about a minimalist mechanical keyboard clicking."}
+{"id": "travel_transit_009", "domain": "travel_transit", "topic": "a rattling suitcase waiting by stairs", "prompt": "Craft a haiku about a rattling suitcase waiting by stairs."}
+{"id": "seasons_weather_043", "domain": "seasons_weather", "topic": "a sudden summer heatwave at noon", "prompt": "Craft a haiku about a sudden summer heatwave at noon."}
+{"id": "nature_wildlife_093", "domain": "nature_wildlife", "topic": "a drowsy owl perched in old pines", "prompt": "Craft a haiku about a drowsy owl perched in old pines."}
+{"id": "night_cosmos_013", "domain": "night_cosmos", "topic": "a silver eclipse darkening midday sky", "prompt": "Write a haiku about a silver eclipse darkening midday sky."}
+{"id": "home_objects_083", "domain": "home_objects", "topic": "a cherished fountain pen on linen paper", "prompt": "Write a haiku about a cherished fountain pen on linen paper."}
+{"id": "travel_transit_085", "domain": "travel_transit", "topic": "a foggy window seat above clouds", "prompt": "Write a poetic haiku describing a foggy window seat above clouds."}
+{"id": "home_objects_006", "domain": "home_objects", "topic": "an antique wooden rocking chair", "prompt": "Craft a haiku about an antique wooden rocking chair."}
+{"id": "food_kitchen_057", "domain": "food_kitchen", "topic": "a bitter espresso poured in silence", "prompt": "Write a poetic haiku describing a bitter espresso poured in silence."}
+{"id": "urban_moments_050", "domain": "urban_moments", "topic": "a midnight subway platform at dusk", "prompt": "Craft a haiku about a midnight subway platform at dusk."}
+{"id": "coding_tech_082", "domain": "coding_tech", "topic": "a humming server rack in cold air", "prompt": "Craft a haiku about a humming server rack in cold air."}
+{"id": "travel_transit_084", "domain": "travel_transit", "topic": "a foggy footbridge over a creek", "prompt": "Craft a haiku about a foggy footbridge over a creek."}
+{"id": "coding_tech_038", "domain": "coding_tech", "topic": "a midnight old floppy disk in drawer", "prompt": "Write a poetic haiku describing a midnight old floppy disk in drawer."}
+{"id": "food_kitchen_067", "domain": "food_kitchen", "topic": "a sweet espresso poured in silence", "prompt": "Write a poetic haiku describing a sweet espresso poured in silence."}
+{"id": "travel_transit_096", "domain": "travel_transit", "topic": "a departing sailboat leaning into wind", "prompt": "Write a haiku about a departing sailboat leaning into wind."}
+{"id": "coding_tech_003", "domain": "coding_tech", "topic": "a quiet green test suite passing", "prompt": "Write a poetic haiku describing a quiet green test suite passing."}
+{"id": "ocean_mountains_046", "domain": "ocean_mountains", "topic": "a rugged canyon river at twilight", "prompt": "Compose a 5-7-5 haiku capturing a rugged canyon river at twilight."}
+{"id": "coding_tech_030", "domain": "coding_tech", "topic": "a midnight cursor blinking on black", "prompt": "Compose a 5-7-5 haiku capturing a midnight cursor blinking on black."}
+{"id": "home_objects_024", "domain": "home_objects", "topic": "a sun-warmed record spinning softly", "prompt": "Compose a 5-7-5 haiku capturing a sun-warmed record spinning softly."}
+{"id": "home_objects_091", "domain": "home_objects", "topic": "a ticking ceramic mug by a window", "prompt": "Craft a haiku about a ticking ceramic mug by a window."}
+{"id": "home_objects_075", "domain": "home_objects", "topic": "a cracked paper lantern in breeze", "prompt": "Write a vivid haiku inspired by a cracked paper lantern in breeze."}
+{"id": "food_kitchen_063", "domain": "food_kitchen", "topic": "a sweet cup of green tea", "prompt": "Write a haiku about a sweet cup of green tea."}
+{"id": "food_kitchen_011", "domain": "food_kitchen", "topic": "a fragrant kettle whistling at dawn", "prompt": "Craft a haiku about a fragrant kettle whistling at dawn."}
+{"id": "ocean_mountains_007", "domain": "ocean_mountains", "topic": "a distant fishing boat entering harbor", "prompt": "Write a vivid haiku inspired by a distant fishing boat entering harbor."}
+{"id": "night_cosmos_019", "domain": "night_cosmos", "topic": "a silver dawn star fading in blue", "prompt": "Compose a 5-7-5 haiku capturing a silver dawn star fading in blue."}
+{"id": "coding_tech_034", "domain": "coding_tech", "topic": "a midnight mechanical keyboard clicking", "prompt": "Write a haiku about a midnight mechanical keyboard clicking."}
+{"id": "urban_moments_025", "domain": "urban_moments", "topic": "a crowded laundromat spinning late", "prompt": "Craft a haiku about a crowded laundromat spinning late."}
+{"id": "seasons_weather_038", "domain": "seasons_weather", "topic": "a golden April hail on rooftops", "prompt": "Craft a haiku about a golden April hail on rooftops."}
+{"id": "food_kitchen_092", "domain": "food_kitchen", "topic": "a late-night loaf of sourdough cooling", "prompt": "Write a poetic haiku describing a late-night loaf of sourdough cooling."}
+{"id": "ocean_mountains_090", "domain": "ocean_mountains", "topic": "a moonlit lighthouse above dark waves", "prompt": "Write a haiku about a moonlit lighthouse above dark waves."}
+{"id": "seasons_weather_006", "domain": "seasons_weather", "topic": "a quiet thunderstorm rolling east", "prompt": "Compose a 5-7-5 haiku capturing a quiet thunderstorm rolling east."}
+{"id": "travel_transit_050", "domain": "travel_transit", "topic": "a wooden train crossing rice fields", "prompt": "Write a poetic haiku describing a wooden train crossing rice fields."}
+{"id": "night_cosmos_023", "domain": "night_cosmos", "topic": "a sprawling eclipse darkening midday sky", "prompt": "Write a haiku about a sprawling eclipse darkening midday sky."}
+{"id": "ocean_mountains_077", "domain": "ocean_mountains", "topic": "a cloud-wrapped fishing boat entering harbor", "prompt": "Write a vivid haiku inspired by a cloud-wrapped fishing boat entering harbor."}
+{"id": "night_cosmos_041", "domain": "night_cosmos", "topic": "a drifting meteor streaking past Orion", "prompt": "Craft a haiku about a drifting meteor streaking past Orion."}
+{"id": "ocean_mountains_094", "domain": "ocean_mountains", "topic": "a moonlit driftwood beach at low tide", "prompt": "Write a poetic haiku describing a moonlit driftwood beach at low tide."}
+{"id": "home_objects_054", "domain": "home_objects", "topic": "a flickering record spinning softly", "prompt": "Compose a 5-7-5 haiku capturing a flickering record spinning softly."}
+{"id": "ocean_mountains_081", "domain": "ocean_mountains", "topic": "a tide-carved granite ridge above clouds", "prompt": "Compose a 5-7-5 haiku capturing a tide-carved granite ridge above clouds."}
+{"id": "nature_wildlife_003", "domain": "nature_wildlife", "topic": "a solitary owl perched in old pines", "prompt": "Craft a haiku about a solitary owl perched in old pines."}
+{"id": "coding_tech_081", "domain": "coding_tech", "topic": "a humming bug solved before sunrise", "prompt": "Write a vivid haiku inspired by a humming bug solved before sunrise."}
+{"id": "urban_moments_076", "domain": "urban_moments", "topic": "a bustling baker opening wooden shutters", "prompt": "Write a poetic haiku describing a bustling baker opening wooden shutters."}
+{"id": "food_kitchen_009", "domain": "food_kitchen", "topic": "a steaming ramen broth in winter", "prompt": "Compose a 5-7-5 haiku capturing a steaming ramen broth in winter."}
+{"id": "nature_wildlife_086", "domain": "nature_wildlife", "topic": "a darting salmon leaping cold rapids", "prompt": "Compose a 5-7-5 haiku capturing a darting salmon leaping cold rapids."}
+{"id": "coding_tech_095", "domain": "coding_tech", "topic": "a minimalist git merge without conflict", "prompt": "Compose a 5-7-5 haiku capturing a minimalist git merge without conflict."}
+{"id": "emotions_memory_017", "domain": "emotions_memory", "topic": "a quiet courage before starting over", "prompt": "Write a vivid haiku inspired by a quiet courage before starting over."}
+{"id": "night_cosmos_085", "domain": "night_cosmos", "topic": "a timeless firefly meadow under stars", "prompt": "Write a vivid haiku inspired by a timeless firefly meadow under stars."}
+{"id": "night_cosmos_087", "domain": "night_cosmos", "topic": "a timeless satellite gliding through dusk", "prompt": "Write a poetic haiku describing a timeless satellite gliding through dusk."}
+{"id": "ocean_mountains_063", "domain": "ocean_mountains", "topic": "a salt-sprayed alpine meadow in July", "prompt": "Craft a haiku about a salt-sprayed alpine meadow in July."}
+{"id": "travel_transit_059", "domain": "travel_transit", "topic": "a wooden suitcase waiting by stairs", "prompt": "Craft a haiku about a wooden suitcase waiting by stairs."}
+{"id": "night_cosmos_094", "domain": "night_cosmos", "topic": "a shimmering comet tail in deep black", "prompt": "Compose a 5-7-5 haiku capturing a shimmering comet tail in deep black."}
+{"id": "emotions_memory_084", "domain": "emotions_memory", "topic": "a hopeful longing for familiar hills", "prompt": "Write a poetic haiku describing a hopeful longing for familiar hills."}
+{"id": "nature_wildlife_036", "domain": "nature_wildlife", "topic": "a hidden salmon leaping cold rapids", "prompt": "Compose a 5-7-5 haiku capturing a hidden salmon leaping cold rapids."}
+{"id": "coding_tech_085", "domain": "coding_tech", "topic": "a humming git merge without conflict", "prompt": "Compose a 5-7-5 haiku capturing a humming git merge without conflict."}
+{"id": "seasons_weather_086", "domain": "seasons_weather", "topic": "a gentle thunderstorm rolling east", "prompt": "Compose a 5-7-5 haiku capturing a gentle thunderstorm rolling east."}
+{"id": "food_kitchen_040", "domain": "food_kitchen", "topic": "a quiet bowl of miso soup", "prompt": "Write a vivid haiku inspired by a quiet bowl of miso soup."}
+{"id": "night_cosmos_089", "domain": "night_cosmos", "topic": "a timeless dawn star fading in blue", "prompt": "Compose a 5-7-5 haiku capturing a timeless dawn star fading in blue."}
+{"id": "coding_tech_063", "domain": "coding_tech", "topic": "a sudden green test suite passing", "prompt": "Write a poetic haiku describing a sudden green test suite passing."}
+{"id": "urban_moments_005", "domain": "urban_moments", "topic": "a rainy laundromat spinning late", "prompt": "Craft a haiku about a rainy laundromat spinning late."}
+{"id": "food_kitchen_056", "domain": "food_kitchen", "topic": "a bitter pot of spiced apple cider", "prompt": "Craft a haiku about a bitter pot of spiced apple cider."}
+{"id": "ocean_mountains_016", "domain": "ocean_mountains", "topic": "a windblown canyon river at twilight", "prompt": "Compose a 5-7-5 haiku capturing a windblown canyon river at twilight."}
+{"id": "home_objects_087", "domain": "home_objects", "topic": "a cherished cast-iron teapot on embers", "prompt": "Write a poetic haiku describing a cherished cast-iron teapot on embers."}
+{"id": "emotions_memory_048", "domain": "emotions_memory", "topic": "a tender gratitude at sunset", "prompt": "Craft a haiku about a tender gratitude at sunset."}
+{"id": "coding_tech_079", "domain": "coding_tech", "topic": "a patient coffee cooling beside code", "prompt": "Write a haiku about a patient coffee cooling beside code."}
+{"id": "nature_wildlife_071", "domain": "nature_wildlife", "topic": "a silent red fox crossing fresh snow", "prompt": "Compose a 5-7-5 haiku capturing a silent red fox crossing fresh snow."}
+{"id": "emotions_memory_040", "domain": "emotions_memory", "topic": "a tender farewell at the gate", "prompt": "Write a haiku about a tender farewell at the gate."}
+{"id": "ocean_mountains_049", "domain": "ocean_mountains", "topic": "a rugged waterfall hidden in moss", "prompt": "Write a poetic haiku describing a rugged waterfall hidden in moss."}
+{"id": "food_kitchen_043", "domain": "food_kitchen", "topic": "a quiet cup of green tea", "prompt": "Write a haiku about a quiet cup of green tea."}
+{"id": "home_objects_065", "domain": "home_objects", "topic": "a worn paper lantern in breeze", "prompt": "Write a vivid haiku inspired by a worn paper lantern in breeze."}
+{"id": "night_cosmos_048", "domain": "night_cosmos", "topic": "a drifting milky way over dark lake", "prompt": "Write a haiku about a drifting milky way over dark lake."}
+{"id": "nature_wildlife_047", "domain": "nature_wildlife", "topic": "a patient deer stepping through ferns", "prompt": "Write a vivid haiku inspired by a patient deer stepping through ferns."}
+{"id": "home_objects_033", "domain": "home_objects", "topic": "a forgotten fountain pen on linen paper", "prompt": "Write a haiku about a forgotten fountain pen on linen paper."}
+{"id": "home_objects_013", "domain": "home_objects", "topic": "a dusty fountain pen on linen paper", "prompt": "Write a haiku about a dusty fountain pen on linen paper."}
+{"id": "food_kitchen_042", "domain": "food_kitchen", "topic": "a quiet loaf of sourdough cooling", "prompt": "Write a poetic haiku describing a quiet loaf of sourdough cooling."}
+{"id": "ocean_mountains_074", "domain": "ocean_mountains", "topic": "a cloud-wrapped driftwood beach at low tide", "prompt": "Write a poetic haiku describing a cloud-wrapped driftwood beach at low tide."}
+{"id": "seasons_weather_049", "domain": "seasons_weather", "topic": "a sudden late November sunset", "prompt": "Write a poetic haiku describing a sudden late November sunset."}
+{"id": "night_cosmos_024", "domain": "night_cosmos", "topic": "a sprawling comet tail in deep black", "prompt": "Compose a 5-7-5 haiku capturing a sprawling comet tail in deep black."}
+{"id": "travel_transit_019", "domain": "travel_transit", "topic": "a night suitcase waiting by stairs", "prompt": "Craft a haiku about a night suitcase waiting by stairs."}
+{"id": "ocean_mountains_002", "domain": "ocean_mountains", "topic": "a distant tidepool teeming with crabs", "prompt": "Write a vivid haiku inspired by a distant tidepool teeming with crabs."}
+{"id": "seasons_weather_012", "domain": "seasons_weather", "topic": "an early spring cherry blossom breeze", "prompt": "Write a vivid haiku inspired by an early spring cherry blossom breeze."}
+{"id": "home_objects_086", "domain": "home_objects", "topic": "a cherished wooden rocking chair", "prompt": "Craft a haiku about a cherished wooden rocking chair."}
+{"id": "travel_transit_054", "domain": "travel_transit", "topic": "a wooden footbridge over a creek", "prompt": "Craft a haiku about a wooden footbridge over a creek."}
+{"id": "night_cosmos_010", "domain": "night_cosmos", "topic": "a silver full moon over pine trees", "prompt": "Write a vivid haiku inspired by a silver full moon over pine trees."}
+{"id": "ocean_mountains_021", "domain": "ocean_mountains", "topic": "a sunlit granite ridge above clouds", "prompt": "Compose a 5-7-5 haiku capturing a sunlit granite ridge above clouds."}
+{"id": "travel_transit_074", "domain": "travel_transit", "topic": "a winding footbridge over a creek", "prompt": "Craft a haiku about a winding footbridge over a creek."}
+{"id": "home_objects_003", "domain": "home_objects", "topic": "an antique fountain pen on linen paper", "prompt": "Write a haiku about an antique fountain pen on linen paper."}
+{"id": "night_cosmos_007", "domain": "night_cosmos", "topic": "a pale satellite gliding through dusk", "prompt": "Write a poetic haiku describing a pale satellite gliding through dusk."}
+{"id": "nature_wildlife_094", "domain": "nature_wildlife", "topic": "a drowsy hummingbird near wild sage", "prompt": "Write a poetic haiku describing a drowsy hummingbird near wild sage."}
+{"id": "food_kitchen_074", "domain": "food_kitchen", "topic": "a warm skillet of roasted chestnuts", "prompt": "Compose a 5-7-5 haiku capturing a warm skillet of roasted chestnuts."}
+{"id": "seasons_weather_077", "domain": "seasons_weather", "topic": "a fading foggy October dawn", "prompt": "Write a vivid haiku inspired by a fading foggy October dawn."}
+{"id": "seasons_weather_047", "domain": "seasons_weather", "topic": "a sudden foggy October dawn", "prompt": "Write a vivid haiku inspired by a sudden foggy October dawn."}
+{"id": "nature_wildlife_069", "domain": "nature_wildlife", "topic": "a wandering whale surfacing in mist", "prompt": "Write a poetic haiku describing a wandering whale surfacing in mist."}
+{"id": "food_kitchen_096", "domain": "food_kitchen", "topic": "a late-night pot of spiced apple cider", "prompt": "Craft a haiku about a late-night pot of spiced apple cider."}
+{"id": "urban_moments_004", "domain": "urban_moments", "topic": "a rainy crosswalk under amber lights", "prompt": "Write a vivid haiku inspired by a rainy crosswalk under amber lights."}
+{"id": "nature_wildlife_054", "domain": "nature_wildlife", "topic": "a silver hummingbird near wild sage", "prompt": "Write a poetic haiku describing a silver hummingbird near wild sage."}
+{"id": "travel_transit_023", "domain": "travel_transit", "topic": "a coastal gravel road through orchards", "prompt": "Write a vivid haiku inspired by a coastal gravel road through orchards."}
+{"id": "seasons_weather_004", "domain": "seasons_weather", "topic": "a quiet first frost on green grass", "prompt": "Write a poetic haiku describing a quiet first frost on green grass."}
+{"id": "seasons_weather_023", "domain": "seasons_weather", "topic": "a crisp summer heatwave at noon", "prompt": "Craft a haiku about a crisp summer heatwave at noon."}
+{"id": "seasons_weather_048", "domain": "seasons_weather", "topic": "a sudden April hail on rooftops", "prompt": "Craft a haiku about a sudden April hail on rooftops."}
+{"id": "coding_tech_027", "domain": "coding_tech", "topic": "a stubborn neural network training slowly", "prompt": "Craft a haiku about a stubborn neural network training slowly."}
+{"id": "coding_tech_066", "domain": "coding_tech", "topic": "a sudden laptop screen in dark room", "prompt": "Write a vivid haiku inspired by a sudden laptop screen in dark room."}
+{"id": "night_cosmos_014", "domain": "night_cosmos", "topic": "a silver comet tail in deep black", "prompt": "Compose a 5-7-5 haiku capturing a silver comet tail in deep black."}
+{"id": "ocean_mountains_004", "domain": "ocean_mountains", "topic": "a distant driftwood beach at low tide", "prompt": "Write a poetic haiku describing a distant driftwood beach at low tide."}
+{"id": "urban_moments_097", "domain": "urban_moments", "topic": "a windy bus stop in gray drizzle", "prompt": "Write a haiku about a windy bus stop in gray drizzle."}
+{"id": "coding_tech_088", "domain": "coding_tech", "topic": "a humming old floppy disk in drawer", "prompt": "Write a poetic haiku describing a humming old floppy disk in drawer."}
+{"id": "travel_transit_039", "domain": "travel_transit", "topic": "a lonely suitcase waiting by stairs", "prompt": "Craft a haiku about a lonely suitcase waiting by stairs."}
+{"id": "coding_tech_056", "domain": "coding_tech", "topic": "a tangled laptop screen in dark room", "prompt": "Write a vivid haiku inspired by a tangled laptop screen in dark room."}
+{"id": "nature_wildlife_056", "domain": "nature_wildlife", "topic": "a silver salmon leaping cold rapids", "prompt": "Compose a 5-7-5 haiku capturing a silver salmon leaping cold rapids."}
+{"id": "nature_wildlife_088", "domain": "nature_wildlife", "topic": "a darting cicada singing at dusk", "prompt": "Craft a haiku about a darting cicada singing at dusk."}
+{"id": "ocean_mountains_058", "domain": "ocean_mountains", "topic": "a tranquil cedar cliff overlooking sea", "prompt": "Craft a haiku about a tranquil cedar cliff overlooking sea."}
+{"id": "travel_transit_002", "domain": "travel_transit", "topic": "a rattling bicycle coasting downhill", "prompt": "Compose a 5-7-5 haiku capturing a rattling bicycle coasting downhill."}
+{"id": "urban_moments_071", "domain": "urban_moments", "topic": "a bustling corner bookstore window", "prompt": "Write a poetic haiku describing a bustling corner bookstore window."}
+{"id": "ocean_mountains_029", "domain": "ocean_mountains", "topic": "a sunlit waterfall hidden in moss", "prompt": "Write a poetic haiku describing a sunlit waterfall hidden in moss."}
+{"id": "ocean_mountains_082", "domain": "ocean_mountains", "topic": "a tide-carved tidepool teeming with crabs", "prompt": "Write a vivid haiku inspired by a tide-carved tidepool teeming with crabs."}
+{"id": "emotions_memory_007", "domain": "emotions_memory", "topic": "a lingering courage before starting over", "prompt": "Write a vivid haiku inspired by a lingering courage before starting over."}
+{"id": "home_objects_074", "domain": "home_objects", "topic": "a cracked record spinning softly", "prompt": "Compose a 5-7-5 haiku capturing a cracked record spinning softly."}
+{"id": "seasons_weather_092", "domain": "seasons_weather", "topic": "a bitter spring cherry blossom breeze", "prompt": "Write a vivid haiku inspired by a bitter spring cherry blossom breeze."}
+{"id": "night_cosmos_049", "domain": "night_cosmos", "topic": "a drifting dawn star fading in blue", "prompt": "Compose a 5-7-5 haiku capturing a drifting dawn star fading in blue."}
+{"id": "coding_tech_096", "domain": "coding_tech", "topic": "a minimalist laptop screen in dark room", "prompt": "Write a vivid haiku inspired by a minimalist laptop screen in dark room."}
+{"id": "home_objects_045", "domain": "home_objects", "topic": "a handmade paper lantern in breeze", "prompt": "Write a vivid haiku inspired by a handmade paper lantern in breeze."}
+{"id": "urban_moments_091", "domain": "urban_moments", "topic": "a windy corner bookstore window", "prompt": "Write a poetic haiku describing a windy corner bookstore window."}
+{"id": "home_objects_076", "domain": "home_objects", "topic": "a cracked wooden rocking chair", "prompt": "Craft a haiku about a cracked wooden rocking chair."}
+{"id": "night_cosmos_065", "domain": "night_cosmos", "topic": "a crescent firefly meadow under stars", "prompt": "Write a vivid haiku inspired by a crescent firefly meadow under stars."}
+{"id": "urban_moments_007", "domain": "urban_moments", "topic": "a rainy bus stop in gray drizzle", "prompt": "Write a haiku about a rainy bus stop in gray drizzle."}
+{"id": "nature_wildlife_064", "domain": "nature_wildlife", "topic": "a wandering hummingbird near wild sage", "prompt": "Write a poetic haiku describing a wandering hummingbird near wild sage."}
+{"id": "food_kitchen_054", "domain": "food_kitchen", "topic": "a bitter skillet of roasted chestnuts", "prompt": "Compose a 5-7-5 haiku capturing a bitter skillet of roasted chestnuts."}
+{"id": "emotions_memory_012", "domain": "emotions_memory", "topic": "a quiet letter left unopened", "prompt": "Write a vivid haiku inspired by a quiet letter left unopened."}
+{"id": "seasons_weather_082", "domain": "seasons_weather", "topic": "a gentle spring cherry blossom breeze", "prompt": "Write a vivid haiku inspired by a gentle spring cherry blossom breeze."}
+{"id": "emotions_memory_062", "domain": "emotions_memory", "topic": "a peaceful letter left unopened", "prompt": "Write a vivid haiku inspired by a peaceful letter left unopened."}
+{"id": "night_cosmos_062", "domain": "night_cosmos", "topic": "a crescent aurora rippling above snow", "prompt": "Write a poetic haiku describing a crescent aurora rippling above snow."}
+{"id": "food_kitchen_068", "domain": "food_kitchen", "topic": "a sweet honeycomb dripping on toast", "prompt": "Write a haiku about a sweet honeycomb dripping on toast."}
+{"id": "ocean_mountains_099", "domain": "ocean_mountains", "topic": "a moonlit waterfall hidden in moss", "prompt": "Write a poetic haiku describing a moonlit waterfall hidden in moss."}
+{"id": "travel_transit_006", "domain": "travel_transit", "topic": "a rattling sailboat leaning into wind", "prompt": "Write a haiku about a rattling sailboat leaning into wind."}
+{"id": "travel_transit_083", "domain": "travel_transit", "topic": "a foggy gravel road through orchards", "prompt": "Write a vivid haiku inspired by a foggy gravel road through orchards."}
+{"id": "emotions_memory_009", "domain": "emotions_memory", "topic": "a lingering solitude without loneliness", "prompt": "Write a poetic haiku describing a lingering solitude without loneliness."}
+{"id": "urban_moments_061", "domain": "urban_moments", "topic": "a sleepy corner bookstore window", "prompt": "Write a poetic haiku describing a sleepy corner bookstore window."}
+{"id": "night_cosmos_092", "domain": "night_cosmos", "topic": "a shimmering aurora rippling above snow", "prompt": "Write a poetic haiku describing a shimmering aurora rippling above snow."}
+{"id": "coding_tech_069", "domain": "coding_tech", "topic": "a sudden coffee cooling beside code", "prompt": "Write a haiku about a sudden coffee cooling beside code."}
+{"id": "emotions_memory_015", "domain": "emotions_memory", "topic": "a quiet relief after a hard week", "prompt": "Write a haiku about a quiet relief after a hard week."}
+{"id": "food_kitchen_070", "domain": "food_kitchen", "topic": "a warm bowl of miso soup", "prompt": "Write a vivid haiku inspired by a warm bowl of miso soup."}
+{"id": "home_objects_035", "domain": "home_objects", "topic": "a forgotten paper lantern in breeze", "prompt": "Write a vivid haiku inspired by a forgotten paper lantern in breeze."}
+{"id": "urban_moments_023", "domain": "urban_moments", "topic": "a crowded alleyway after rainfall", "prompt": "Compose a 5-7-5 haiku capturing a crowded alleyway after rainfall."}
+{"id": "food_kitchen_023", "domain": "food_kitchen", "topic": "a freshly baked cup of green tea", "prompt": "Write a haiku about a freshly baked cup of green tea."}
+{"id": "emotions_memory_051", "domain": "emotions_memory", "topic": "a fragile childhood summer afternoon", "prompt": "Compose a 5-7-5 haiku capturing a fragile childhood summer afternoon."}
+{"id": "home_objects_084", "domain": "home_objects", "topic": "a cherished record spinning softly", "prompt": "Compose a 5-7-5 haiku capturing a cherished record spinning softly."}
+{"id": "travel_transit_034", "domain": "travel_transit", "topic": "a lonely footbridge over a creek", "prompt": "Craft a haiku about a lonely footbridge over a creek."}
+{"id": "night_cosmos_037", "domain": "night_cosmos", "topic": "a silent satellite gliding through dusk", "prompt": "Write a poetic haiku describing a silent satellite gliding through dusk."}
+{"id": "seasons_weather_008", "domain": "seasons_weather", "topic": "a quiet April hail on rooftops", "prompt": "Craft a haiku about a quiet April hail on rooftops."}
+{"id": "food_kitchen_021", "domain": "food_kitchen", "topic": "a freshly baked kettle whistling at dawn", "prompt": "Craft a haiku about a freshly baked kettle whistling at dawn."}
+{"id": "nature_wildlife_087", "domain": "nature_wildlife", "topic": "a darting deer stepping through ferns", "prompt": "Write a vivid haiku inspired by a darting deer stepping through ferns."}
+{"id": "nature_wildlife_005", "domain": "nature_wildlife", "topic": "a solitary spider spinning dawn silk", "prompt": "Write a haiku about a solitary spider spinning dawn silk."}
+{"id": "food_kitchen_033", "domain": "food_kitchen", "topic": "a simmering cup of green tea", "prompt": "Write a haiku about a simmering cup of green tea."}
+{"id": "ocean_mountains_070", "domain": "ocean_mountains", "topic": "a cloud-wrapped lighthouse above dark waves", "prompt": "Write a haiku about a cloud-wrapped lighthouse above dark waves."}
+{"id": "urban_moments_057", "domain": "urban_moments", "topic": "a midnight bus stop in gray drizzle", "prompt": "Write a haiku about a midnight bus stop in gray drizzle."}
+{"id": "home_objects_030", "domain": "home_objects", "topic": "a forgotten brass pocket watch", "prompt": "Write a vivid haiku inspired by a forgotten brass pocket watch."}
+{"id": "seasons_weather_093", "domain": "seasons_weather", "topic": "a bitter summer heatwave at noon", "prompt": "Craft a haiku about a bitter summer heatwave at noon."}
+{"id": "nature_wildlife_051", "domain": "nature_wildlife", "topic": "a silver red fox crossing fresh snow", "prompt": "Compose a 5-7-5 haiku capturing a silver red fox crossing fresh snow."}
+{"id": "home_objects_043", "domain": "home_objects", "topic": "a handmade fountain pen on linen paper", "prompt": "Write a haiku about a handmade fountain pen on linen paper."}
+{"id": "seasons_weather_079", "domain": "seasons_weather", "topic": "a fading late November sunset", "prompt": "Write a poetic haiku describing a fading late November sunset."}
+{"id": "coding_tech_036", "domain": "coding_tech", "topic": "a midnight laptop screen in dark room", "prompt": "Write a vivid haiku inspired by a midnight laptop screen in dark room."}
+{"id": "home_objects_049", "domain": "home_objects", "topic": "a handmade glass marble catching sunlight", "prompt": "Compose a 5-7-5 haiku capturing a handmade glass marble catching sunlight."}
+{"id": "coding_tech_025", "domain": "coding_tech", "topic": "a stubborn git merge without conflict", "prompt": "Compose a 5-7-5 haiku capturing a stubborn git merge without conflict."}
+{"id": "nature_wildlife_068", "domain": "nature_wildlife", "topic": "a wandering cicada singing at dusk", "prompt": "Craft a haiku about a wandering cicada singing at dusk."}
+{"id": "food_kitchen_051", "domain": "food_kitchen", "topic": "a bitter kettle whistling at dawn", "prompt": "Craft a haiku about a bitter kettle whistling at dawn."}
+{"id": "nature_wildlife_066", "domain": "nature_wildlife", "topic": "a wandering salmon leaping cold rapids", "prompt": "Compose a 5-7-5 haiku capturing a wandering salmon leaping cold rapids."}
+{"id": "nature_wildlife_038", "domain": "nature_wildlife", "topic": "a hidden cicada singing at dusk", "prompt": "Craft a haiku about a hidden cicada singing at dusk."}
+{"id": "coding_tech_062", "domain": "coding_tech", "topic": "a sudden server rack in cold air", "prompt": "Craft a haiku about a sudden server rack in cold air."}
+{"id": "night_cosmos_084", "domain": "night_cosmos", "topic": "a timeless comet tail in deep black", "prompt": "Compose a 5-7-5 haiku capturing a timeless comet tail in deep black."}
+{"id": "travel_transit_026", "domain": "travel_transit", "topic": "a coastal sailboat leaning into wind", "prompt": "Write a haiku about a coastal sailboat leaning into wind."}
+{"id": "coding_tech_051", "domain": "coding_tech", "topic": "a tangled bug solved before sunrise", "prompt": "Write a vivid haiku inspired by a tangled bug solved before sunrise."}
+{"id": "ocean_mountains_068", "domain": "ocean_mountains", "topic": "a salt-sprayed cedar cliff overlooking sea", "prompt": "Craft a haiku about a salt-sprayed cedar cliff overlooking sea."}
+{"id": "urban_moments_077", "domain": "urban_moments", "topic": "a bustling bus stop in gray drizzle", "prompt": "Write a haiku about a bustling bus stop in gray drizzle."}
+{"id": "travel_transit_014", "domain": "travel_transit", "topic": "a night footbridge over a creek", "prompt": "Craft a haiku about a night footbridge over a creek."}
+{"id": "night_cosmos_009", "domain": "night_cosmos", "topic": "a pale dawn star fading in blue", "prompt": "Compose a 5-7-5 haiku capturing a pale dawn star fading in blue."}
+{"id": "coding_tech_011", "domain": "coding_tech", "topic": "a glowing bug solved before sunrise", "prompt": "Write a vivid haiku inspired by a glowing bug solved before sunrise."}
+{"id": "food_kitchen_013", "domain": "food_kitchen", "topic": "a fragrant cup of green tea", "prompt": "Write a haiku about a fragrant cup of green tea."}
+{"id": "emotions_memory_041", "domain": "emotions_memory", "topic": "a tender childhood summer afternoon", "prompt": "Compose a 5-7-5 haiku capturing a tender childhood summer afternoon."}
+{"id": "travel_transit_051", "domain": "travel_transit", "topic": "a wooden ferry cutting silver wake", "prompt": "Write a haiku about a wooden ferry cutting silver wake."}
+{"id": "nature_wildlife_018", "domain": "nature_wildlife", "topic": "a watchful cicada singing at dusk", "prompt": "Craft a haiku about a watchful cicada singing at dusk."}
+{"id": "night_cosmos_012", "domain": "night_cosmos", "topic": "a silver aurora rippling above snow", "prompt": "Write a poetic haiku describing a silver aurora rippling above snow."}
+{"id": "emotions_memory_097", "domain": "emotions_memory", "topic": "a distant courage before starting over", "prompt": "Write a vivid haiku inspired by a distant courage before starting over."}
+{"id": "coding_tech_022", "domain": "coding_tech", "topic": "a stubborn server rack in cold air", "prompt": "Craft a haiku about a stubborn server rack in cold air."}
+{"id": "travel_transit_073", "domain": "travel_transit", "topic": "a winding gravel road through orchards", "prompt": "Write a vivid haiku inspired by a winding gravel road through orchards."}
+{"id": "ocean_mountains_015", "domain": "ocean_mountains", "topic": "a windblown glacier valley in silence", "prompt": "Write a haiku about a windblown glacier valley in silence."}
+{"id": "food_kitchen_044", "domain": "food_kitchen", "topic": "a quiet skillet of roasted chestnuts", "prompt": "Compose a 5-7-5 haiku capturing a quiet skillet of roasted chestnuts."}
+{"id": "night_cosmos_050", "domain": "night_cosmos", "topic": "a radiant full moon over pine trees", "prompt": "Write a vivid haiku inspired by a radiant full moon over pine trees."}
+{"id": "urban_moments_060", "domain": "urban_moments", "topic": "a sleepy subway platform at dusk", "prompt": "Craft a haiku about a sleepy subway platform at dusk."}
+{"id": "emotions_memory_063", "domain": "emotions_memory", "topic": "a peaceful moment of quiet forgiveness", "prompt": "Craft a haiku about a peaceful moment of quiet forgiveness."}
+{"id": "food_kitchen_034", "domain": "food_kitchen", "topic": "a simmering skillet of roasted chestnuts", "prompt": "Compose a 5-7-5 haiku capturing a simmering skillet of roasted chestnuts."}
+{"id": "night_cosmos_000", "domain": "night_cosmos", "topic": "a pale full moon over pine trees", "prompt": "Write a vivid haiku inspired by a pale full moon over pine trees."}
+{"id": "urban_moments_074", "domain": "urban_moments", "topic": "a bustling crosswalk under amber lights", "prompt": "Write a vivid haiku inspired by a bustling crosswalk under amber lights."}
+{"id": "night_cosmos_029", "domain": "night_cosmos", "topic": "a sprawling dawn star fading in blue", "prompt": "Compose a 5-7-5 haiku capturing a sprawling dawn star fading in blue."}
+{"id": "ocean_mountains_026", "domain": "ocean_mountains", "topic": "a sunlit canyon river at twilight", "prompt": "Compose a 5-7-5 haiku capturing a sunlit canyon river at twilight."}
+{"id": "ocean_mountains_084", "domain": "ocean_mountains", "topic": "a tide-carved driftwood beach at low tide", "prompt": "Write a poetic haiku describing a tide-carved driftwood beach at low tide."}
+{"id": "nature_wildlife_011", "domain": "nature_wildlife", "topic": "a watchful red fox crossing fresh snow", "prompt": "Compose a 5-7-5 haiku capturing a watchful red fox crossing fresh snow."}
+{"id": "ocean_mountains_048", "domain": "ocean_mountains", "topic": "a rugged cedar cliff overlooking sea", "prompt": "Craft a haiku about a rugged cedar cliff overlooking sea."}
+{"id": "urban_moments_052", "domain": "urban_moments", "topic": "a midnight rooftop garden in summer", "prompt": "Write a haiku about a midnight rooftop garden in summer."}
+{"id": "nature_wildlife_070", "domain": "nature_wildlife", "topic": "a silent heron beside still reeds", "prompt": "Write a haiku about a silent heron beside still reeds."}
+{"id": "home_objects_080", "domain": "home_objects", "topic": "a cherished brass pocket watch", "prompt": "Write a vivid haiku inspired by a cherished brass pocket watch."}
+{"id": "ocean_mountains_061", "domain": "ocean_mountains", "topic": "a salt-sprayed granite ridge above clouds", "prompt": "Compose a 5-7-5 haiku capturing a salt-sprayed granite ridge above clouds."}
+{"id": "nature_wildlife_099", "domain": "nature_wildlife", "topic": "a drowsy whale surfacing in mist", "prompt": "Write a poetic haiku describing a drowsy whale surfacing in mist."}
+{"id": "coding_tech_090", "domain": "coding_tech", "topic": "a minimalist cursor blinking on black", "prompt": "Compose a 5-7-5 haiku capturing a minimalist cursor blinking on black."}
+{"id": "home_objects_095", "domain": "home_objects", "topic": "a ticking paper lantern in breeze", "prompt": "Write a vivid haiku inspired by a ticking paper lantern in breeze."}
+{"id": "ocean_mountains_010", "domain": "ocean_mountains", "topic": "a windblown lighthouse above dark waves", "prompt": "Write a haiku about a windblown lighthouse above dark waves."}
+{"id": "seasons_weather_064", "domain": "seasons_weather", "topic": "a bright first frost on green grass", "prompt": "Write a poetic haiku describing a bright first frost on green grass."}
+{"id": "food_kitchen_006", "domain": "food_kitchen", "topic": "a steaming pot of spiced apple cider", "prompt": "Craft a haiku about a steaming pot of spiced apple cider."}
+{"id": "ocean_mountains_079", "domain": "ocean_mountains", "topic": "a cloud-wrapped waterfall hidden in moss", "prompt": "Write a poetic haiku describing a cloud-wrapped waterfall hidden in moss."}
+{"id": "urban_moments_084", "domain": "urban_moments", "topic": "a steam-filled crosswalk under amber lights", "prompt": "Write a vivid haiku inspired by a steam-filled crosswalk under amber lights."}
+{"id": "urban_moments_002", "domain": "urban_moments", "topic": "a rainy rooftop garden in summer", "prompt": "Write a haiku about a rainy rooftop garden in summer."}
+{"id": "emotions_memory_019", "domain": "emotions_memory", "topic": "a quiet solitude without loneliness", "prompt": "Write a poetic haiku describing a quiet solitude without loneliness."}
+{"id": "urban_moments_055", "domain": "urban_moments", "topic": "a midnight laundromat spinning late", "prompt": "Craft a haiku about a midnight laundromat spinning late."}
+{"id": "travel_transit_088", "domain": "travel_transit", "topic": "a foggy empty highway at daybreak", "prompt": "Write a vivid haiku inspired by a foggy empty highway at daybreak."}
+{"id": "urban_moments_048", "domain": "urban_moments", "topic": "a sunlit jazz note drifting outdoors", "prompt": "Compose a 5-7-5 haiku capturing a sunlit jazz note drifting outdoors."}
+{"id": "emotions_memory_031", "domain": "emotions_memory", "topic": "a sudden childhood summer afternoon", "prompt": "Compose a 5-7-5 haiku capturing a sudden childhood summer afternoon."}
+{"id": "night_cosmos_099", "domain": "night_cosmos", "topic": "a shimmering dawn star fading in blue", "prompt": "Compose a 5-7-5 haiku capturing a shimmering dawn star fading in blue."}
+{"id": "home_objects_041", "domain": "home_objects", "topic": "a handmade ceramic mug by a window", "prompt": "Craft a haiku about a handmade ceramic mug by a window."}
+{"id": "home_objects_082", "domain": "home_objects", "topic": "a cherished quilted blanket on oak", "prompt": "Write a poetic haiku describing a cherished quilted blanket on oak."}
+{"id": "travel_transit_053", "domain": "travel_transit", "topic": "a wooden gravel road through orchards", "prompt": "Write a vivid haiku inspired by a wooden gravel road through orchards."}
+{"id": "home_objects_048", "domain": "home_objects", "topic": "a handmade key hanging by the door", "prompt": "Write a haiku about a handmade key hanging by the door."}
+{"id": "seasons_weather_018", "domain": "seasons_weather", "topic": "an early April hail on rooftops", "prompt": "Craft a haiku about an early April hail on rooftops."}
+{"id": "ocean_mountains_060", "domain": "ocean_mountains", "topic": "a salt-sprayed lighthouse above dark waves", "prompt": "Write a haiku about a salt-sprayed lighthouse above dark waves."}
+{"id": "ocean_mountains_051", "domain": "ocean_mountains", "topic": "a tranquil granite ridge above clouds", "prompt": "Compose a 5-7-5 haiku capturing a tranquil granite ridge above clouds."}
+{"id": "seasons_weather_087", "domain": "seasons_weather", "topic": "a gentle foggy October dawn", "prompt": "Write a vivid haiku inspired by a gentle foggy October dawn."}
+{"id": "ocean_mountains_088", "domain": "ocean_mountains", "topic": "a tide-carved cedar cliff overlooking sea", "prompt": "Craft a haiku about a tide-carved cedar cliff overlooking sea."}
+{"id": "emotions_memory_068", "domain": "emotions_memory", "topic": "a peaceful gratitude at sunset", "prompt": "Craft a haiku about a peaceful gratitude at sunset."}
+{"id": "coding_tech_046", "domain": "coding_tech", "topic": "a clean laptop screen in dark room", "prompt": "Write a vivid haiku inspired by a clean laptop screen in dark room."}
+{"id": "night_cosmos_028", "domain": "night_cosmos", "topic": "a sprawling milky way over dark lake", "prompt": "Write a haiku about a sprawling milky way over dark lake."}
+{"id": "urban_moments_058", "domain": "urban_moments", "topic": "a midnight jazz note drifting outdoors", "prompt": "Compose a 5-7-5 haiku capturing a midnight jazz note drifting outdoors."}
+{"id": "food_kitchen_081", "domain": "food_kitchen", "topic": "a rustic kettle whistling at dawn", "prompt": "Craft a haiku about a rustic kettle whistling at dawn."}
+{"id": "night_cosmos_018", "domain": "night_cosmos", "topic": "a silver milky way over dark lake", "prompt": "Write a haiku about a silver milky way over dark lake."}
+{"id": "nature_wildlife_063", "domain": "nature_wildlife", "topic": "a wandering owl perched in old pines", "prompt": "Craft a haiku about a wandering owl perched in old pines."}
+{"id": "food_kitchen_088", "domain": "food_kitchen", "topic": "a rustic honeycomb dripping on toast", "prompt": "Write a haiku about a rustic honeycomb dripping on toast."}
+{"id": "urban_moments_037", "domain": "urban_moments", "topic": "a hushed bus stop in gray drizzle", "prompt": "Write a haiku about a hushed bus stop in gray drizzle."}
+{"id": "home_objects_020", "domain": "home_objects", "topic": "a sun-warmed brass pocket watch", "prompt": "Write a vivid haiku inspired by a sun-warmed brass pocket watch."}
+{"id": "food_kitchen_025", "domain": "food_kitchen", "topic": "a freshly baked slice of ripe summer peach", "prompt": "Write a vivid haiku inspired by a freshly baked slice of ripe summer peach."}
+{"id": "seasons_weather_095", "domain": "seasons_weather", "topic": "a bitter melting icicle drip", "prompt": "Write a haiku about a bitter melting icicle drip."}
+{"id": "nature_wildlife_016", "domain": "nature_wildlife", "topic": "a watchful salmon leaping cold rapids", "prompt": "Compose a 5-7-5 haiku capturing a watchful salmon leaping cold rapids."}
+{"id": "urban_moments_075", "domain": "urban_moments", "topic": "a bustling laundromat spinning late", "prompt": "Craft a haiku about a bustling laundromat spinning late."}
+{"id": "coding_tech_023", "domain": "coding_tech", "topic": "a stubborn green test suite passing", "prompt": "Write a poetic haiku describing a stubborn green test suite passing."}
+{"id": "urban_moments_009", "domain": "urban_moments", "topic": "a rainy pigeon strutting on brick", "prompt": "Write a vivid haiku inspired by a rainy pigeon strutting on brick."}
+{"id": "ocean_mountains_056", "domain": "ocean_mountains", "topic": "a tranquil canyon river at twilight", "prompt": "Compose a 5-7-5 haiku capturing a tranquil canyon river at twilight."}
+{"id": "travel_transit_047", "domain": "travel_transit", "topic": "a sunlit stone stair climbing a hill", "prompt": "Compose a 5-7-5 haiku capturing a sunlit stone stair climbing a hill."}
+{"id": "food_kitchen_012", "domain": "food_kitchen", "topic": "a fragrant loaf of sourdough cooling", "prompt": "Write a poetic haiku describing a fragrant loaf of sourdough cooling."}
+{"id": "emotions_memory_093", "domain": "emotions_memory", "topic": "a distant moment of quiet forgiveness", "prompt": "Craft a haiku about a distant moment of quiet forgiveness."}
+{"id": "food_kitchen_015", "domain": "food_kitchen", "topic": "a fragrant slice of ripe summer peach", "prompt": "Write a vivid haiku inspired by a fragrant slice of ripe summer peach."}
+{"id": "home_objects_085", "domain": "home_objects", "topic": "a cherished paper lantern in breeze", "prompt": "Write a vivid haiku inspired by a cherished paper lantern in breeze."}
+{"id": "nature_wildlife_009", "domain": "nature_wildlife", "topic": "a solitary whale surfacing in mist", "prompt": "Write a poetic haiku describing a solitary whale surfacing in mist."}
+{"id": "seasons_weather_098", "domain": "seasons_weather", "topic": "a bitter April hail on rooftops", "prompt": "Craft a haiku about a bitter April hail on rooftops."}
+{"id": "nature_wildlife_024", "domain": "nature_wildlife", "topic": "a restless hummingbird near wild sage", "prompt": "Write a poetic haiku describing a restless hummingbird near wild sage."}
+{"id": "nature_wildlife_028", "domain": "nature_wildlife", "topic": "a restless cicada singing at dusk", "prompt": "Craft a haiku about a restless cicada singing at dusk."}
+{"id": "urban_moments_053", "domain": "urban_moments", "topic": "a midnight alleyway after rainfall", "prompt": "Compose a 5-7-5 haiku capturing a midnight alleyway after rainfall."}
+{"id": "home_objects_036", "domain": "home_objects", "topic": "a forgotten wooden rocking chair", "prompt": "Craft a haiku about a forgotten wooden rocking chair."}
+{"id": "travel_transit_086", "domain": "travel_transit", "topic": "a foggy sailboat leaning into wind", "prompt": "Write a haiku about a foggy sailboat leaning into wind."}
+{"id": "emotions_memory_023", "domain": "emotions_memory", "topic": "a bittersweet moment of quiet forgiveness", "prompt": "Craft a haiku about a bittersweet moment of quiet forgiveness."}
+{"id": "food_kitchen_090", "domain": "food_kitchen", "topic": "a late-night bowl of miso soup", "prompt": "Write a vivid haiku inspired by a late-night bowl of miso soup."}
+{"id": "ocean_mountains_069", "domain": "ocean_mountains", "topic": "a salt-sprayed waterfall hidden in moss", "prompt": "Write a poetic haiku describing a salt-sprayed waterfall hidden in moss."}
+{"id": "emotions_memory_060", "domain": "emotions_memory", "topic": "a peaceful farewell at the gate", "prompt": "Write a haiku about a peaceful farewell at the gate."}
+{"id": "urban_moments_036", "domain": "urban_moments", "topic": "a hushed baker opening wooden shutters", "prompt": "Write a poetic haiku describing a hushed baker opening wooden shutters."}
+{"id": "night_cosmos_003", "domain": "night_cosmos", "topic": "a pale eclipse darkening midday sky", "prompt": "Write a haiku about a pale eclipse darkening midday sky."}
+{"id": "night_cosmos_001", "domain": "night_cosmos", "topic": "a pale meteor streaking past Orion", "prompt": "Craft a haiku about a pale meteor streaking past Orion."}
+{"id": "coding_tech_089", "domain": "coding_tech", "topic": "a humming coffee cooling beside code", "prompt": "Write a haiku about a humming coffee cooling beside code."}
+{"id": "urban_moments_032", "domain": "urban_moments", "topic": "a hushed rooftop garden in summer", "prompt": "Write a haiku about a hushed rooftop garden in summer."}
+{"id": "nature_wildlife_039", "domain": "nature_wildlife", "topic": "a hidden whale surfacing in mist", "prompt": "Write a poetic haiku describing a hidden whale surfacing in mist."}
+{"id": "travel_transit_027", "domain": "travel_transit", "topic": "a coastal stone stair climbing a hill", "prompt": "Compose a 5-7-5 haiku capturing a coastal stone stair climbing a hill."}
+{"id": "coding_tech_067", "domain": "coding_tech", "topic": "a sudden neural network training slowly", "prompt": "Craft a haiku about a sudden neural network training slowly."}
+{"id": "travel_transit_000", "domain": "travel_transit", "topic": "a rattling train crossing rice fields", "prompt": "Write a poetic haiku describing a rattling train crossing rice fields."}
+{"id": "urban_moments_029", "domain": "urban_moments", "topic": "a crowded pigeon strutting on brick", "prompt": "Write a vivid haiku inspired by a crowded pigeon strutting on brick."}
+{"id": "coding_tech_083", "domain": "coding_tech", "topic": "a humming green test suite passing", "prompt": "Write a poetic haiku describing a humming green test suite passing."}
+{"id": "urban_moments_010", "domain": "urban_moments", "topic": "a neon subway platform at dusk", "prompt": "Craft a haiku about a neon subway platform at dusk."}
+{"id": "food_kitchen_062", "domain": "food_kitchen", "topic": "a sweet loaf of sourdough cooling", "prompt": "Write a poetic haiku describing a sweet loaf of sourdough cooling."}
+{"id": "nature_wildlife_083", "domain": "nature_wildlife", "topic": "a darting owl perched in old pines", "prompt": "Craft a haiku about a darting owl perched in old pines."}
+{"id": "urban_moments_079", "domain": "urban_moments", "topic": "a bustling pigeon strutting on brick", "prompt": "Write a vivid haiku inspired by a bustling pigeon strutting on brick."}
+{"id": "urban_moments_081", "domain": "urban_moments", "topic": "a steam-filled corner bookstore window", "prompt": "Write a poetic haiku describing a steam-filled corner bookstore window."}
+{"id": "coding_tech_098", "domain": "coding_tech", "topic": "a minimalist old floppy disk in drawer", "prompt": "Write a poetic haiku describing a minimalist old floppy disk in drawer."}
+{"id": "emotions_memory_045", "domain": "emotions_memory", "topic": "a tender relief after a hard week", "prompt": "Write a haiku about a tender relief after a hard week."}
+{"id": "emotions_memory_072", "domain": "emotions_memory", "topic": "a restless letter left unopened", "prompt": "Write a vivid haiku inspired by a restless letter left unopened."}
+{"id": "travel_transit_056", "domain": "travel_transit", "topic": "a wooden sailboat leaning into wind", "prompt": "Write a haiku about a wooden sailboat leaning into wind."}
+{"id": "emotions_memory_075", "domain": "emotions_memory", "topic": "a restless relief after a hard week", "prompt": "Write a haiku about a restless relief after a hard week."}
+{"id": "urban_moments_024", "domain": "urban_moments", "topic": "a crowded crosswalk under amber lights", "prompt": "Write a vivid haiku inspired by a crowded crosswalk under amber lights."}
+{"id": "home_objects_009", "domain": "home_objects", "topic": "an antique glass marble catching sunlight", "prompt": "Compose a 5-7-5 haiku capturing an antique glass marble catching sunlight."}
+{"id": "urban_moments_088", "domain": "urban_moments", "topic": "a steam-filled jazz note drifting outdoors", "prompt": "Compose a 5-7-5 haiku capturing a steam-filled jazz note drifting outdoors."}
+{"id": "emotions_memory_014", "domain": "emotions_memory", "topic": "a quiet longing for familiar hills", "prompt": "Write a poetic haiku describing a quiet longing for familiar hills."}
+{"id": "travel_transit_035", "domain": "travel_transit", "topic": "a lonely window seat above clouds", "prompt": "Write a poetic haiku describing a lonely window seat above clouds."}
+{"id": "food_kitchen_095", "domain": "food_kitchen", "topic": "a late-night slice of ripe summer peach", "prompt": "Write a vivid haiku inspired by a late-night slice of ripe summer peach."}
+{"id": "food_kitchen_098", "domain": "food_kitchen", "topic": "a late-night honeycomb dripping on toast", "prompt": "Write a haiku about a late-night honeycomb dripping on toast."}
+{"id": "food_kitchen_053", "domain": "food_kitchen", "topic": "a bitter cup of green tea", "prompt": "Write a haiku about a bitter cup of green tea."}
+{"id": "travel_transit_005", "domain": "travel_transit", "topic": "a rattling window seat above clouds", "prompt": "Write a poetic haiku describing a rattling window seat above clouds."}
+{"id": "food_kitchen_086", "domain": "food_kitchen", "topic": "a rustic pot of spiced apple cider", "prompt": "Craft a haiku about a rustic pot of spiced apple cider."}
+{"id": "emotions_memory_056", "domain": "emotions_memory", "topic": "a fragile laughter heard through walls", "prompt": "Compose a 5-7-5 haiku capturing a fragile laughter heard through walls."}
+{"id": "urban_moments_046", "domain": "urban_moments", "topic": "a sunlit baker opening wooden shutters", "prompt": "Write a poetic haiku describing a sunlit baker opening wooden shutters."}
+{"id": "home_objects_015", "domain": "home_objects", "topic": "a dusty paper lantern in breeze", "prompt": "Write a vivid haiku inspired by a dusty paper lantern in breeze."}
+{"id": "coding_tech_005", "domain": "coding_tech", "topic": "a quiet git merge without conflict", "prompt": "Compose a 5-7-5 haiku capturing a quiet git merge without conflict."}
+{"id": "coding_tech_047", "domain": "coding_tech", "topic": "a clean neural network training slowly", "prompt": "Craft a haiku about a clean neural network training slowly."}
+{"id": "food_kitchen_099", "domain": "food_kitchen", "topic": "a late-night ramen broth in winter", "prompt": "Compose a 5-7-5 haiku capturing a late-night ramen broth in winter."}
+{"id": "emotions_memory_044", "domain": "emotions_memory", "topic": "a tender longing for familiar hills", "prompt": "Write a poetic haiku describing a tender longing for familiar hills."}
+{"id": "ocean_mountains_052", "domain": "ocean_mountains", "topic": "a tranquil tidepool teeming with crabs", "prompt": "Write a vivid haiku inspired by a tranquil tidepool teeming with crabs."}
+{"id": "emotions_memory_010", "domain": "emotions_memory", "topic": "a quiet farewell at the gate", "prompt": "Write a haiku about a quiet farewell at the gate."}
+{"id": "seasons_weather_007", "domain": "seasons_weather", "topic": "a quiet foggy October dawn", "prompt": "Write a vivid haiku inspired by a quiet foggy October dawn."}
+{"id": "urban_moments_096", "domain": "urban_moments", "topic": "a windy baker opening wooden shutters", "prompt": "Write a poetic haiku describing a windy baker opening wooden shutters."}
+{"id": "travel_transit_097", "domain": "travel_transit", "topic": "a departing stone stair climbing a hill", "prompt": "Compose a 5-7-5 haiku capturing a departing stone stair climbing a hill."}
+{"id": "coding_tech_057", "domain": "coding_tech", "topic": "a tangled neural network training slowly", "prompt": "Craft a haiku about a tangled neural network training slowly."}
+{"id": "travel_transit_040", "domain": "travel_transit", "topic": "a sunlit train crossing rice fields", "prompt": "Write a poetic haiku describing a sunlit train crossing rice fields."}
+{"id": "ocean_mountains_032", "domain": "ocean_mountains", "topic": "a shadowed tidepool teeming with crabs", "prompt": "Write a vivid haiku inspired by a shadowed tidepool teeming with crabs."}
+{"id": "nature_wildlife_079", "domain": "nature_wildlife", "topic": "a silent whale surfacing in mist", "prompt": "Write a poetic haiku describing a silent whale surfacing in mist."}
+{"id": "urban_moments_015", "domain": "urban_moments", "topic": "a neon laundromat spinning late", "prompt": "Craft a haiku about a neon laundromat spinning late."}
+{"id": "nature_wildlife_053", "domain": "nature_wildlife", "topic": "a silver owl perched in old pines", "prompt": "Craft a haiku about a silver owl perched in old pines."}
+{"id": "food_kitchen_069", "domain": "food_kitchen", "topic": "a sweet ramen broth in winter", "prompt": "Compose a 5-7-5 haiku capturing a sweet ramen broth in winter."}
+{"id": "night_cosmos_063", "domain": "night_cosmos", "topic": "a crescent eclipse darkening midday sky", "prompt": "Write a haiku about a crescent eclipse darkening midday sky."}
+{"id": "urban_moments_064", "domain": "urban_moments", "topic": "a sleepy crosswalk under amber lights", "prompt": "Write a vivid haiku inspired by a sleepy crosswalk under amber lights."}
+{"id": "food_kitchen_041", "domain": "food_kitchen", "topic": "a quiet kettle whistling at dawn", "prompt": "Craft a haiku about a quiet kettle whistling at dawn."}
+{"id": "ocean_mountains_078", "domain": "ocean_mountains", "topic": "a cloud-wrapped cedar cliff overlooking sea", "prompt": "Craft a haiku about a cloud-wrapped cedar cliff overlooking sea."}
+{"id": "coding_tech_040", "domain": "coding_tech", "topic": "a clean cursor blinking on black", "prompt": "Compose a 5-7-5 haiku capturing a clean cursor blinking on black."}
+{"id": "home_objects_017", "domain": "home_objects", "topic": "a dusty cast-iron teapot on embers", "prompt": "Write a poetic haiku describing a dusty cast-iron teapot on embers."}
+{"id": "urban_moments_095", "domain": "urban_moments", "topic": "a windy laundromat spinning late", "prompt": "Craft a haiku about a windy laundromat spinning late."}
+{"id": "travel_transit_062", "domain": "travel_transit", "topic": "a slow bicycle coasting downhill", "prompt": "Compose a 5-7-5 haiku capturing a slow bicycle coasting downhill."}
+{"id": "emotions_memory_094", "domain": "emotions_memory", "topic": "a distant longing for familiar hills", "prompt": "Write a poetic haiku describing a distant longing for familiar hills."}
+{"id": "urban_moments_082", "domain": "urban_moments", "topic": "a steam-filled rooftop garden in summer", "prompt": "Write a haiku about a steam-filled rooftop garden in summer."}
+{"id": "travel_transit_065", "domain": "travel_transit", "topic": "a slow window seat above clouds", "prompt": "Write a poetic haiku describing a slow window seat above clouds."}
+{"id": "nature_wildlife_082", "domain": "nature_wildlife", "topic": "a darting koi swimming under lilies", "prompt": "Write a vivid haiku inspired by a darting koi swimming under lilies."}
+{"id": "ocean_mountains_039", "domain": "ocean_mountains", "topic": "a shadowed waterfall hidden in moss", "prompt": "Write a poetic haiku describing a shadowed waterfall hidden in moss."}
+{"id": "nature_wildlife_000", "domain": "nature_wildlife", "topic": "a solitary heron beside still reeds", "prompt": "Write a haiku about a solitary heron beside still reeds."}
+{"id": "night_cosmos_086", "domain": "night_cosmos", "topic": "a timeless constellation above desert sand", "prompt": "Craft a haiku about a timeless constellation above desert sand."}
+{"id": "nature_wildlife_012", "domain": "nature_wildlife", "topic": "a watchful koi swimming under lilies", "prompt": "Write a vivid haiku inspired by a watchful koi swimming under lilies."}
+{"id": "emotions_memory_043", "domain": "emotions_memory", "topic": "a tender moment of quiet forgiveness", "prompt": "Craft a haiku about a tender moment of quiet forgiveness."}
+{"id": "ocean_mountains_023", "domain": "ocean_mountains", "topic": "a sunlit alpine meadow in July", "prompt": "Craft a haiku about a sunlit alpine meadow in July."}
+{"id": "travel_transit_001", "domain": "travel_transit", "topic": "a rattling ferry cutting silver wake", "prompt": "Write a haiku about a rattling ferry cutting silver wake."}
+{"id": "urban_moments_038", "domain": "urban_moments", "topic": "a hushed jazz note drifting outdoors", "prompt": "Compose a 5-7-5 haiku capturing a hushed jazz note drifting outdoors."}
+{"id": "urban_moments_020", "domain": "urban_moments", "topic": "a crowded subway platform at dusk", "prompt": "Craft a haiku about a crowded subway platform at dusk."}
+{"id": "night_cosmos_021", "domain": "night_cosmos", "topic": "a sprawling meteor streaking past Orion", "prompt": "Craft a haiku about a sprawling meteor streaking past Orion."}
+{"id": "home_objects_034", "domain": "home_objects", "topic": "a forgotten record spinning softly", "prompt": "Compose a 5-7-5 haiku capturing a forgotten record spinning softly."}
+{"id": "coding_tech_007", "domain": "coding_tech", "topic": "a quiet neural network training slowly", "prompt": "Craft a haiku about a quiet neural network training slowly."}
+{"id": "coding_tech_058", "domain": "coding_tech", "topic": "a tangled old floppy disk in drawer", "prompt": "Write a poetic haiku describing a tangled old floppy disk in drawer."}
+{"id": "emotions_memory_032", "domain": "emotions_memory", "topic": "a sudden letter left unopened", "prompt": "Write a vivid haiku inspired by a sudden letter left unopened."}
+{"id": "emotions_memory_092", "domain": "emotions_memory", "topic": "a distant letter left unopened", "prompt": "Write a vivid haiku inspired by a distant letter left unopened."}
+{"id": "nature_wildlife_022", "domain": "nature_wildlife", "topic": "a restless koi swimming under lilies", "prompt": "Write a vivid haiku inspired by a restless koi swimming under lilies."}
+{"id": "urban_moments_043", "domain": "urban_moments", "topic": "a sunlit alleyway after rainfall", "prompt": "Compose a 5-7-5 haiku capturing a sunlit alleyway after rainfall."}
+{"id": "night_cosmos_025", "domain": "night_cosmos", "topic": "a sprawling firefly meadow under stars", "prompt": "Write a vivid haiku inspired by a sprawling firefly meadow under stars."}
+{"id": "coding_tech_053", "domain": "coding_tech", "topic": "a tangled green test suite passing", "prompt": "Write a poetic haiku describing a tangled green test suite passing."}
+{"id": "food_kitchen_055", "domain": "food_kitchen", "topic": "a bitter slice of ripe summer peach", "prompt": "Write a vivid haiku inspired by a bitter slice of ripe summer peach."}
+{"id": "home_objects_088", "domain": "home_objects", "topic": "a cherished key hanging by the door", "prompt": "Write a haiku about a cherished key hanging by the door."}
+{"id": "ocean_mountains_072", "domain": "ocean_mountains", "topic": "a cloud-wrapped tidepool teeming with crabs", "prompt": "Write a vivid haiku inspired by a cloud-wrapped tidepool teeming with crabs."}
+{"id": "coding_tech_044", "domain": "coding_tech", "topic": "a clean mechanical keyboard clicking", "prompt": "Write a haiku about a clean mechanical keyboard clicking."}
+{"id": "night_cosmos_004", "domain": "night_cosmos", "topic": "a pale comet tail in deep black", "prompt": "Compose a 5-7-5 haiku capturing a pale comet tail in deep black."}
+{"id": "travel_transit_081", "domain": "travel_transit", "topic": "a foggy ferry cutting silver wake", "prompt": "Write a haiku about a foggy ferry cutting silver wake."}
+{"id": "emotions_memory_037", "domain": "emotions_memory", "topic": "a sudden courage before starting over", "prompt": "Write a vivid haiku inspired by a sudden courage before starting over."}
+{"id": "nature_wildlife_049", "domain": "nature_wildlife", "topic": "a patient whale surfacing in mist", "prompt": "Write a poetic haiku describing a patient whale surfacing in mist."}
+{"id": "seasons_weather_045", "domain": "seasons_weather", "topic": "a sudden melting icicle drip", "prompt": "Write a haiku about a sudden melting icicle drip."}
+{"id": "ocean_mountains_071", "domain": "ocean_mountains", "topic": "a cloud-wrapped granite ridge above clouds", "prompt": "Compose a 5-7-5 haiku capturing a cloud-wrapped granite ridge above clouds."}
+{"id": "food_kitchen_066", "domain": "food_kitchen", "topic": "a sweet pot of spiced apple cider", "prompt": "Craft a haiku about a sweet pot of spiced apple cider."}
+{"id": "nature_wildlife_008", "domain": "nature_wildlife", "topic": "a solitary cicada singing at dusk", "prompt": "Craft a haiku about a solitary cicada singing at dusk."}
+{"id": "urban_moments_080", "domain": "urban_moments", "topic": "a steam-filled subway platform at dusk", "prompt": "Craft a haiku about a steam-filled subway platform at dusk."}
+{"id": "emotions_memory_095", "domain": "emotions_memory", "topic": "a distant relief after a hard week", "prompt": "Write a haiku about a distant relief after a hard week."}
+{"id": "ocean_mountains_020", "domain": "ocean_mountains", "topic": "a sunlit lighthouse above dark waves", "prompt": "Write a haiku about a sunlit lighthouse above dark waves."}
+{"id": "home_objects_094", "domain": "home_objects", "topic": "a ticking record spinning softly", "prompt": "Compose a 5-7-5 haiku capturing a ticking record spinning softly."}
+{"id": "urban_moments_044", "domain": "urban_moments", "topic": "a sunlit crosswalk under amber lights", "prompt": "Write a vivid haiku inspired by a sunlit crosswalk under amber lights."}
+{"id": "nature_wildlife_050", "domain": "nature_wildlife", "topic": "a silver heron beside still reeds", "prompt": "Write a haiku about a silver heron beside still reeds."}
+{"id": "seasons_weather_046", "domain": "seasons_weather", "topic": "a sudden thunderstorm rolling east", "prompt": "Compose a 5-7-5 haiku capturing a sudden thunderstorm rolling east."}
+{"id": "ocean_mountains_035", "domain": "ocean_mountains", "topic": "a shadowed glacier valley in silence", "prompt": "Write a haiku about a shadowed glacier valley in silence."}
+{"id": "ocean_mountains_025", "domain": "ocean_mountains", "topic": "a sunlit glacier valley in silence", "prompt": "Write a haiku about a sunlit glacier valley in silence."}
+{"id": "nature_wildlife_017", "domain": "nature_wildlife", "topic": "a watchful deer stepping through ferns", "prompt": "Write a vivid haiku inspired by a watchful deer stepping through ferns."}
+{"id": "food_kitchen_072", "domain": "food_kitchen", "topic": "a warm loaf of sourdough cooling", "prompt": "Write a poetic haiku describing a warm loaf of sourdough cooling."}
+{"id": "emotions_memory_059", "domain": "emotions_memory", "topic": "a fragile solitude without loneliness", "prompt": "Write a poetic haiku describing a fragile solitude without loneliness."}
+{"id": "coding_tech_075", "domain": "coding_tech", "topic": "a patient git merge without conflict", "prompt": "Compose a 5-7-5 haiku capturing a patient git merge without conflict."}
+{"id": "night_cosmos_074", "domain": "night_cosmos", "topic": "a cold comet tail in deep black", "prompt": "Compose a 5-7-5 haiku capturing a cold comet tail in deep black."}
+{"id": "emotions_memory_070", "domain": "emotions_memory", "topic": "a restless farewell at the gate", "prompt": "Write a haiku about a restless farewell at the gate."}
+{"id": "travel_transit_075", "domain": "travel_transit", "topic": "a winding window seat above clouds", "prompt": "Write a poetic haiku describing a winding window seat above clouds."}
+{"id": "seasons_weather_024", "domain": "seasons_weather", "topic": "a crisp first frost on green grass", "prompt": "Write a poetic haiku describing a crisp first frost on green grass."}
+{"id": "night_cosmos_098", "domain": "night_cosmos", "topic": "a shimmering milky way over dark lake", "prompt": "Write a haiku about a shimmering milky way over dark lake."}
+{"id": "food_kitchen_008", "domain": "food_kitchen", "topic": "a steaming honeycomb dripping on toast", "prompt": "Write a haiku about a steaming honeycomb dripping on toast."}
+{"id": "emotions_memory_033", "domain": "emotions_memory", "topic": "a sudden moment of quiet forgiveness", "prompt": "Craft a haiku about a sudden moment of quiet forgiveness."}
+{"id": "urban_moments_001", "domain": "urban_moments", "topic": "a rainy corner bookstore window", "prompt": "Write a poetic haiku describing a rainy corner bookstore window."}
+{"id": "night_cosmos_026", "domain": "night_cosmos", "topic": "a sprawling constellation above desert sand", "prompt": "Craft a haiku about a sprawling constellation above desert sand."}
+{"id": "seasons_weather_014", "domain": "seasons_weather", "topic": "an early first frost on green grass", "prompt": "Write a poetic haiku describing an early first frost on green grass."}
+{"id": "nature_wildlife_027", "domain": "nature_wildlife", "topic": "a restless deer stepping through ferns", "prompt": "Write a vivid haiku inspired by a restless deer stepping through ferns."}
+{"id": "ocean_mountains_006", "domain": "ocean_mountains", "topic": "a distant canyon river at twilight", "prompt": "Compose a 5-7-5 haiku capturing a distant canyon river at twilight."}
+{"id": "emotions_memory_090", "domain": "emotions_memory", "topic": "a distant farewell at the gate", "prompt": "Write a haiku about a distant farewell at the gate."}
+{"id": "food_kitchen_097", "domain": "food_kitchen", "topic": "a late-night espresso poured in silence", "prompt": "Write a poetic haiku describing a late-night espresso poured in silence."}
+{"id": "seasons_weather_021", "domain": "seasons_weather", "topic": "a crisp autumn rainstorm on glass", "prompt": "Compose a 5-7-5 haiku capturing a crisp autumn rainstorm on glass."}
+{"id": "urban_moments_041", "domain": "urban_moments", "topic": "a sunlit corner bookstore window", "prompt": "Write a poetic haiku describing a sunlit corner bookstore window."}
+{"id": "home_objects_053", "domain": "home_objects", "topic": "a flickering fountain pen on linen paper", "prompt": "Write a haiku about a flickering fountain pen on linen paper."}
+{"id": "seasons_weather_061", "domain": "seasons_weather", "topic": "a bright autumn rainstorm on glass", "prompt": "Compose a 5-7-5 haiku capturing a bright autumn rainstorm on glass."}
+{"id": "travel_transit_052", "domain": "travel_transit", "topic": "a wooden bicycle coasting downhill", "prompt": "Compose a 5-7-5 haiku capturing a wooden bicycle coasting downhill."}
+{"id": "urban_moments_034", "domain": "urban_moments", "topic": "a hushed crosswalk under amber lights", "prompt": "Write a vivid haiku inspired by a hushed crosswalk under amber lights."}
+{"id": "nature_wildlife_041", "domain": "nature_wildlife", "topic": "a patient red fox crossing fresh snow", "prompt": "Compose a 5-7-5 haiku capturing a patient red fox crossing fresh snow."}
+{"id": "travel_transit_082", "domain": "travel_transit", "topic": "a foggy bicycle coasting downhill", "prompt": "Compose a 5-7-5 haiku capturing a foggy bicycle coasting downhill."}
+{"id": "coding_tech_018", "domain": "coding_tech", "topic": "a glowing old floppy disk in drawer", "prompt": "Write a poetic haiku describing a glowing old floppy disk in drawer."}
+{"id": "night_cosmos_011", "domain": "night_cosmos", "topic": "a silver meteor streaking past Orion", "prompt": "Craft a haiku about a silver meteor streaking past Orion."}
+{"id": "home_objects_062", "domain": "home_objects", "topic": "a worn quilted blanket on oak", "prompt": "Write a poetic haiku describing a worn quilted blanket on oak."}
+{"id": "coding_tech_099", "domain": "coding_tech", "topic": "a minimalist coffee cooling beside code", "prompt": "Write a haiku about a minimalist coffee cooling beside code."}
+{"id": "seasons_weather_089", "domain": "seasons_weather", "topic": "a gentle late November sunset", "prompt": "Write a poetic haiku describing a gentle late November sunset."}
+{"id": "emotions_memory_002", "domain": "emotions_memory", "topic": "a lingering letter left unopened", "prompt": "Write a vivid haiku inspired by a lingering letter left unopened."}
+{"id": "seasons_weather_010", "domain": "seasons_weather", "topic": "an early winter snowy morning", "prompt": "Write a haiku about an early winter snowy morning."}
+{"id": "emotions_memory_055", "domain": "emotions_memory", "topic": "a fragile relief after a hard week", "prompt": "Write a haiku about a fragile relief after a hard week."}
+{"id": "seasons_weather_026", "domain": "seasons_weather", "topic": "a crisp thunderstorm rolling east", "prompt": "Compose a 5-7-5 haiku capturing a crisp thunderstorm rolling east."}
+{"id": "seasons_weather_063", "domain": "seasons_weather", "topic": "a bright summer heatwave at noon", "prompt": "Craft a haiku about a bright summer heatwave at noon."}
+{"id": "food_kitchen_076", "domain": "food_kitchen", "topic": "a warm pot of spiced apple cider", "prompt": "Craft a haiku about a warm pot of spiced apple cider."}
+{"id": "food_kitchen_003", "domain": "food_kitchen", "topic": "a steaming cup of green tea", "prompt": "Write a haiku about a steaming cup of green tea."}
+{"id": "nature_wildlife_080", "domain": "nature_wildlife", "topic": "a darting heron beside still reeds", "prompt": "Write a haiku about a darting heron beside still reeds."}
+{"id": "ocean_mountains_009", "domain": "ocean_mountains", "topic": "a distant waterfall hidden in moss", "prompt": "Write a poetic haiku describing a distant waterfall hidden in moss."}
+{"id": "food_kitchen_024", "domain": "food_kitchen", "topic": "a freshly baked skillet of roasted chestnuts", "prompt": "Compose a 5-7-5 haiku capturing a freshly baked skillet of roasted chestnuts."}
+{"id": "home_objects_078", "domain": "home_objects", "topic": "a cracked key hanging by the door", "prompt": "Write a haiku about a cracked key hanging by the door."}
+{"id": "night_cosmos_069", "domain": "night_cosmos", "topic": "a crescent dawn star fading in blue", "prompt": "Compose a 5-7-5 haiku capturing a crescent dawn star fading in blue."}
+{"id": "ocean_mountains_036", "domain": "ocean_mountains", "topic": "a shadowed canyon river at twilight", "prompt": "Compose a 5-7-5 haiku capturing a shadowed canyon river at twilight."}
+{"id": "coding_tech_024", "domain": "coding_tech", "topic": "a stubborn mechanical keyboard clicking", "prompt": "Write a haiku about a stubborn mechanical keyboard clicking."}
+{"id": "travel_transit_095", "domain": "travel_transit", "topic": "a departing window seat above clouds", "prompt": "Write a poetic haiku describing a departing window seat above clouds."}
+{"id": "coding_tech_076", "domain": "coding_tech", "topic": "a patient laptop screen in dark room", "prompt": "Write a vivid haiku inspired by a patient laptop screen in dark room."}
+{"id": "home_objects_037", "domain": "home_objects", "topic": "a forgotten cast-iron teapot on embers", "prompt": "Write a poetic haiku describing a forgotten cast-iron teapot on embers."}
+{"id": "nature_wildlife_010", "domain": "nature_wildlife", "topic": "a watchful heron beside still reeds", "prompt": "Write a haiku about a watchful heron beside still reeds."}
+{"id": "coding_tech_059", "domain": "coding_tech", "topic": "a tangled coffee cooling beside code", "prompt": "Write a haiku about a tangled coffee cooling beside code."}
+{"id": "travel_transit_093", "domain": "travel_transit", "topic": "a departing gravel road through orchards", "prompt": "Write a vivid haiku inspired by a departing gravel road through orchards."}
+{"id": "home_objects_018", "domain": "home_objects", "topic": "a dusty key hanging by the door", "prompt": "Write a haiku about a dusty key hanging by the door."}
+{"id": "ocean_mountains_024", "domain": "ocean_mountains", "topic": "a sunlit driftwood beach at low tide", "prompt": "Write a poetic haiku describing a sunlit driftwood beach at low tide."}
+{"id": "seasons_weather_019", "domain": "seasons_weather", "topic": "an early late November sunset", "prompt": "Write a poetic haiku describing an early late November sunset."}
+{"id": "travel_transit_044", "domain": "travel_transit", "topic": "a sunlit footbridge over a creek", "prompt": "Craft a haiku about a sunlit footbridge over a creek."}
+{"id": "travel_transit_029", "domain": "travel_transit", "topic": "a coastal suitcase waiting by stairs", "prompt": "Craft a haiku about a coastal suitcase waiting by stairs."}
+{"id": "food_kitchen_027", "domain": "food_kitchen", "topic": "a freshly baked espresso poured in silence", "prompt": "Write a poetic haiku describing a freshly baked espresso poured in silence."}
+{"id": "emotions_memory_036", "domain": "emotions_memory", "topic": "a sudden laughter heard through walls", "prompt": "Compose a 5-7-5 haiku capturing a sudden laughter heard through walls."}
+{"id": "urban_moments_078", "domain": "urban_moments", "topic": "a bustling jazz note drifting outdoors", "prompt": "Compose a 5-7-5 haiku capturing a bustling jazz note drifting outdoors."}
+{"id": "nature_wildlife_048", "domain": "nature_wildlife", "topic": "a patient cicada singing at dusk", "prompt": "Craft a haiku about a patient cicada singing at dusk."}
+{"id": "food_kitchen_079", "domain": "food_kitchen", "topic": "a warm ramen broth in winter", "prompt": "Compose a 5-7-5 haiku capturing a warm ramen broth in winter."}
+{"id": "home_objects_032", "domain": "home_objects", "topic": "a forgotten quilted blanket on oak", "prompt": "Write a poetic haiku describing a forgotten quilted blanket on oak."}
+{"id": "travel_transit_038", "domain": "travel_transit", "topic": "a lonely empty highway at daybreak", "prompt": "Write a vivid haiku inspired by a lonely empty highway at daybreak."}
+{"id": "food_kitchen_094", "domain": "food_kitchen", "topic": "a late-night skillet of roasted chestnuts", "prompt": "Compose a 5-7-5 haiku capturing a late-night skillet of roasted chestnuts."}
+{"id": "nature_wildlife_055", "domain": "nature_wildlife", "topic": "a silver spider spinning dawn silk", "prompt": "Write a haiku about a silver spider spinning dawn silk."}
+{"id": "seasons_weather_068", "domain": "seasons_weather", "topic": "a bright April hail on rooftops", "prompt": "Craft a haiku about a bright April hail on rooftops."}
+{"id": "travel_transit_064", "domain": "travel_transit", "topic": "a slow footbridge over a creek", "prompt": "Craft a haiku about a slow footbridge over a creek."}
+{"id": "urban_moments_083", "domain": "urban_moments", "topic": "a steam-filled alleyway after rainfall", "prompt": "Compose a 5-7-5 haiku capturing a steam-filled alleyway after rainfall."}
+{"id": "travel_transit_028", "domain": "travel_transit", "topic": "a coastal empty highway at daybreak", "prompt": "Write a vivid haiku inspired by a coastal empty highway at daybreak."}
+{"id": "urban_moments_093", "domain": "urban_moments", "topic": "a windy alleyway after rainfall", "prompt": "Compose a 5-7-5 haiku capturing a windy alleyway after rainfall."}
+{"id": "coding_tech_004", "domain": "coding_tech", "topic": "a quiet mechanical keyboard clicking", "prompt": "Write a haiku about a quiet mechanical keyboard clicking."}
+{"id": "emotions_memory_054", "domain": "emotions_memory", "topic": "a fragile longing for familiar hills", "prompt": "Write a poetic haiku describing a fragile longing for familiar hills."}
+{"id": "ocean_mountains_044", "domain": "ocean_mountains", "topic": "a rugged driftwood beach at low tide", "prompt": "Write a poetic haiku describing a rugged driftwood beach at low tide."}
+{"id": "travel_transit_080", "domain": "travel_transit", "topic": "a foggy train crossing rice fields", "prompt": "Write a poetic haiku describing a foggy train crossing rice fields."}
+{"id": "night_cosmos_031", "domain": "night_cosmos", "topic": "a silent meteor streaking past Orion", "prompt": "Craft a haiku about a silent meteor streaking past Orion."}
+{"id": "coding_tech_037", "domain": "coding_tech", "topic": "a midnight neural network training slowly", "prompt": "Craft a haiku about a midnight neural network training slowly."}
+{"id": "seasons_weather_088", "domain": "seasons_weather", "topic": "a gentle April hail on rooftops", "prompt": "Craft a haiku about a gentle April hail on rooftops."}
+{"id": "food_kitchen_002", "domain": "food_kitchen", "topic": "a steaming loaf of sourdough cooling", "prompt": "Write a poetic haiku describing a steaming loaf of sourdough cooling."}
+{"id": "night_cosmos_088", "domain": "night_cosmos", "topic": "a timeless milky way over dark lake", "prompt": "Write a haiku about a timeless milky way over dark lake."}
+{"id": "food_kitchen_075", "domain": "food_kitchen", "topic": "a warm slice of ripe summer peach", "prompt": "Write a vivid haiku inspired by a warm slice of ripe summer peach."}
+{"id": "seasons_weather_067", "domain": "seasons_weather", "topic": "a bright foggy October dawn", "prompt": "Write a vivid haiku inspired by a bright foggy October dawn."}
+{"id": "urban_moments_070", "domain": "urban_moments", "topic": "a bustling subway platform at dusk", "prompt": "Craft a haiku about a bustling subway platform at dusk."}
+{"id": "food_kitchen_071", "domain": "food_kitchen", "topic": "a warm kettle whistling at dawn", "prompt": "Craft a haiku about a warm kettle whistling at dawn."}
+{"id": "emotions_memory_049", "domain": "emotions_memory", "topic": "a tender solitude without loneliness", "prompt": "Write a poetic haiku describing a tender solitude without loneliness."}
+{"id": "ocean_mountains_095", "domain": "ocean_mountains", "topic": "a moonlit glacier valley in silence", "prompt": "Write a haiku about a moonlit glacier valley in silence."}
+{"id": "night_cosmos_056", "domain": "night_cosmos", "topic": "a radiant constellation above desert sand", "prompt": "Craft a haiku about a radiant constellation above desert sand."}
+{"id": "food_kitchen_065", "domain": "food_kitchen", "topic": "a sweet slice of ripe summer peach", "prompt": "Write a vivid haiku inspired by a sweet slice of ripe summer peach."}
+{"id": "seasons_weather_074", "domain": "seasons_weather", "topic": "a fading first frost on green grass", "prompt": "Write a poetic haiku describing a fading first frost on green grass."}
+{"id": "seasons_weather_057", "domain": "seasons_weather", "topic": "a misty foggy October dawn", "prompt": "Write a vivid haiku inspired by a misty foggy October dawn."}
+{"id": "nature_wildlife_095", "domain": "nature_wildlife", "topic": "a drowsy spider spinning dawn silk", "prompt": "Write a haiku about a drowsy spider spinning dawn silk."}
+{"id": "ocean_mountains_030", "domain": "ocean_mountains", "topic": "a shadowed lighthouse above dark waves", "prompt": "Write a haiku about a shadowed lighthouse above dark waves."}
+{"id": "coding_tech_086", "domain": "coding_tech", "topic": "a humming laptop screen in dark room", "prompt": "Write a vivid haiku inspired by a humming laptop screen in dark room."}
+{"id": "emotions_memory_027", "domain": "emotions_memory", "topic": "a bittersweet courage before starting over", "prompt": "Write a vivid haiku inspired by a bittersweet courage before starting over."}
+{"id": "emotions_memory_083", "domain": "emotions_memory", "topic": "a hopeful moment of quiet forgiveness", "prompt": "Craft a haiku about a hopeful moment of quiet forgiveness."}
+{"id": "food_kitchen_018", "domain": "food_kitchen", "topic": "a fragrant honeycomb dripping on toast", "prompt": "Write a haiku about a fragrant honeycomb dripping on toast."}
+{"id": "seasons_weather_003", "domain": "seasons_weather", "topic": "a quiet summer heatwave at noon", "prompt": "Craft a haiku about a quiet summer heatwave at noon."}
+{"id": "ocean_mountains_014", "domain": "ocean_mountains", "topic": "a windblown driftwood beach at low tide", "prompt": "Write a poetic haiku describing a windblown driftwood beach at low tide."}
+{"id": "nature_wildlife_091", "domain": "nature_wildlife", "topic": "a drowsy red fox crossing fresh snow", "prompt": "Compose a 5-7-5 haiku capturing a drowsy red fox crossing fresh snow."}
+{"id": "ocean_mountains_055", "domain": "ocean_mountains", "topic": "a tranquil glacier valley in silence", "prompt": "Write a haiku about a tranquil glacier valley in silence."}
+{"id": "food_kitchen_093", "domain": "food_kitchen", "topic": "a late-night cup of green tea", "prompt": "Write a haiku about a late-night cup of green tea."}
+{"id": "emotions_memory_020", "domain": "emotions_memory", "topic": "a bittersweet farewell at the gate", "prompt": "Write a haiku about a bittersweet farewell at the gate."}
+{"id": "nature_wildlife_019", "domain": "nature_wildlife", "topic": "a watchful whale surfacing in mist", "prompt": "Write a poetic haiku describing a watchful whale surfacing in mist."}
+{"id": "nature_wildlife_032", "domain": "nature_wildlife", "topic": "a hidden koi swimming under lilies", "prompt": "Write a vivid haiku inspired by a hidden koi swimming under lilies."}
+{"id": "nature_wildlife_098", "domain": "nature_wildlife", "topic": "a drowsy cicada singing at dusk", "prompt": "Craft a haiku about a drowsy cicada singing at dusk."}
+{"id": "home_objects_028", "domain": "home_objects", "topic": "a sun-warmed key hanging by the door", "prompt": "Write a haiku about a sun-warmed key hanging by the door."}
+{"id": "coding_tech_043", "domain": "coding_tech", "topic": "a clean green test suite passing", "prompt": "Write a poetic haiku describing a clean green test suite passing."}
+{"id": "home_objects_066", "domain": "home_objects", "topic": "a worn wooden rocking chair", "prompt": "Craft a haiku about a worn wooden rocking chair."}
+{"id": "coding_tech_068", "domain": "coding_tech", "topic": "a sudden old floppy disk in drawer", "prompt": "Write a poetic haiku describing a sudden old floppy disk in drawer."}
+{"id": "urban_moments_066", "domain": "urban_moments", "topic": "a sleepy baker opening wooden shutters", "prompt": "Write a poetic haiku describing a sleepy baker opening wooden shutters."}
+{"id": "home_objects_022", "domain": "home_objects", "topic": "a sun-warmed quilted blanket on oak", "prompt": "Write a poetic haiku describing a sun-warmed quilted blanket on oak."}
+{"id": "seasons_weather_027", "domain": "seasons_weather", "topic": "a crisp foggy October dawn", "prompt": "Write a vivid haiku inspired by a crisp foggy October dawn."}
+{"id": "emotions_memory_058", "domain": "emotions_memory", "topic": "a fragile gratitude at sunset", "prompt": "Craft a haiku about a fragile gratitude at sunset."}
+{"id": "night_cosmos_075", "domain": "night_cosmos", "topic": "a cold firefly meadow under stars", "prompt": "Write a vivid haiku inspired by a cold firefly meadow under stars."}
+{"id": "travel_transit_048", "domain": "travel_transit", "topic": "a sunlit empty highway at daybreak", "prompt": "Write a vivid haiku inspired by a sunlit empty highway at daybreak."}
+{"id": "travel_transit_072", "domain": "travel_transit", "topic": "a winding bicycle coasting downhill", "prompt": "Compose a 5-7-5 haiku capturing a winding bicycle coasting downhill."}
+{"id": "seasons_weather_083", "domain": "seasons_weather", "topic": "a gentle summer heatwave at noon", "prompt": "Craft a haiku about a gentle summer heatwave at noon."}
+{"id": "emotions_memory_047", "domain": "emotions_memory", "topic": "a tender courage before starting over", "prompt": "Write a vivid haiku inspired by a tender courage before starting over."}
+{"id": "nature_wildlife_014", "domain": "nature_wildlife", "topic": "a watchful hummingbird near wild sage", "prompt": "Write a poetic haiku describing a watchful hummingbird near wild sage."}
+{"id": "emotions_memory_079", "domain": "emotions_memory", "topic": "a restless solitude without loneliness", "prompt": "Write a poetic haiku describing a restless solitude without loneliness."}
+{"id": "food_kitchen_078", "domain": "food_kitchen", "topic": "a warm honeycomb dripping on toast", "prompt": "Write a haiku about a warm honeycomb dripping on toast."}
+{"id": "urban_moments_018", "domain": "urban_moments", "topic": "a neon jazz note drifting outdoors", "prompt": "Compose a 5-7-5 haiku capturing a neon jazz note drifting outdoors."}
+{"id": "seasons_weather_013", "domain": "seasons_weather", "topic": "an early summer heatwave at noon", "prompt": "Craft a haiku about an early summer heatwave at noon."}
+{"id": "seasons_weather_097", "domain": "seasons_weather", "topic": "a bitter foggy October dawn", "prompt": "Write a vivid haiku inspired by a bitter foggy October dawn."}
+{"id": "food_kitchen_016", "domain": "food_kitchen", "topic": "a fragrant pot of spiced apple cider", "prompt": "Craft a haiku about a fragrant pot of spiced apple cider."}
+{"id": "coding_tech_064", "domain": "coding_tech", "topic": "a sudden mechanical keyboard clicking", "prompt": "Write a haiku about a sudden mechanical keyboard clicking."}
+{"id": "seasons_weather_075", "domain": "seasons_weather", "topic": "a fading melting icicle drip", "prompt": "Write a haiku about a fading melting icicle drip."}
+{"id": "coding_tech_061", "domain": "coding_tech", "topic": "a sudden bug solved before sunrise", "prompt": "Write a vivid haiku inspired by a sudden bug solved before sunrise."}
+{"id": "ocean_mountains_012", "domain": "ocean_mountains", "topic": "a windblown tidepool teeming with crabs", "prompt": "Write a vivid haiku inspired by a windblown tidepool teeming with crabs."}
+{"id": "night_cosmos_040", "domain": "night_cosmos", "topic": "a drifting full moon over pine trees", "prompt": "Write a vivid haiku inspired by a drifting full moon over pine trees."}
+{"id": "travel_transit_066", "domain": "travel_transit", "topic": "a slow sailboat leaning into wind", "prompt": "Write a haiku about a slow sailboat leaning into wind."}
+{"id": "seasons_weather_066", "domain": "seasons_weather", "topic": "a bright thunderstorm rolling east", "prompt": "Compose a 5-7-5 haiku capturing a bright thunderstorm rolling east."}
+{"id": "home_objects_016", "domain": "home_objects", "topic": "a dusty wooden rocking chair", "prompt": "Craft a haiku about a dusty wooden rocking chair."}
+{"id": "nature_wildlife_025", "domain": "nature_wildlife", "topic": "a restless spider spinning dawn silk", "prompt": "Write a haiku about a restless spider spinning dawn silk."}
+{"id": "ocean_mountains_013", "domain": "ocean_mountains", "topic": "a windblown alpine meadow in July", "prompt": "Craft a haiku about a windblown alpine meadow in July."}
+{"id": "seasons_weather_080", "domain": "seasons_weather", "topic": "a gentle winter snowy morning", "prompt": "Write a haiku about a gentle winter snowy morning."}
+{"id": "home_objects_005", "domain": "home_objects", "topic": "an antique paper lantern in breeze", "prompt": "Write a vivid haiku inspired by an antique paper lantern in breeze."}
+{"id": "coding_tech_017", "domain": "coding_tech", "topic": "a glowing neural network training slowly", "prompt": "Craft a haiku about a glowing neural network training slowly."}
+{"id": "seasons_weather_033", "domain": "seasons_weather", "topic": "a golden summer heatwave at noon", "prompt": "Craft a haiku about a golden summer heatwave at noon."}
+{"id": "nature_wildlife_015", "domain": "nature_wildlife", "topic": "a watchful spider spinning dawn silk", "prompt": "Write a haiku about a watchful spider spinning dawn silk."}
+{"id": "seasons_weather_059", "domain": "seasons_weather", "topic": "a misty late November sunset", "prompt": "Write a poetic haiku describing a misty late November sunset."}
+{"id": "seasons_weather_076", "domain": "seasons_weather", "topic": "a fading thunderstorm rolling east", "prompt": "Compose a 5-7-5 haiku capturing a fading thunderstorm rolling east."}
+{"id": "home_objects_008", "domain": "home_objects", "topic": "an antique key hanging by the door", "prompt": "Write a haiku about an antique key hanging by the door."}
+{"id": "home_objects_001", "domain": "home_objects", "topic": "an antique ceramic mug by a window", "prompt": "Craft a haiku about an antique ceramic mug by a window."}
+{"id": "night_cosmos_073", "domain": "night_cosmos", "topic": "a cold eclipse darkening midday sky", "prompt": "Write a haiku about a cold eclipse darkening midday sky."}
+{"id": "coding_tech_054", "domain": "coding_tech", "topic": "a tangled mechanical keyboard clicking", "prompt": "Write a haiku about a tangled mechanical keyboard clicking."}
+{"id": "emotions_memory_046", "domain": "emotions_memory", "topic": "a tender laughter heard through walls", "prompt": "Compose a 5-7-5 haiku capturing a tender laughter heard through walls."}
+{"id": "seasons_weather_029", "domain": "seasons_weather", "topic": "a crisp late November sunset", "prompt": "Write a poetic haiku describing a crisp late November sunset."}
+{"id": "nature_wildlife_020", "domain": "nature_wildlife", "topic": "a restless heron beside still reeds", "prompt": "Write a haiku about a restless heron beside still reeds."}
+{"id": "emotions_memory_008", "domain": "emotions_memory", "topic": "a lingering gratitude at sunset", "prompt": "Craft a haiku about a lingering gratitude at sunset."}
+{"id": "travel_transit_010", "domain": "travel_transit", "topic": "a night train crossing rice fields", "prompt": "Write a poetic haiku describing a night train crossing rice fields."}
+{"id": "coding_tech_049", "domain": "coding_tech", "topic": "a clean coffee cooling beside code", "prompt": "Write a haiku about a clean coffee cooling beside code."}
+{"id": "urban_moments_069", "domain": "urban_moments", "topic": "a sleepy pigeon strutting on brick", "prompt": "Write a vivid haiku inspired by a sleepy pigeon strutting on brick."}
+{"id": "night_cosmos_015", "domain": "night_cosmos", "topic": "a silver firefly meadow under stars", "prompt": "Write a vivid haiku inspired by a silver firefly meadow under stars."}
+{"id": "travel_transit_046", "domain": "travel_transit", "topic": "a sunlit sailboat leaning into wind", "prompt": "Write a haiku about a sunlit sailboat leaning into wind."}
+{"id": "night_cosmos_008", "domain": "night_cosmos", "topic": "a pale milky way over dark lake", "prompt": "Write a haiku about a pale milky way over dark lake."}
+{"id": "emotions_memory_001", "domain": "emotions_memory", "topic": "a lingering childhood summer afternoon", "prompt": "Compose a 5-7-5 haiku capturing a lingering childhood summer afternoon."}
+{"id": "home_objects_031", "domain": "home_objects", "topic": "a forgotten ceramic mug by a window", "prompt": "Craft a haiku about a forgotten ceramic mug by a window."}
+{"id": "ocean_mountains_087", "domain": "ocean_mountains", "topic": "a tide-carved fishing boat entering harbor", "prompt": "Write a vivid haiku inspired by a tide-carved fishing boat entering harbor."}
+{"id": "night_cosmos_036", "domain": "night_cosmos", "topic": "a silent constellation above desert sand", "prompt": "Craft a haiku about a silent constellation above desert sand."}
+{"id": "emotions_memory_021", "domain": "emotions_memory", "topic": "a bittersweet childhood summer afternoon", "prompt": "Compose a 5-7-5 haiku capturing a bittersweet childhood summer afternoon."}
+{"id": "urban_moments_026", "domain": "urban_moments", "topic": "a crowded baker opening wooden shutters", "prompt": "Write a poetic haiku describing a crowded baker opening wooden shutters."}
+{"id": "night_cosmos_027", "domain": "night_cosmos", "topic": "a sprawling satellite gliding through dusk", "prompt": "Write a poetic haiku describing a sprawling satellite gliding through dusk."}
+{"id": "emotions_memory_065", "domain": "emotions_memory", "topic": "a peaceful relief after a hard week", "prompt": "Write a haiku about a peaceful relief after a hard week."}
+{"id": "seasons_weather_053", "domain": "seasons_weather", "topic": "a misty summer heatwave at noon", "prompt": "Craft a haiku about a misty summer heatwave at noon."}
+{"id": "seasons_weather_000", "domain": "seasons_weather", "topic": "a quiet winter snowy morning", "prompt": "Write a haiku about a quiet winter snowy morning."}
+{"id": "nature_wildlife_065", "domain": "nature_wildlife", "topic": "a wandering spider spinning dawn silk", "prompt": "Write a haiku about a wandering spider spinning dawn silk."}
+{"id": "nature_wildlife_059", "domain": "nature_wildlife", "topic": "a silver whale surfacing in mist", "prompt": "Write a poetic haiku describing a silver whale surfacing in mist."}
+{"id": "urban_moments_016", "domain": "urban_moments", "topic": "a neon baker opening wooden shutters", "prompt": "Write a poetic haiku describing a neon baker opening wooden shutters."}
+{"id": "night_cosmos_030", "domain": "night_cosmos", "topic": "a silent full moon over pine trees", "prompt": "Write a vivid haiku inspired by a silent full moon over pine trees."}
+{"id": "travel_transit_012", "domain": "travel_transit", "topic": "a night bicycle coasting downhill", "prompt": "Compose a 5-7-5 haiku capturing a night bicycle coasting downhill."}
+{"id": "home_objects_050", "domain": "home_objects", "topic": "a flickering brass pocket watch", "prompt": "Write a vivid haiku inspired by a flickering brass pocket watch."}
+{"id": "coding_tech_016", "domain": "coding_tech", "topic": "a glowing laptop screen in dark room", "prompt": "Write a vivid haiku inspired by a glowing laptop screen in dark room."}
+{"id": "nature_wildlife_030", "domain": "nature_wildlife", "topic": "a hidden heron beside still reeds", "prompt": "Write a haiku about a hidden heron beside still reeds."}
+{"id": "food_kitchen_060", "domain": "food_kitchen", "topic": "a sweet bowl of miso soup", "prompt": "Write a vivid haiku inspired by a sweet bowl of miso soup."}
+{"id": "urban_moments_042", "domain": "urban_moments", "topic": "a sunlit rooftop garden in summer", "prompt": "Write a haiku about a sunlit rooftop garden in summer."}
+{"id": "ocean_mountains_073", "domain": "ocean_mountains", "topic": "a cloud-wrapped alpine meadow in July", "prompt": "Craft a haiku about a cloud-wrapped alpine meadow in July."}
+{"id": "food_kitchen_035", "domain": "food_kitchen", "topic": "a simmering slice of ripe summer peach", "prompt": "Write a vivid haiku inspired by a simmering slice of ripe summer peach."}
+{"id": "seasons_weather_060", "domain": "seasons_weather", "topic": "a bright winter snowy morning", "prompt": "Write a haiku about a bright winter snowy morning."}
+{"id": "food_kitchen_082", "domain": "food_kitchen", "topic": "a rustic loaf of sourdough cooling", "prompt": "Write a poetic haiku describing a rustic loaf of sourdough cooling."}
+{"id": "home_objects_026", "domain": "home_objects", "topic": "a sun-warmed wooden rocking chair", "prompt": "Craft a haiku about a sun-warmed wooden rocking chair."}
+{"id": "night_cosmos_035", "domain": "night_cosmos", "topic": "a silent firefly meadow under stars", "prompt": "Write a vivid haiku inspired by a silent firefly meadow under stars."}
+{"id": "nature_wildlife_089", "domain": "nature_wildlife", "topic": "a darting whale surfacing in mist", "prompt": "Write a poetic haiku describing a darting whale surfacing in mist."}
+{"id": "ocean_mountains_033", "domain": "ocean_mountains", "topic": "a shadowed alpine meadow in July", "prompt": "Craft a haiku about a shadowed alpine meadow in July."}
+{"id": "travel_transit_032", "domain": "travel_transit", "topic": "a lonely bicycle coasting downhill", "prompt": "Compose a 5-7-5 haiku capturing a lonely bicycle coasting downhill."}
+{"id": "urban_moments_059", "domain": "urban_moments", "topic": "a midnight pigeon strutting on brick", "prompt": "Write a vivid haiku inspired by a midnight pigeon strutting on brick."}
+{"id": "home_objects_072", "domain": "home_objects", "topic": "a cracked quilted blanket on oak", "prompt": "Write a poetic haiku describing a cracked quilted blanket on oak."}
+{"id": "home_objects_064", "domain": "home_objects", "topic": "a worn record spinning softly", "prompt": "Compose a 5-7-5 haiku capturing a worn record spinning softly."}
+{"id": "night_cosmos_097", "domain": "night_cosmos", "topic": "a shimmering satellite gliding through dusk", "prompt": "Write a poetic haiku describing a shimmering satellite gliding through dusk."}
+{"id": "ocean_mountains_028", "domain": "ocean_mountains", "topic": "a sunlit cedar cliff overlooking sea", "prompt": "Craft a haiku about a sunlit cedar cliff overlooking sea."}
+{"id": "night_cosmos_066", "domain": "night_cosmos", "topic": "a crescent constellation above desert sand", "prompt": "Craft a haiku about a crescent constellation above desert sand."}
+{"id": "emotions_memory_006", "domain": "emotions_memory", "topic": "a lingering laughter heard through walls", "prompt": "Compose a 5-7-5 haiku capturing a lingering laughter heard through walls."}
+{"id": "night_cosmos_032", "domain": "night_cosmos", "topic": "a silent aurora rippling above snow", "prompt": "Write a poetic haiku describing a silent aurora rippling above snow."}
+{"id": "seasons_weather_071", "domain": "seasons_weather", "topic": "a fading autumn rainstorm on glass", "prompt": "Compose a 5-7-5 haiku capturing a fading autumn rainstorm on glass."}
+{"id": "ocean_mountains_000", "domain": "ocean_mountains", "topic": "a distant lighthouse above dark waves", "prompt": "Write a haiku about a distant lighthouse above dark waves."}
+{"id": "ocean_mountains_076", "domain": "ocean_mountains", "topic": "a cloud-wrapped canyon river at twilight", "prompt": "Compose a 5-7-5 haiku capturing a cloud-wrapped canyon river at twilight."}
+{"id": "home_objects_052", "domain": "home_objects", "topic": "a flickering quilted blanket on oak", "prompt": "Write a poetic haiku describing a flickering quilted blanket on oak."}
+{"id": "travel_transit_055", "domain": "travel_transit", "topic": "a wooden window seat above clouds", "prompt": "Write a poetic haiku describing a wooden window seat above clouds."}
+{"id": "home_objects_068", "domain": "home_objects", "topic": "a worn key hanging by the door", "prompt": "Write a haiku about a worn key hanging by the door."}
+{"id": "coding_tech_055", "domain": "coding_tech", "topic": "a tangled git merge without conflict", "prompt": "Compose a 5-7-5 haiku capturing a tangled git merge without conflict."}
+{"id": "urban_moments_028", "domain": "urban_moments", "topic": "a crowded jazz note drifting outdoors", "prompt": "Compose a 5-7-5 haiku capturing a crowded jazz note drifting outdoors."}
+{"id": "night_cosmos_096", "domain": "night_cosmos", "topic": "a shimmering constellation above desert sand", "prompt": "Craft a haiku about a shimmering constellation above desert sand."}
+{"id": "travel_transit_091", "domain": "travel_transit", "topic": "a departing ferry cutting silver wake", "prompt": "Write a haiku about a departing ferry cutting silver wake."}
+{"id": "home_objects_010", "domain": "home_objects", "topic": "a dusty brass pocket watch", "prompt": "Write a vivid haiku inspired by a dusty brass pocket watch."}
+{"id": "nature_wildlife_078", "domain": "nature_wildlife", "topic": "a silent cicada singing at dusk", "prompt": "Craft a haiku about a silent cicada singing at dusk."}
+{"id": "travel_transit_060", "domain": "travel_transit", "topic": "a slow train crossing rice fields", "prompt": "Write a poetic haiku describing a slow train crossing rice fields."}
+{"id": "urban_moments_030", "domain": "urban_moments", "topic": "a hushed subway platform at dusk", "prompt": "Craft a haiku about a hushed subway platform at dusk."}
+{"id": "home_objects_055", "domain": "home_objects", "topic": "a flickering paper lantern in breeze", "prompt": "Write a vivid haiku inspired by a flickering paper lantern in breeze."}
+{"id": "coding_tech_029", "domain": "coding_tech", "topic": "a stubborn coffee cooling beside code", "prompt": "Write a haiku about a stubborn coffee cooling beside code."}
+{"id": "emotions_memory_000", "domain": "emotions_memory", "topic": "a lingering farewell at the gate", "prompt": "Write a haiku about a lingering farewell at the gate."}
+{"id": "travel_transit_018", "domain": "travel_transit", "topic": "a night empty highway at daybreak", "prompt": "Write a vivid haiku inspired by a night empty highway at daybreak."}
+{"id": "night_cosmos_072", "domain": "night_cosmos", "topic": "a cold aurora rippling above snow", "prompt": "Write a poetic haiku describing a cold aurora rippling above snow."}
+{"id": "ocean_mountains_017", "domain": "ocean_mountains", "topic": "a windblown fishing boat entering harbor", "prompt": "Write a vivid haiku inspired by a windblown fishing boat entering harbor."}
+{"id": "food_kitchen_091", "domain": "food_kitchen", "topic": "a late-night kettle whistling at dawn", "prompt": "Craft a haiku about a late-night kettle whistling at dawn."}
+{"id": "nature_wildlife_043", "domain": "nature_wildlife", "topic": "a patient owl perched in old pines", "prompt": "Craft a haiku about a patient owl perched in old pines."}
+{"id": "emotions_memory_081", "domain": "emotions_memory", "topic": "a hopeful childhood summer afternoon", "prompt": "Compose a 5-7-5 haiku capturing a hopeful childhood summer afternoon."}
+{"id": "urban_moments_072", "domain": "urban_moments", "topic": "a bustling rooftop garden in summer", "prompt": "Write a haiku about a bustling rooftop garden in summer."}
+{"id": "night_cosmos_068", "domain": "night_cosmos", "topic": "a crescent milky way over dark lake", "prompt": "Write a haiku about a crescent milky way over dark lake."}
+{"id": "food_kitchen_004", "domain": "food_kitchen", "topic": "a steaming skillet of roasted chestnuts", "prompt": "Compose a 5-7-5 haiku capturing a steaming skillet of roasted chestnuts."}
+{"id": "night_cosmos_058", "domain": "night_cosmos", "topic": "a radiant milky way over dark lake", "prompt": "Write a haiku about a radiant milky way over dark lake."}
+{"id": "night_cosmos_083", "domain": "night_cosmos", "topic": "a timeless eclipse darkening midday sky", "prompt": "Write a haiku about a timeless eclipse darkening midday sky."}
+{"id": "nature_wildlife_013", "domain": "nature_wildlife", "topic": "a watchful owl perched in old pines", "prompt": "Craft a haiku about a watchful owl perched in old pines."}
+{"id": "home_objects_021", "domain": "home_objects", "topic": "a sun-warmed ceramic mug by a window", "prompt": "Craft a haiku about a sun-warmed ceramic mug by a window."}
+{"id": "travel_transit_036", "domain": "travel_transit", "topic": "a lonely sailboat leaning into wind", "prompt": "Write a haiku about a lonely sailboat leaning into wind."}
+{"id": "night_cosmos_078", "domain": "night_cosmos", "topic": "a cold milky way over dark lake", "prompt": "Write a haiku about a cold milky way over dark lake."}
+{"id": "home_objects_019", "domain": "home_objects", "topic": "a dusty glass marble catching sunlight", "prompt": "Compose a 5-7-5 haiku capturing a dusty glass marble catching sunlight."}
+{"id": "travel_transit_041", "domain": "travel_transit", "topic": "a sunlit ferry cutting silver wake", "prompt": "Write a haiku about a sunlit ferry cutting silver wake."}
+{"id": "urban_moments_086", "domain": "urban_moments", "topic": "a steam-filled baker opening wooden shutters", "prompt": "Write a poetic haiku describing a steam-filled baker opening wooden shutters."}
+{"id": "emotions_memory_028", "domain": "emotions_memory", "topic": "a bittersweet gratitude at sunset", "prompt": "Craft a haiku about a bittersweet gratitude at sunset."}
+{"id": "seasons_weather_017", "domain": "seasons_weather", "topic": "an early foggy October dawn", "prompt": "Write a vivid haiku inspired by an early foggy October dawn."}
+{"id": "emotions_memory_073", "domain": "emotions_memory", "topic": "a restless moment of quiet forgiveness", "prompt": "Craft a haiku about a restless moment of quiet forgiveness."}
+{"id": "night_cosmos_076", "domain": "night_cosmos", "topic": "a cold constellation above desert sand", "prompt": "Craft a haiku about a cold constellation above desert sand."}
+{"id": "emotions_memory_039", "domain": "emotions_memory", "topic": "a sudden solitude without loneliness", "prompt": "Write a poetic haiku describing a sudden solitude without loneliness."}
+{"id": "food_kitchen_022", "domain": "food_kitchen", "topic": "a freshly baked loaf of sourdough cooling", "prompt": "Write a poetic haiku describing a freshly baked loaf of sourdough cooling."}
+{"id": "emotions_memory_004", "domain": "emotions_memory", "topic": "a lingering longing for familiar hills", "prompt": "Write a poetic haiku describing a lingering longing for familiar hills."}
+{"id": "nature_wildlife_072", "domain": "nature_wildlife", "topic": "a silent koi swimming under lilies", "prompt": "Write a vivid haiku inspired by a silent koi swimming under lilies."}
+{"id": "ocean_mountains_043", "domain": "ocean_mountains", "topic": "a rugged alpine meadow in July", "prompt": "Craft a haiku about a rugged alpine meadow in July."}
+{"id": "coding_tech_080", "domain": "coding_tech", "topic": "a humming cursor blinking on black", "prompt": "Compose a 5-7-5 haiku capturing a humming cursor blinking on black."}
+{"id": "ocean_mountains_086", "domain": "ocean_mountains", "topic": "a tide-carved canyon river at twilight", "prompt": "Compose a 5-7-5 haiku capturing a tide-carved canyon river at twilight."}
+{"id": "home_objects_004", "domain": "home_objects", "topic": "an antique record spinning softly", "prompt": "Compose a 5-7-5 haiku capturing an antique record spinning softly."}
+{"id": "emotions_memory_074", "domain": "emotions_memory", "topic": "a restless longing for familiar hills", "prompt": "Write a poetic haiku describing a restless longing for familiar hills."}
+{"id": "travel_transit_076", "domain": "travel_transit", "topic": "a winding sailboat leaning into wind", "prompt": "Write a haiku about a winding sailboat leaning into wind."}
+{"id": "food_kitchen_030", "domain": "food_kitchen", "topic": "a simmering bowl of miso soup", "prompt": "Write a vivid haiku inspired by a simmering bowl of miso soup."}
+{"id": "urban_moments_013", "domain": "urban_moments", "topic": "a neon alleyway after rainfall", "prompt": "Compose a 5-7-5 haiku capturing a neon alleyway after rainfall."}
+{"id": "ocean_mountains_098", "domain": "ocean_mountains", "topic": "a moonlit cedar cliff overlooking sea", "prompt": "Craft a haiku about a moonlit cedar cliff overlooking sea."}
+{"id": "seasons_weather_094", "domain": "seasons_weather", "topic": "a bitter first frost on green grass", "prompt": "Write a poetic haiku describing a bitter first frost on green grass."}
+{"id": "coding_tech_012", "domain": "coding_tech", "topic": "a glowing server rack in cold air", "prompt": "Craft a haiku about a glowing server rack in cold air."}
+{"id": "emotions_memory_029", "domain": "emotions_memory", "topic": "a bittersweet solitude without loneliness", "prompt": "Write a poetic haiku describing a bittersweet solitude without loneliness."}
+{"id": "night_cosmos_005", "domain": "night_cosmos", "topic": "a pale firefly meadow under stars", "prompt": "Write a vivid haiku inspired by a pale firefly meadow under stars."}
+{"id": "seasons_weather_016", "domain": "seasons_weather", "topic": "an early thunderstorm rolling east", "prompt": "Compose a 5-7-5 haiku capturing an early thunderstorm rolling east."}
+{"id": "nature_wildlife_090", "domain": "nature_wildlife", "topic": "a drowsy heron beside still reeds", "prompt": "Write a haiku about a drowsy heron beside still reeds."}
+{"id": "home_objects_063", "domain": "home_objects", "topic": "a worn fountain pen on linen paper", "prompt": "Write a haiku about a worn fountain pen on linen paper."}
+{"id": "emotions_memory_034", "domain": "emotions_memory", "topic": "a sudden longing for familiar hills", "prompt": "Write a poetic haiku describing a sudden longing for familiar hills."}
+{"id": "ocean_mountains_005", "domain": "ocean_mountains", "topic": "a distant glacier valley in silence", "prompt": "Write a haiku about a distant glacier valley in silence."}
+{"id": "home_objects_089", "domain": "home_objects", "topic": "a cherished glass marble catching sunlight", "prompt": "Compose a 5-7-5 haiku capturing a cherished glass marble catching sunlight."}
+{"id": "food_kitchen_059", "domain": "food_kitchen", "topic": "a bitter ramen broth in winter", "prompt": "Compose a 5-7-5 haiku capturing a bitter ramen broth in winter."}
+{"id": "coding_tech_006", "domain": "coding_tech", "topic": "a quiet laptop screen in dark room", "prompt": "Write a vivid haiku inspired by a quiet laptop screen in dark room."}
+{"id": "urban_moments_094", "domain": "urban_moments", "topic": "a windy crosswalk under amber lights", "prompt": "Write a vivid haiku inspired by a windy crosswalk under amber lights."}
+{"id": "night_cosmos_033", "domain": "night_cosmos", "topic": "a silent eclipse darkening midday sky", "prompt": "Write a haiku about a silent eclipse darkening midday sky."}
+{"id": "seasons_weather_056", "domain": "seasons_weather", "topic": "a misty thunderstorm rolling east", "prompt": "Compose a 5-7-5 haiku capturing a misty thunderstorm rolling east."}
+{"id": "night_cosmos_059", "domain": "night_cosmos", "topic": "a radiant dawn star fading in blue", "prompt": "Compose a 5-7-5 haiku capturing a radiant dawn star fading in blue."}
+{"id": "travel_transit_068", "domain": "travel_transit", "topic": "a slow empty highway at daybreak", "prompt": "Write a vivid haiku inspired by a slow empty highway at daybreak."}
+{"id": "seasons_weather_058", "domain": "seasons_weather", "topic": "a misty April hail on rooftops", "prompt": "Craft a haiku about a misty April hail on rooftops."}
+{"id": "nature_wildlife_075", "domain": "nature_wildlife", "topic": "a silent spider spinning dawn silk", "prompt": "Write a haiku about a silent spider spinning dawn silk."}
+{"id": "night_cosmos_051", "domain": "night_cosmos", "topic": "a radiant meteor streaking past Orion", "prompt": "Craft a haiku about a radiant meteor streaking past Orion."}
+{"id": "food_kitchen_005", "domain": "food_kitchen", "topic": "a steaming slice of ripe summer peach", "prompt": "Write a vivid haiku inspired by a steaming slice of ripe summer peach."}
+{"id": "coding_tech_019", "domain": "coding_tech", "topic": "a glowing coffee cooling beside code", "prompt": "Write a haiku about a glowing coffee cooling beside code."}
+{"id": "nature_wildlife_096", "domain": "nature_wildlife", "topic": "a drowsy salmon leaping cold rapids", "prompt": "Compose a 5-7-5 haiku capturing a drowsy salmon leaping cold rapids."}
+{"id": "night_cosmos_054", "domain": "night_cosmos", "topic": "a radiant comet tail in deep black", "prompt": "Compose a 5-7-5 haiku capturing a radiant comet tail in deep black."}
+{"id": "ocean_mountains_037", "domain": "ocean_mountains", "topic": "a shadowed fishing boat entering harbor", "prompt": "Write a vivid haiku inspired by a shadowed fishing boat entering harbor."}
+{"id": "seasons_weather_090", "domain": "seasons_weather", "topic": "a bitter winter snowy morning", "prompt": "Write a haiku about a bitter winter snowy morning."}
+{"id": "coding_tech_010", "domain": "coding_tech", "topic": "a glowing cursor blinking on black", "prompt": "Compose a 5-7-5 haiku capturing a glowing cursor blinking on black."}
+{"id": "urban_moments_065", "domain": "urban_moments", "topic": "a sleepy laundromat spinning late", "prompt": "Craft a haiku about a sleepy laundromat spinning late."}
+{"id": "night_cosmos_016", "domain": "night_cosmos", "topic": "a silver constellation above desert sand", "prompt": "Craft a haiku about a silver constellation above desert sand."}
+{"id": "urban_moments_090", "domain": "urban_moments", "topic": "a windy subway platform at dusk", "prompt": "Craft a haiku about a windy subway platform at dusk."}
+{"id": "nature_wildlife_067", "domain": "nature_wildlife", "topic": "a wandering deer stepping through ferns", "prompt": "Write a vivid haiku inspired by a wandering deer stepping through ferns."}
+{"id": "travel_transit_070", "domain": "travel_transit", "topic": "a winding train crossing rice fields", "prompt": "Write a poetic haiku describing a winding train crossing rice fields."}
+{"id": "emotions_memory_098", "domain": "emotions_memory", "topic": "a distant gratitude at sunset", "prompt": "Craft a haiku about a distant gratitude at sunset."}
+{"id": "home_objects_098", "domain": "home_objects", "topic": "a ticking key hanging by the door", "prompt": "Write a haiku about a ticking key hanging by the door."}
+{"id": "food_kitchen_029", "domain": "food_kitchen", "topic": "a freshly baked ramen broth in winter", "prompt": "Compose a 5-7-5 haiku capturing a freshly baked ramen broth in winter."}
+{"id": "home_objects_029", "domain": "home_objects", "topic": "a sun-warmed glass marble catching sunlight", "prompt": "Compose a 5-7-5 haiku capturing a sun-warmed glass marble catching sunlight."}
+{"id": "emotions_memory_085", "domain": "emotions_memory", "topic": "a hopeful relief after a hard week", "prompt": "Write a haiku about a hopeful relief after a hard week."}
+{"id": "night_cosmos_082", "domain": "night_cosmos", "topic": "a timeless aurora rippling above snow", "prompt": "Write a poetic haiku describing a timeless aurora rippling above snow."}
+{"id": "coding_tech_060", "domain": "coding_tech", "topic": "a sudden cursor blinking on black", "prompt": "Compose a 5-7-5 haiku capturing a sudden cursor blinking on black."}
+{"id": "ocean_mountains_093", "domain": "ocean_mountains", "topic": "a moonlit alpine meadow in July", "prompt": "Craft a haiku about a moonlit alpine meadow in July."}
+{"id": "travel_transit_024", "domain": "travel_transit", "topic": "a coastal footbridge over a creek", "prompt": "Craft a haiku about a coastal footbridge over a creek."}
+{"id": "urban_moments_068", "domain": "urban_moments", "topic": "a sleepy jazz note drifting outdoors", "prompt": "Compose a 5-7-5 haiku capturing a sleepy jazz note drifting outdoors."}
