@@ -23,6 +23,8 @@ from grpo_haiku.grpo import (
     normalize_completion_text,
     reference_policy,
     save_adapter,
+    sequence_completion_logprobs,
+    sequence_completion_logprobs_and_entropy,
     snapshot_lora_weights,
 )
 from grpo_haiku.rewards import score_completion
@@ -235,3 +237,57 @@ def test_cosine_lr_schedule_endpoints_and_monotonic_decay():
     mid = cosine_lr(100, 200, 4e-6, 5e-7)
     assert 2e-6 < mid < 2.5e-6
     assert cosine_lr(50, 200, 4e-6, 5e-7) > mid > cosine_lr(150, 200, 4e-6, 5e-7)
+
+
+def test_dapo_clip_higher_and_entropy_bonus():
+    old_lp = mx.array([-1.0, -1.0, -1.0])
+    ref_lp = mx.array([-1.0, -1.0, -1.0])
+    # Ratio = exp(1.0) > 1.28 -> clipped at 1 + clip_eps_high = 1.28
+    loss_hi, _ = grpo_token_loss(
+        mx.array([0.0, 0.0, 0.0]),
+        old_lp,
+        ref_lp,
+        advantage=1.0,
+        kl_beta=0.0,
+        clip_eps=0.2,
+        clip_eps_high=0.28,
+    )
+    mx.eval(loss_hi)
+    assert abs(float(loss_hi.item()) - (-1.28)) < 1e-5
+
+    # Higher entropy reduces loss when entropy_coef > 0
+    loss_low_ent, _ = grpo_token_loss(
+        old_lp, old_lp, ref_lp, advantage=0.0, kl_beta=0.0,
+        token_entropy=mx.array([0.5, 0.5, 0.5]), entropy_coef=0.01,
+    )
+    loss_high_ent, _ = grpo_token_loss(
+        old_lp, old_lp, ref_lp, advantage=0.0, kl_beta=0.0,
+        token_entropy=mx.array([2.0, 2.0, 2.0]), entropy_coef=0.01,
+    )
+    mx.eval(loss_low_ent, loss_high_ent)
+    assert float(loss_high_ent.item()) < float(loss_low_ent.item())
+
+
+class _TinyVocabLM(nn.Module):
+    def __init__(self, vocab: int = 12, dim: int = 8) -> None:
+        super().__init__()
+        self.emb = nn.Embedding(vocab, dim)
+        self.head = nn.Linear(dim, vocab, bias=False)
+
+    def __call__(self, tokens: mx.array) -> mx.array:
+        return self.head(self.emb(tokens))
+
+
+def test_sequence_completion_logprobs_and_entropy_matches_cross_entropy():
+    mx.random.seed(7)
+    lm = _TinyVocabLM()
+    prompt_ids = [1, 2, 3]
+    comp_ids = [4, 5, 6, 7]
+
+    lp_ce = sequence_completion_logprobs(lm, prompt_ids, comp_ids)
+    lp_ent, ent = sequence_completion_logprobs_and_entropy(lm, prompt_ids, comp_ids)
+    mx.eval(lp_ce, lp_ent, ent)
+
+    assert bool(mx.allclose(lp_ce, lp_ent, atol=1e-5).item())
+    assert bool(mx.all(ent >= 0.0).item())
+    assert ent.shape == (len(comp_ids),)

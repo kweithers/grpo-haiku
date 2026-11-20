@@ -85,7 +85,8 @@ class GRPOConfig:
     train_file: str = "data/train.jsonl"
     eval_file: str = "data/eval.jsonl"
     resume_adapter: str | None = None
-    run_name: str = "qwen3_1.7b_r2_sft_grpo_v5"
+    kl_ref_adapter: str | None = None  # "base" for base model, adapter path, or None (=resume_adapter)
+    run_name: str = "qwen3_1.7b_anti_collapse_v7"
     runs_dir: str = "runs"
 
     # GRPO rollout & optimization
@@ -98,8 +99,10 @@ class GRPOConfig:
     learning_rate: float = 4e-6
     min_learning_rate: float = 5e-7
     weight_decay: float = 0.01
-    kl_beta: float = 0.03
+    kl_beta: float = 0.04
     clip_eps: float = 0.2
+    clip_eps_high: float = 0.28  # DAPO Clip-Higher: lets rare creative tokens climb faster
+    entropy_coef: float = 0.005  # Mild token entropy bonus to deter greedy template lock-in
     grad_clip_norm: float = 1.0
     adv_eps: float = 1e-6
     line_credit_weight: float = 0.50  # Blend of per-line vs global advantage per token

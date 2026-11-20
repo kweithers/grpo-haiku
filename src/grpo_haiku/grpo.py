@@ -164,8 +164,11 @@ def grpo_token_loss(
     advantage: float | mx.array,
     kl_beta: float = 0.04,
     clip_eps: float = 0.2,
+    clip_eps_high: float | None = None,
+    token_entropy: mx.array | None = None,
+    entropy_coef: float = 0.0,
 ) -> tuple[mx.array, mx.array]:
-    """Compute mean per-token GRPO clipped surrogate + k3 KL loss and mean KL."""
+    """Compute mean per-token GRPO asymmetric-clipped surrogate + k3 KL - entropy bonus."""
     log_ratio = mx.clip(new_logprobs - old_logprobs, -20.0, 20.0)
     ratio = mx.exp(log_ratio)
     adv = (
@@ -174,12 +177,15 @@ def grpo_token_loss(
         else mx.array(advantage, dtype=mx.float32)
     )
 
+    hi = clip_eps if clip_eps_high is None else clip_eps_high
     surr1 = ratio * adv
-    surr2 = mx.clip(ratio, 1.0 - clip_eps, 1.0 + clip_eps) * adv
+    surr2 = mx.clip(ratio, 1.0 - clip_eps, 1.0 + hi) * adv
     policy_loss = -mx.minimum(surr1, surr2)
 
     kl = kl_k3(new_logprobs, ref_logprobs)
     total_loss = mx.mean(policy_loss + kl_beta * kl)
+    if token_entropy is not None and entropy_coef > 0.0:
+        total_loss = total_loss - entropy_coef * mx.mean(token_entropy.astype(mx.float32))
     return total_loss, mx.mean(kl)
 
 
@@ -303,6 +309,29 @@ def sequence_completion_logprobs(
     # -cross_entropy gives exact log_softmax(logits)[target] without keeping full log_probs graph
     nll = nn.losses.cross_entropy(comp_logits, comp_targets, reduction="none")
     return -nll[0]  # (T_comp,)
+
+
+def sequence_completion_logprobs_and_entropy(
+    model: nn.Module,
+    prompt_ids: list[int],
+    completion_ids: list[int],
+) -> tuple[mx.array, mx.array]:
+    """Compute per-token target log-probs AND Shannon entropy on completion tokens (batch=1)."""
+    full_ids = prompt_ids + completion_ids
+    tokens = mx.array(full_ids, dtype=mx.int32)[None, :]
+    inputs = tokens[:, :-1]
+    targets = tokens[:, 1:]
+
+    logits = model(inputs)
+    start = len(prompt_ids) - 1
+    comp_logits = logits[:, start:, :].astype(mx.float32)  # (1, T_comp, V)
+    comp_targets = targets[:, start:]  # (1, T_comp)
+
+    log_probs = comp_logits - mx.logsumexp(comp_logits, axis=-1, keepdims=True)
+    target_lp = mx.take_along_axis(log_probs, comp_targets[..., None], axis=-1)[0, :, 0]
+    probs = mx.exp(log_probs)
+    entropy = -mx.sum(probs * log_probs, axis=-1)[0]
+    return target_lp, entropy
 
 
 # ---------------------------------------------------------------------------
@@ -468,11 +497,27 @@ def train_grpo(
     print(f"Loading model: {model_cfg.model_name}")
     model, tokenizer = build_lora_model(model_cfg)
 
+    # Resolve reference policy for KL independently of `--resume-adapter` so iterative runs
+    # can anchor KL to a high-diversity policy (e.g. `sft_v1` or `base`) without ratcheting.
     ref_lora_weights: list[tuple[str, mx.array]] | None = None
-    if grpo_cfg.resume_adapter:
-        print(f"Resuming LoRA weights from: {grpo_cfg.resume_adapter} (anchoring KL to resumed adapter)")
-        load_lora_weights_into_model(model, grpo_cfg.resume_adapter)
+    kl_ref_spec = grpo_cfg.kl_ref_adapter
+    if kl_ref_spec is not None and kl_ref_spec.lower() in {"base", "none"}:
+        print("Anchoring KL to frozen base model (explicit --kl-ref-adapter=base)")
+        ref_lora_weights = None
+    elif kl_ref_spec is not None:
+        print(f"Anchoring KL to reference adapter: {kl_ref_spec}")
+        init_snap = snapshot_lora_weights(model)
+        load_lora_weights_into_model(model, kl_ref_spec)
         ref_lora_weights = snapshot_lora_weights(model)
+        model.load_weights(init_snap, strict=False)
+        mx.eval(model.trainable_parameters())
+
+    if grpo_cfg.resume_adapter:
+        print(f"Resuming trainable LoRA weights from: {grpo_cfg.resume_adapter}")
+        load_lora_weights_into_model(model, grpo_cfg.resume_adapter)
+        if kl_ref_spec is None:
+            print("Anchoring KL to resumed adapter (pass --kl-ref-adapter to override)")
+            ref_lora_weights = snapshot_lora_weights(model)
 
     relevance_scorer: RelevanceScorer | None = None
     if reward_cfg.relevance_weight > 0.0:
@@ -493,16 +538,29 @@ def train_grpo(
         old_lp: mx.array,
         ref_lp: mx.array,
         advantage: mx.array,
-    ) -> tuple[mx.array, mx.array]:
-        new_lp = sequence_completion_logprobs(model_arg, prompt_ids, completion_ids)
-        return grpo_token_loss(
+    ) -> tuple[mx.array, mx.array, mx.array]:
+        if grpo_cfg.entropy_coef > 0.0:
+            new_lp, tok_ent = sequence_completion_logprobs_and_entropy(
+                model_arg, prompt_ids, completion_ids
+            )
+            mean_ent = mx.mean(tok_ent)
+        else:
+            new_lp = sequence_completion_logprobs(model_arg, prompt_ids, completion_ids)
+            tok_ent = None
+            mean_ent = mx.array(0.0, dtype=mx.float32)
+
+        loss, mean_kl = grpo_token_loss(
             new_logprobs=new_lp,
             old_logprobs=old_lp,
             ref_logprobs=ref_lp,
             advantage=advantage,
             kl_beta=grpo_cfg.kl_beta,
             clip_eps=grpo_cfg.clip_eps,
+            clip_eps_high=grpo_cfg.clip_eps_high,
+            token_entropy=tok_ent,
+            entropy_coef=grpo_cfg.entropy_coef,
         )
+        return loss, mean_kl, mean_ent
 
     loss_and_grad_fn = nn.value_and_grad(model, _single_seq_loss)
     metrics_path = run_dir / "metrics.jsonl"
@@ -521,6 +579,7 @@ def train_grpo(
     print(
         f"Starting GRPO training: steps={grpo_cfg.num_steps}, G={grpo_cfg.group_size}, "
         f"lr={grpo_cfg.learning_rate}->{grpo_cfg.min_learning_rate}, kl_beta={grpo_cfg.kl_beta}, "
+        f"clip=[{grpo_cfg.clip_eps},{grpo_cfg.clip_eps_high}], ent_coef={grpo_cfg.entropy_coef}, "
         f"line_credit_w={grpo_cfg.line_credit_weight}, relevance_w={reward_cfg.relevance_weight}, "
         f"max_tokens={grpo_cfg.max_completion_tokens}"
     )
@@ -592,11 +651,12 @@ def train_grpo(
 
         loss_val = 0.0
         kl_val = 0.0
+        ent_val = 0.0
         grad_norm_val = 0.0
         skipped_update = (not has_variance) or (len(valid_indices) == 0)
 
         if not skipped_update:
-            # 3. Reference log-probs (anchored to SFT snapshot if resumed, else base model)
+            # 3. Reference log-probs (anchored to --kl-ref-adapter, SFT snapshot, or base model)
             ref_logprobs_list: dict[int, mx.array] = {}
             with reference_policy(model, ref_lora_weights):
                 for idx in valid_indices:
@@ -618,6 +678,7 @@ def train_grpo(
             # 4. Micro-batch=1 gradient accumulation with scoped gradient checkpointing
             epoch_losses: list[float] = []
             epoch_kls: list[float] = []
+            epoch_ents: list[float] = []
             inv_n = 1.0 / len(valid_indices)
 
             with gradient_checkpointing(model, enabled=model_cfg.grad_checkpoint):
@@ -625,9 +686,10 @@ def train_grpo(
                     accum_grads = None
                     step_loss = 0.0
                     step_kl = 0.0
+                    step_ent = 0.0
 
                     for idx in valid_indices:
-                        (seq_loss, seq_kl), grads = loss_and_grad_fn(
+                        (seq_loss, seq_kl, seq_ent), grads = loss_and_grad_fn(
                             model,
                             prompt_ids,
                             comp_token_ids[idx],
@@ -641,9 +703,10 @@ def train_grpo(
                         else:
                             accum_grads = tree_map(lambda a, b: a + b, accum_grads, scaled_grads)
 
-                        mx.eval(accum_grads, seq_loss, seq_kl)
+                        mx.eval(accum_grads, seq_loss, seq_kl, seq_ent)
                         step_loss += float(seq_loss.item()) * inv_n
                         step_kl += float(seq_kl.item()) * inv_n
+                        step_ent += float(seq_ent.item()) * inv_n
 
                     if accum_grads is not None:
                         accum_grads, grad_norm_val = clip_grad_norm(
@@ -654,9 +717,11 @@ def train_grpo(
 
                     epoch_losses.append(step_loss)
                     epoch_kls.append(step_kl)
+                    epoch_ents.append(step_ent)
 
             loss_val = sum(epoch_losses) / max(1, len(epoch_losses))
             kl_val = sum(epoch_kls) / max(1, len(epoch_kls))
+            ent_val = sum(epoch_ents) / max(1, len(epoch_ents))
 
         if hasattr(mx, "clear_cache"):
             mx.clear_cache()
@@ -689,6 +754,7 @@ def train_grpo(
             "cliche_rate": round(cliche_rate, 4),
             "loss": round(loss_val, 5),
             "kl": round(kl_val, 5),
+            "entropy": round(ent_val, 4),
             "lr": round(current_lr, 8),
             "grad_norm": round(grad_norm_val, 4),
             "avg_tokens": round(avg_comp_len, 1),
@@ -700,8 +766,8 @@ def train_grpo(
         print(
             f"[step {step:04d}/{grpo_cfg.num_steps}] "
             f"r={reward_mean:+.3f} (max={reward_max:+.3f}) | "
-            f"575={exact_rate*100:5.1f}% fmt={format_rate*100:5.1f}% rel={rel_mean:.2f} | "
-            f"kl={kl_val:.4f} gnorm={grad_norm_val:.2f} | "
+            f"575={exact_rate*100:5.1f}% fmt={format_rate*100:5.1f}% rel={rel_mean:.2f} cl={cliche_rate*100:4.0f}% | "
+            f"kl={kl_val:.4f} ent={ent_val:.2f} gnorm={grad_norm_val:.2f} | "
             f"toks={avg_comp_len:5.1f} mem={peak_mem_gb:.2f}GB ({step_sec:.1f}s)"
             + (" [skip:0var]" if skipped_update else "")
         )
@@ -759,6 +825,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--train-file", type=str, default=GRPOConfig.train_file)
     parser.add_argument("--eval-file", type=str, default=GRPOConfig.eval_file)
     parser.add_argument("--resume-adapter", type=str, default=GRPOConfig.resume_adapter)
+    parser.add_argument("--kl-ref-adapter", type=str, default=GRPOConfig.kl_ref_adapter)
     parser.add_argument("--run-name", type=str, default=GRPOConfig.run_name)
     parser.add_argument("--runs-dir", type=str, default=GRPOConfig.runs_dir)
     parser.add_argument("--steps", type=int, default=GRPOConfig.num_steps)
@@ -770,6 +837,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--lr", type=float, default=GRPOConfig.learning_rate)
     parser.add_argument("--min-lr", type=float, default=GRPOConfig.min_learning_rate)
     parser.add_argument("--kl-beta", type=float, default=GRPOConfig.kl_beta)
+    parser.add_argument("--clip-high", type=float, default=GRPOConfig.clip_eps_high)
+    parser.add_argument("--entropy-coef", type=float, default=GRPOConfig.entropy_coef)
     parser.add_argument("--line-credit-weight", type=float, default=GRPOConfig.line_credit_weight)
     parser.add_argument("--relevance-weight", type=float, default=RewardConfig.relevance_weight)
     parser.add_argument("--lora-rank", type=int, default=ModelConfig.lora_rank)
@@ -798,6 +867,7 @@ def main() -> None:
         train_file=args.train_file,
         eval_file=args.eval_file,
         resume_adapter=args.resume_adapter,
+        kl_ref_adapter=args.kl_ref_adapter,
         run_name=args.run_name,
         runs_dir=args.runs_dir,
         num_steps=args.steps,
@@ -809,6 +879,8 @@ def main() -> None:
         learning_rate=args.lr,
         min_learning_rate=args.min_lr,
         kl_beta=args.kl_beta,
+        clip_eps_high=args.clip_high,
+        entropy_coef=args.entropy_coef,
         line_credit_weight=args.line_credit_weight,
         eval_every=args.eval_every,
         eval_subset_size=args.eval_subset,
