@@ -5,34 +5,15 @@ from __future__ import annotations
 import argparse
 import json
 import random
-import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-_EMPTY_THINK_SUFFIX_RE = re.compile(r"<think>\s*</think>\s*$")
-
 SYSTEM_PROMPT = (
-    "You are a skilled haiku poet. Write a vivid, evocative English haiku "
-    "with strictly 3 lines following the 5-7-5 syllable structure.\n\n"
-    "Always think briefly inside <think>...</think> to draft your lines, count "
-    "each word's syllables, and fix any line that is not 5-7-5. Use standard "
-    "English words and avoid repeating words or copying the prompt verbatim.\n"
-    "Then output ONLY the final 3-line haiku inside <haiku>...</haiku> tags, "
-    "with nothing after </haiku>."
-)
-
-FEWSHOT_USER = "Write a haiku about falling autumn leaves."
-FEWSHOT_ASSISTANT = (
-    "<think>\n"
-    "L1: Crisp(1) red(1) leaves(1) drift(1) down(1) = 5\n"
-    "L2: Cold(1) wind(1) sweeps(1) the(1) dark(1) lane(1) = 6 -> swap 'dark' for 'qui-et'(2) -> Cold(1) wind(1) sweeps(1) the(1) qui-et(2) lane(1) = 7\n"
-    "L3: Dusk(1) cools(1) the(1) damp(1) earth(1) = 5\n"
-    "</think>\n"
-    "<haiku>\n"
-    "Crisp red leaves drift down\n"
-    "Cold wind sweeps the quiet lane\n"
-    "Dusk cools the damp earth\n"
-    "</haiku>"
+    "You are a skilled haiku poet. Output ONLY a vivid, evocative 3-line English "
+    "haiku strictly following the 5-7-5 syllable structure (5 syllables on line 1, "
+    "7 syllables on line 2, 5 syllables on line 3).\n\n"
+    "Use standard English words, avoid repeating words or copying the prompt verbatim, "
+    "and output nothing besides the 3 lines of the haiku (no title, no commentary, no tags)."
 )
 
 PROMPT_TEMPLATES = (
@@ -383,59 +364,37 @@ def load_jsonl(path: str | Path) -> list[HaikuPromptExample]:
 
 
 def format_chat_prompt(tokenizer, user_prompt: str, system_prompt: str = SYSTEM_PROMPT) -> str:
-    """Format prompt with a concise 1-shot <think>/<haiku> demonstration.
-
-    Uses `enable_thinking=False` when supported (Qwen3) so the chat template preserves
-    our concise 1-shot <think> scratchpad instead of triggering Qwen3's 1,000-token
-    verbose math-CoT mode, while remaining compatible with Gemma and other models.
-    """
+    """Format prompt for direct 3-line haiku generation with thinking disabled."""
     messages = [
         {"role": "system", "content": system_prompt},
-        {"role": "user", "content": FEWSHOT_USER},
-        {"role": "assistant", "content": FEWSHOT_ASSISTANT},
         {"role": "user", "content": user_prompt},
     ]
     if hasattr(tokenizer, "apply_chat_template") and getattr(tokenizer, "chat_template", None):
         try:
-            prompt = tokenizer.apply_chat_template(
+            # For Qwen3, `enable_thinking=False` cleanly disables thinking mode.
+            return tokenizer.apply_chat_template(
                 messages,
                 tokenize=False,
                 add_generation_prompt=True,
                 enable_thinking=False,
             )
-            # Qwen3's `enable_thinking=False` appends an empty `<think>\n\n</think>\n\n`
-            # suffix to disable thinking; strip it and prefill `<think>\nL1:` so both
-            # Qwen3 and Gemma jump straight into concise syllable counting instead of
-            # rambling past the token budget.
-            prompt = _EMPTY_THINK_SUFFIX_RE.sub("", prompt)
-            return prompt + "<think>\nL1:"
         except TypeError:
             # Gemma and older templates do not accept enable_thinking
             try:
-                prompt = tokenizer.apply_chat_template(
+                return tokenizer.apply_chat_template(
                     messages,
                     tokenize=False,
                     add_generation_prompt=True,
                 )
-                return prompt + "<think>\nL1:"
             except Exception:
-                # Some templates (e.g. Gemma) merge system into first user message
-                merged = [
-                    {"role": "user", "content": f"{system_prompt}\n\n{FEWSHOT_USER}"},
-                    {"role": "assistant", "content": FEWSHOT_ASSISTANT},
-                    {"role": "user", "content": user_prompt},
-                ]
-                prompt = tokenizer.apply_chat_template(
+                # Some templates (e.g. Gemma) merge system into user message
+                merged = [{"role": "user", "content": f"{system_prompt}\n\n{user_prompt}"}]
+                return tokenizer.apply_chat_template(
                     merged,
                     tokenize=False,
                     add_generation_prompt=True,
                 )
-                return prompt + "<think>\nL1:"
-    return (
-        f"{system_prompt}\n\n"
-        f"User: {FEWSHOT_USER}\nAssistant:\n{FEWSHOT_ASSISTANT}\n\n"
-        f"User: {user_prompt}\nAssistant:\n<think>\nL1:"
-    )
+    return f"{system_prompt}\n\nUser: {user_prompt}\nAssistant:\n"
 
 
 def main() -> None:

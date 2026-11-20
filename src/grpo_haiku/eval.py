@@ -45,7 +45,7 @@ def evaluate_model(
     model_name: str,
     eval_file: str,
     adapter_path: str | None = None,
-    max_tokens: int = 512,
+    max_tokens: int = 64,
     batch_size: int = 8,
     limit: int | None = None,
     relevance_weight: float = RewardConfig.relevance_weight,
@@ -188,7 +188,7 @@ def main() -> None:
     parser.add_argument("--eval-file", type=str, default="data/eval.jsonl")
     parser.add_argument("--out", type=str, default=None, help="Path to write JSON eval results.")
     parser.add_argument("--compare-with", type=str, default=None, help="Path to baseline eval JSON.")
-    parser.add_argument("--max-tokens", type=int, default=512)
+    parser.add_argument("--max-tokens", type=int, default=64)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--limit", type=int, default=None, help="Optional cap on number of eval prompts.")
     parser.add_argument("--relevance-weight", type=float, default=RewardConfig.relevance_weight)

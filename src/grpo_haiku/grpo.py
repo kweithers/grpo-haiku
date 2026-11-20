@@ -205,13 +205,8 @@ def save_adapter(
 
 
 def normalize_completion_text(prompt_text: str, completion_text: str) -> str:
-    """Restore any unclosed `<think>` prefill from `prompt_text` so tag parsing is uniform."""
-    idx = prompt_text.rfind("<think>")
-    if idx != -1 and "</think>" not in prompt_text[idx:]:
-        prefix = prompt_text[idx:]
-        if not completion_text.lstrip().lower().startswith("<think>"):
-            return prefix + completion_text
-    return completion_text
+    """Return completion text cleanly stripped for direct 3-line haiku scoring."""
+    return completion_text.strip()
 
 
 def truncate_after_haiku_close(

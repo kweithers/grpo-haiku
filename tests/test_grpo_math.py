@@ -134,7 +134,5 @@ def test_scoped_gradient_checkpointing_and_save_adapter(tmp_path):
     assert cfg["lora_parameters"]["rank"] == 2
 
 
-def test_normalize_completion_text_restores_prefilled_think():
-    assert normalize_completion_text("...<|im_start|>assistant\n<think>\n", "count syls</think><haiku>a\nb\nc</haiku>").startswith("<think>\n")
-    assert normalize_completion_text("...<|im_start|>assistant\n<think>\nL1:", " Soft snow\n</think><haiku>a\nb\nc</haiku>").startswith("<think>\nL1: Soft snow")
-    assert normalize_completion_text("...<|im_start|>assistant\n", "<think>hi</think><haiku>a\nb\nc</haiku>").startswith("<think>hi")
+def test_normalize_completion_text_strips_whitespace():
+    assert normalize_completion_text("prompt", "  Line one\nLine two\nLine three  ") == "Line one\nLine two\nLine three"

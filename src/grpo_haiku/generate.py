@@ -22,7 +22,7 @@ def main() -> None:
     parser.add_argument("--topic", type=str, default="a winter snowy morning")
     parser.add_argument("--temp", type=float, default=0.7)
     parser.add_argument("--top-p", type=float, default=0.95)
-    parser.add_argument("--max-tokens", type=int, default=512)
+    parser.add_argument("--max-tokens", type=int, default=64)
     parser.add_argument("--no-relevance", action="store_true")
     args = parser.parse_args()
 
@@ -49,13 +49,7 @@ def main() -> None:
     )
     bd = score_completion(args.topic, completion, cfg=reward_cfg, relevance_scorer=scorer)
 
-    print(f"\n=== Prompt: {user_prompt} ===")
-    if bd.think_text:
-        print("\n<think>")
-        print(bd.think_text)
-        print("</think>")
-
-    print("\n<haiku>")
+    print(f"\n=== Prompt: {user_prompt} ===\n")
     targets = reward_cfg.line_targets
     for i, line in enumerate(bd.haiku_lines):
         analysis = analyze_line(line)
@@ -65,8 +59,7 @@ def main() -> None:
         mark = "✓" if (target is not None and analysis.matches_exact(target)) else "✗"
         print(f"  {mark} {line:<45s}  [syllables={counts_str}, target={target}{oov_str}]")
     if not bd.haiku_lines:
-        print(f"  [unparsed raw output]\n{completion}")
-    print("</haiku>")
+        print(f"  [empty output]\n{completion}")
 
     print(
         f"\nVerdict: {'EXACT 5-7-5 ✓' if bd.is_exact_575 else 'NOT EXACT ✗'} | "
