@@ -4,7 +4,13 @@ from __future__ import annotations
 
 from grpo_haiku.config import RewardConfig
 from grpo_haiku.relevance import has_prompt_echo
-from grpo_haiku.rewards import parse_completion, score_completion, score_group
+from grpo_haiku.rewards import (
+    ClicheTracker,
+    extract_content_bigrams,
+    parse_completion,
+    score_completion,
+    score_group,
+)
 
 
 class DummyRelevanceScorer:
@@ -218,3 +224,45 @@ def test_score_group_batches_cleanly():
     assert len(results) == 2
     assert results[0].total_reward > results[1].total_reward
     assert len(parse_completion(completions[0]).lines) == 3
+
+
+def test_cliche_tracker_penalizes_overused_non_topic_bigrams_and_expires():
+    tracker = ClicheTracker(window=4, min_count=2)
+    # Record two unrelated haikus that both lean on "silence holds"
+    tracker.record("Wind cools the harbor\nLanterns sway above the pier\nSilence holds the dusk", topic="a harbor at dusk")
+    tracker.record("Coffee cools in glass\nRain taps on the brick window\nSilence holds the night", topic="rainy coffee shop")
+
+    # On a third unrelated topic, "silence holds" is flagged as a cliche
+    cliche_haiku = "Frosted cedar branch\nQuiet snowflakes drift below\nSilence holds the dawn"
+    fresh_haiku = "Frosted cedar branch\nQuiet snowflakes drift below\nDawn breaks pale and still"
+
+    res_cliche = score_completion(
+        "a winter snowy morning",
+        cliche_haiku,
+        relevance_scorer=DummyRelevanceScorer(0.75),
+        cliche_tracker=tracker,
+    )
+    res_fresh = score_completion(
+        "a winter snowy morning",
+        fresh_haiku,
+        relevance_scorer=DummyRelevanceScorer(0.75),
+        cliche_tracker=tracker,
+    )
+    assert res_cliche.cliche_penalty == RewardConfig().cliche_penalty_per_bigram
+    assert res_fresh.cliche_penalty == 0.0
+    assert res_fresh.total_reward > res_cliche.total_reward
+
+    # If the topic itself asks for "silence", topic words are excluded from cliche penalty
+    res_topic_ok = score_completion(
+        "a glacier valley in silence",
+        cliche_haiku,
+        relevance_scorer=DummyRelevanceScorer(0.75),
+        cliche_tracker=tracker,
+    )
+    assert res_topic_ok.cliche_penalty == 0.0
+
+    # Window eviction: push 4 fresh haikus -> "silence holds" expires cleanly
+    for i in range(4):
+        tracker.record(f"Bright sun warms the hill\nBees hum over clover fields\nMeadow wakes at noon", topic=f"topic {i}")
+    assert tracker.overused_bigrams(cliche_haiku, topic="a winter snowy morning") == []
+    assert ("in", "the") not in extract_content_bigrams("Wind blows in the trees")

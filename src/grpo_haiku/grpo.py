@@ -35,7 +35,7 @@ from mlx_lm.tuner.utils import linear_to_lora_layers, print_trainable_parameters
 from grpo_haiku.config import GRPOConfig, ModelConfig, RewardConfig
 from grpo_haiku.data import HaikuPromptExample, format_chat_prompt, load_jsonl
 from grpo_haiku.relevance import MLXEmbeddingRelevanceScorer, RelevanceScorer
-from grpo_haiku.rewards import RewardBreakdown, score_group
+from grpo_haiku.rewards import ClicheTracker, RewardBreakdown, score_group
 
 _LORA_TYPES = (LoRALinear, LoRASwitchLinear, LoRAEmbedding)
 
@@ -506,6 +506,10 @@ def train_grpo(
 
     loss_and_grad_fn = nn.value_and_grad(model, _single_seq_loss)
     metrics_path = run_dir / "metrics.jsonl"
+    cliche_tracker = ClicheTracker(
+        window=reward_cfg.cliche_window,
+        min_count=reward_cfg.cliche_min_count,
+    )
 
     rng = random.Random(grpo_cfg.seed)
     order = list(range(len(train_examples)))
@@ -562,8 +566,15 @@ def train_grpo(
             completions=completions,
             cfg=reward_cfg,
             relevance_scorer=relevance_scorer,
+            cliche_tracker=cliche_tracker,
         )
         rewards = [b.total_reward for b in breakdowns]
+
+        # Record the top valid completion from this step into the rolling cliche window
+        valid_bds = [(i, b) for i, b in enumerate(breakdowns) if b.is_valid_format]
+        if valid_bds:
+            _, top_bd = max(valid_bds, key=lambda pair: pair[1].total_reward)
+            cliche_tracker.record("\n".join(top_bd.haiku_lines), topic=ex.topic)
         token_advantages, has_variance = compute_per_line_token_advantages(
             breakdowns=breakdowns,
             comp_token_ids=comp_token_ids,
@@ -659,6 +670,7 @@ def train_grpo(
         format_rate = sum(1 for b in breakdowns if b.is_valid_format) / n_g
         rel_mean = sum(b.raw_cosine_sim for b in breakdowns) / n_g
         oov_rate = sum(1 for b in breakdowns if b.oov_words) / n_g
+        cliche_rate = sum(1 for b in breakdowns if b.cliche_penalty < 0.0) / n_g
         avg_comp_len = sum(len(t) for t in comp_token_ids) / n_g
 
         row = {
@@ -670,6 +682,7 @@ def train_grpo(
             "format_rate": round(format_rate, 4),
             "relevance_sim": round(rel_mean, 4),
             "oov_rate": round(oov_rate, 4),
+            "cliche_rate": round(cliche_rate, 4),
             "loss": round(loss_val, 5),
             "kl": round(kl_val, 5),
             "lr": round(current_lr, 8),

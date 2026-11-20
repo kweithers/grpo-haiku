@@ -62,6 +62,12 @@ class RewardConfig:
     prompt_echo_ngram: int = 3
     prompt_echo_penalty: float = -0.35
 
+    # Cross-step cliche bigram guardrail (prevents phrase collapse like "silence holds")
+    cliche_window: int = 64
+    cliche_min_count: int = 3
+    cliche_penalty_per_bigram: float = -0.15
+    cliche_penalty_cap: float = -0.45
+
 
 @dataclass
 class GRPOConfig:

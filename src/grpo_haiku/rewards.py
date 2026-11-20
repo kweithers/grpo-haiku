@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import Counter, deque
 import re
 from dataclasses import dataclass
 
@@ -12,6 +13,94 @@ from grpo_haiku.syllables import LineSyllableAnalysis, analyze_line, tokenize_wo
 # Detect stray XML/markdown/think artifacts or digits (e.g. "5-7-5 syllable haiku:")
 _STRAY_TAG_RE = re.compile(r"</?(?:think|haiku)\b[^>]*>", re.IGNORECASE)
 _DIGIT_RE = re.compile(r"\d")
+_FUNCTION_WORDS = frozenset(
+    {
+        "a",
+        "an",
+        "the",
+        "in",
+        "on",
+        "at",
+        "to",
+        "of",
+        "for",
+        "by",
+        "with",
+        "from",
+        "as",
+        "is",
+        "are",
+        "was",
+        "be",
+        "and",
+        "or",
+        "but",
+        "not",
+        "no",
+        "it",
+        "its",
+        "this",
+        "that",
+        "they",
+        "their",
+        "into",
+        "over",
+        "under",
+        "through",
+        "upon",
+    }
+)
+
+
+def extract_content_bigrams(
+    text: str, exclude_words: set[str] | frozenset[str] = frozenset()
+) -> set[tuple[str, str]]:
+    """Extract unique non-trivial bigrams where at least one word is a content word
+    and not both words belong to the current prompt topic."""
+    words = tokenize_words(text)
+    bigrams: set[tuple[str, str]] = set()
+    for i in range(len(words) - 1):
+        w1, w2 = words[i], words[i + 1]
+        if w1 in _FUNCTION_WORDS and w2 in _FUNCTION_WORDS:
+            continue
+        if exclude_words and (w1 in exclude_words or w2 in exclude_words):
+            continue
+        # Only track bigrams where both words aren't tiny 1-2 char fillers or at least one is substantive
+        if (w1 not in _FUNCTION_WORDS) and (w2 not in _FUNCTION_WORDS):
+            bigrams.add((w1, w2))
+    return bigrams
+
+
+class ClicheTracker:
+    """Sliding-window tracker of recent cross-prompt content bigrams to deter phrase collapse."""
+
+    def __init__(self, window: int = 64, min_count: int = 3) -> None:
+        self.window = max(1, window)
+        self.min_count = max(1, min_count)
+        self._history: deque[set[tuple[str, str]]] = deque()
+        self._counts: Counter[tuple[str, str]] = Counter()
+
+    def overused_bigrams(
+        self, haiku_text: str, topic: str = ""
+    ) -> list[tuple[str, str]]:
+        """Return content bigrams in `haiku_text` already seen >= `min_count` times recently."""
+        topic_words = set(tokenize_words(topic))
+        bigrams = extract_content_bigrams(haiku_text, exclude_words=topic_words)
+        return sorted(bg for bg in bigrams if self._counts.get(bg, 0) >= self.min_count)
+
+    def record(self, haiku_text: str, topic: str = "") -> None:
+        """Record one completed haiku's non-topic content bigrams into the rolling window."""
+        topic_words = set(tokenize_words(topic))
+        bigrams = extract_content_bigrams(haiku_text, exclude_words=topic_words)
+        if len(self._history) >= self.window:
+            oldest = self._history.popleft()
+            for bg in oldest:
+                self._counts[bg] -= 1
+                if self._counts[bg] <= 0:
+                    del self._counts[bg]
+        self._history.append(bigrams)
+        for bg in bigrams:
+            self._counts[bg] += 1
 
 
 @dataclass(frozen=True)
@@ -36,6 +125,7 @@ class RewardBreakdown:
     oov_penalty: float
     repetition_penalty: float
     echo_penalty: float
+    cliche_penalty: float
     raw_cosine_sim: float
     is_valid_format: bool
     is_exact_575: bool
@@ -98,6 +188,7 @@ def score_completion(
     cfg: RewardConfig | None = None,
     relevance_scorer: RelevanceScorer | None = None,
     precomputed_sim: float | None = None,
+    cliche_tracker: ClicheTracker | None = None,
 ) -> RewardBreakdown:
     """Compute shaped RLVR reward for a direct 3-line haiku (zero tag rewards)."""
     cfg = cfg or RewardConfig()
@@ -113,6 +204,7 @@ def score_completion(
             oov_penalty=0.0,
             repetition_penalty=0.0,
             echo_penalty=0.0,
+            cliche_penalty=0.0,
             raw_cosine_sim=0.0,
             is_valid_format=False,
             is_exact_575=False,
@@ -203,6 +295,16 @@ def score_completion(
         else 0.0
     )
 
+    # Cross-step cliche phrase penalty (active during GRPO when tracker is provided)
+    cliche_penalty = 0.0
+    if cliche_tracker is not None and is_valid_format:
+        overused = cliche_tracker.overused_bigrams(haiku_plain, topic=topic)
+        if overused:
+            cliche_penalty = max(
+                cfg.cliche_penalty_cap,
+                cfg.cliche_penalty_per_bigram * len(overused),
+            )
+
     total_reward = (
         format_reward
         + syllable_reward
@@ -211,6 +313,7 @@ def score_completion(
         + oov_penalty
         + repetition_penalty
         + echo_penalty
+        + cliche_penalty
     )
 
     return RewardBreakdown(
@@ -222,6 +325,7 @@ def score_completion(
         oov_penalty=round(oov_penalty, 6),
         repetition_penalty=round(repetition_penalty, 6),
         echo_penalty=round(echo_penalty, 6),
+        cliche_penalty=round(cliche_penalty, 6),
         raw_cosine_sim=round(raw_sim, 6),
         is_valid_format=is_valid_format,
         is_exact_575=is_exact_575,
@@ -238,6 +342,7 @@ def score_group(
     completions: list[str],
     cfg: RewardConfig | None = None,
     relevance_scorer: RelevanceScorer | None = None,
+    cliche_tracker: ClicheTracker | None = None,
 ) -> list[RewardBreakdown]:
     """Batch-score a group of completions for the same topic (batches embedding calls)."""
     cfg = cfg or RewardConfig()
@@ -261,6 +366,7 @@ def score_group(
             cfg=cfg,
             relevance_scorer=None,
             precomputed_sim=sim,
+            cliche_tracker=cliche_tracker,
         )
         for comp, sim in zip(completions, sims)
     ]
