@@ -35,33 +35,46 @@ def test_exact_valid_haiku_gets_full_shaped_reward_with_zero_tag_bonus():
     assert res.is_exact_575
     assert res.oov_words == ()
     assert res.format_reward == 0.0
-    assert res.syllable_reward == 1.20
-    assert res.exact_bonus == 2.00
-    assert res.relevance_reward == 0.40
+    assert res.syllable_reward == 1.80
+    assert res.exact_bonus == 2.50
+    assert res.relevance_reward == 0.20
     assert res.oov_penalty == 0.0
     assert res.repetition_penalty == 0.0
     assert res.echo_penalty == 0.0
-    assert res.total_reward == 3.60
+    assert res.total_reward == 4.50
 
 
-def test_near_miss_gets_sharpened_partial_credit():
-    # Line 1: 6 syllables (off by 1), Line 2: 7 (exact), Line 3: 5 (exact)
-    completion = (
+def test_near_miss_gets_sharpened_partial_credit_and_beats_worse_syllables_with_max_theme():
+    # (6, 7, 5): Line 1 off by 1, Line 2 exact, Line 3 exact, moderate relevance
+    better_syl = (
         "Silver frosted branches\n"
         "Quiet snowflakes drift below\n"
         "Dawn breaks pale and still"
     )
-    res = score_completion(
+    res_better = score_completion(
         topic="a quiet winter snowy morning",
-        completion=completion,
+        completion=better_syl,
         relevance_scorer=DummyRelevanceScorer(0.60),
     )
-    assert res.is_valid_format
-    assert not res.is_exact_575
-    assert res.exact_bonus == 0.0
-    assert res.line_distances == (1, 0, 0)
-    # 0.40 * (1 - 0.45) + 0.40 + 0.40 = 0.22 + 0.80 = 1.02
-    assert abs(res.syllable_reward - 1.02) < 1e-5
+    assert res_better.is_valid_format
+    assert not res_better.is_exact_575
+    assert res_better.exact_bonus == 0.0
+    assert res_better.line_distances == (1, 0, 0)
+    # 0.60 * (1 - 0.55) + 0.60 + 0.60 = 0.27 + 1.20 = 1.47
+    assert abs(res_better.syllable_reward - 1.47) < 1e-5
+
+    # (6, 7, 6): Two lines off by 1, even with MAX relevance (0.85), must lose to (6, 7, 5)
+    worse_syl = (
+        "Silver frosted branches\n"
+        "Quiet snowflakes drift below\n"
+        "Morning breaks pale and still"
+    )
+    res_worse = score_completion(
+        topic="a quiet winter snowy morning",
+        completion=worse_syl,
+        relevance_scorer=DummyRelevanceScorer(0.85),
+    )
+    assert res_better.total_reward > res_worse.total_reward
 
 
 def test_wrong_line_count_and_stray_tags_penalized():
@@ -177,10 +190,20 @@ def test_prompt_echo_and_off_topic_jackpot_gate():
         "Quiet snowflakes drift below\n"
         "Dawn breaks pale and still"
     )
+    # Indirect poetic imagery (sim=0.48 >= 0.42) keeps the exact 5-7-5 jackpot
+    res_poetic = score_completion(
+        topic="a simmering skillet of roasted chestnuts",
+        completion=off_topic,
+        relevance_scorer=DummyRelevanceScorer(0.48),
+    )
+    assert res_poetic.is_exact_575
+    assert res_poetic.exact_bonus == RewardConfig().exact_575_bonus
+
+    # Clearly off-topic (sim=0.35 < 0.42) is denied the jackpot
     res_off = score_completion(
         topic="a simmering skillet of roasted chestnuts",
         completion=off_topic,
-        relevance_scorer=DummyRelevanceScorer(0.40),
+        relevance_scorer=DummyRelevanceScorer(0.35),
     )
     assert res_off.is_exact_575
     assert res_off.exact_bonus == 0.0

@@ -37,17 +37,17 @@ class RewardConfig:
     wrong_line_count_penalty_per_line: float = -0.35
     wrong_line_count_penalty_cap: float = -0.60
 
-    # Sharpened 5-7-5 syllable shaping
+    # Sharpened 5-7-5 syllable shaping (exact line jump +0.33 > max theme bonus +0.20)
     line_targets: tuple[int, int, int] = (5, 7, 5)
-    line_max_reward: float = 0.40  # * 3 lines = 1.20 max
-    syllable_error_slope: float = 0.45  # 1 off -> 0.55x, 2 off -> 0.10x, 3+ off -> 0
-    exact_575_bonus: float = 2.00
+    line_max_reward: float = 0.60  # * 3 lines = 1.80 max
+    syllable_error_slope: float = 0.55  # 1 off -> 0.45x (+0.27), 2+ off -> 0.00
+    exact_575_bonus: float = 2.50
 
-    # Semantic prompt relevance
-    relevance_weight: float = 0.40
+    # Semantic prompt relevance (tie-breaker & off-topic guardrail, never overrides syllables)
+    relevance_weight: float = 0.20
     relevance_min_sim: float = 0.45
     relevance_max_sim: float = 0.78
-    exact_bonus_min_sim: float = 0.52  # Off-topic 5-7-5 poems cannot farm the jackpot
+    exact_bonus_min_sim: float = 0.42  # Blocks off-topic poems without penalizing poetic imagery
     embedding_model: str = "bge-small"
 
     # Anti-hacking penalties
