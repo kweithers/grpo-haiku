@@ -13,6 +13,7 @@ from grpo_haiku.grpo import (
     clip_grad_norm,
     compute_group_advantages,
     compute_per_line_token_advantages,
+    cosine_lr,
     gradient_checkpointing,
     grpo_token_loss,
     kl_k3,
@@ -226,3 +227,11 @@ def test_reference_policy_swaps_and_restores_sft_lora_snapshot(tmp_path):
     assert bool(mx.allclose(y_ref, y_sft, atol=1e-5).item())
     assert bool(mx.allclose(y_after, y_grpo, atol=1e-5).item())
     assert not bool(mx.allclose(y_grpo, y_sft, atol=1e-3).item())
+
+
+def test_cosine_lr_schedule_endpoints_and_monotonic_decay():
+    assert abs(cosine_lr(1, 200, 4e-6, 5e-7) - 4e-6) < 1e-12
+    assert abs(cosine_lr(200, 200, 4e-6, 5e-7) - 5e-7) < 1e-12
+    mid = cosine_lr(100, 200, 4e-6, 5e-7)
+    assert 2e-6 < mid < 2.5e-6
+    assert cosine_lr(50, 200, 4e-6, 5e-7) > mid > cosine_lr(150, 200, 4e-6, 5e-7)

@@ -70,7 +70,7 @@ class GRPOConfig:
     train_file: str = "data/train.jsonl"
     eval_file: str = "data/eval.jsonl"
     resume_adapter: str | None = None
-    run_name: str = "qwen3_1.7b_sft_grpo_v4"
+    run_name: str = "qwen3_1.7b_r2_sft_grpo_v5"
     runs_dir: str = "runs"
 
     # GRPO rollout & optimization
@@ -81,6 +81,7 @@ class GRPOConfig:
     temperature: float = 0.9
     top_p: float = 0.95
     learning_rate: float = 4e-6
+    min_learning_rate: float = 5e-7
     weight_decay: float = 0.01
     kl_beta: float = 0.03
     clip_eps: float = 0.2

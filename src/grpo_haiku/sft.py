@@ -25,6 +25,7 @@ from grpo_haiku.data import HaikuPromptExample, format_chat_prompt, load_jsonl
 from grpo_haiku.grpo import (
     build_lora_model,
     clip_grad_norm,
+    cosine_lr,
     gradient_checkpointing,
     normalize_completion_text,
     save_adapter,
@@ -57,6 +58,7 @@ def collect_sft_haikus(
     max_tokens: int = 64,
     temp: float = 0.95,
     top_p: float = 0.95,
+    max_line_repeats: int = 4,
     seed: int = 42,
     reward_cfg: RewardConfig | None = None,
     relevance_scorer: RelevanceScorer | None = None,
@@ -82,6 +84,7 @@ def collect_sft_haikus(
     sampler = make_sampler(temp=temp, top_p=top_p)
     accepted: list[dict] = []
     seen_haikus: set[str] = set()
+    line_counts_seen: dict[str, int] = {}
     total_candidates = 0
 
     for start in range(0, len(examples), prompt_batch_size):
@@ -132,7 +135,14 @@ def collect_sft_haikus(
                 key = "\n".join(bd.haiku_lines).strip().lower()
                 if key in seen_haikus:
                     continue
+                norm_lines = [ln.strip().lower().rstrip(".,;!?—-") for ln in bd.haiku_lines]
+                if max_line_repeats > 0 and any(
+                    line_counts_seen.get(ln, 0) >= max_line_repeats for ln in norm_lines
+                ):
+                    continue
                 seen_haikus.add(key)
+                for ln in norm_lines:
+                    line_counts_seen[ln] = line_counts_seen.get(ln, 0) + 1
                 accepted.append(
                     {
                         "id": ex.id,
@@ -231,6 +241,8 @@ def train_sft(
     loss_and_grad_fn = nn.value_and_grad(model, sft_sequence_loss)
 
     rng = random.Random(seed)
+    steps_per_epoch = max(1, (len(tokenized) + grad_accum_steps - 1) // grad_accum_steps)
+    total_opt_steps = epochs * steps_per_epoch
     opt_step = 0
     t0 = time.perf_counter()
 
@@ -258,10 +270,13 @@ def train_sft(
                     batch_loss += float(loss_val.item()) * inv_n
 
                 if accum_grads is not None:
+                    opt_step += 1
+                    optimizer.learning_rate = cosine_lr(
+                        opt_step, total_opt_steps, learning_rate, 0.1 * learning_rate
+                    )
                     accum_grads, grad_norm = clip_grad_norm(accum_grads, grad_clip_norm)
                     optimizer.update(model, accum_grads)
                     mx.eval(model.parameters(), optimizer.state)
-                    opt_step += 1
                     epoch_losses.append(batch_loss)
 
                     if opt_step == 1 or opt_step % 10 == 0:
@@ -302,6 +317,7 @@ def main() -> None:
     parser.add_argument("--num-prompts", type=int, default=450)
     parser.add_argument("--samples-per-prompt", type=int, default=8)
     parser.add_argument("--prompt-batch-size", type=int, default=8)
+    parser.add_argument("--max-line-repeats", type=int, default=4)
     parser.add_argument("--run-name", type=str, default="sft_v1")
     parser.add_argument("--runs-dir", type=str, default="runs")
     parser.add_argument("--epochs", type=int, default=2)
@@ -322,6 +338,7 @@ def main() -> None:
             num_prompts=args.num_prompts,
             samples_per_prompt=args.samples_per_prompt,
             prompt_batch_size=args.prompt_batch_size,
+            max_line_repeats=args.max_line_repeats,
             seed=args.seed,
         )
 

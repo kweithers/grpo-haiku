@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import json
+import math
 import random
 import time
 from dataclasses import asdict
@@ -42,6 +43,14 @@ _LORA_TYPES = (LoRALinear, LoRASwitchLinear, LoRAEmbedding)
 # ---------------------------------------------------------------------------
 # Pure GRPO math helpers (independently unit-tested)
 # ---------------------------------------------------------------------------
+
+
+def cosine_lr(step: int, total_steps: int, max_lr: float, min_lr: float) -> float:
+    """Cosine decay from `max_lr` at step 1 down to `min_lr` at `total_steps`."""
+    if total_steps <= 1 or max_lr <= min_lr:
+        return max_lr
+    progress = min(1.0, max(0.0, (step - 1) / (total_steps - 1)))
+    return min_lr + 0.5 * (max_lr - min_lr) * (1.0 + math.cos(math.pi * progress))
 
 
 def compute_group_advantages(
@@ -504,7 +513,7 @@ def train_grpo(
 
     print(
         f"Starting GRPO training: steps={grpo_cfg.num_steps}, G={grpo_cfg.group_size}, "
-        f"lr={grpo_cfg.learning_rate}, kl_beta={grpo_cfg.kl_beta}, "
+        f"lr={grpo_cfg.learning_rate}->{grpo_cfg.min_learning_rate}, kl_beta={grpo_cfg.kl_beta}, "
         f"line_credit_w={grpo_cfg.line_credit_weight}, relevance_w={reward_cfg.relevance_weight}, "
         f"max_tokens={grpo_cfg.max_completion_tokens}"
     )
@@ -513,6 +522,14 @@ def train_grpo(
         t0 = time.perf_counter()
         if hasattr(mx, "reset_peak_memory"):
             mx.reset_peak_memory()
+
+        current_lr = cosine_lr(
+            step=step,
+            total_steps=grpo_cfg.num_steps,
+            max_lr=grpo_cfg.learning_rate,
+            min_lr=grpo_cfg.min_learning_rate,
+        )
+        optimizer.learning_rate = current_lr
 
         ex = train_examples[order[(step - 1) % len(order)]]
         if step % len(order) == 0:
@@ -655,6 +672,7 @@ def train_grpo(
             "oov_rate": round(oov_rate, 4),
             "loss": round(loss_val, 5),
             "kl": round(kl_val, 5),
+            "lr": round(current_lr, 8),
             "grad_norm": round(grad_norm_val, 4),
             "avg_tokens": round(avg_comp_len, 1),
             "skipped": skipped_update,
@@ -733,6 +751,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--temp", type=float, default=GRPOConfig.temperature)
     parser.add_argument("--top-p", type=float, default=GRPOConfig.top_p)
     parser.add_argument("--lr", type=float, default=GRPOConfig.learning_rate)
+    parser.add_argument("--min-lr", type=float, default=GRPOConfig.min_learning_rate)
     parser.add_argument("--kl-beta", type=float, default=GRPOConfig.kl_beta)
     parser.add_argument("--line-credit-weight", type=float, default=GRPOConfig.line_credit_weight)
     parser.add_argument("--relevance-weight", type=float, default=RewardConfig.relevance_weight)
@@ -771,6 +790,7 @@ def main() -> None:
         temperature=args.temp,
         top_p=args.top_p,
         learning_rate=args.lr,
+        min_learning_rate=args.min_lr,
         kl_beta=args.kl_beta,
         line_credit_weight=args.line_credit_weight,
         eval_every=args.eval_every,
