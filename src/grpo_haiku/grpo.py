@@ -58,6 +58,90 @@ def compute_group_advantages(
     return [(r - mean_r) / (std_r + eps) for r in rewards], True
 
 
+def map_tokens_to_lines(completion_ids: list[int], tokenizer) -> list[int]:
+    """Map each completion token to its 0-based non-empty haiku line index."""
+    line_indices: list[int] = []
+    line_idx = 0
+    seen_content = False
+    for tid in completion_ids:
+        piece = tokenizer.decode([tid])
+        if "\n" not in piece:
+            line_indices.append(line_idx)
+            if piece.strip():
+                seen_content = True
+        else:
+            before_nl, after_nl = piece.split("\n", 1)
+            if not before_nl.strip() and after_nl.strip() and seen_content:
+                line_idx += 1
+                line_indices.append(line_idx)
+                seen_content = True
+            else:
+                line_indices.append(line_idx)
+                if before_nl.strip():
+                    seen_content = True
+                if seen_content:
+                    line_idx += 1
+                    seen_content = bool(after_nl.strip())
+    return line_indices
+
+
+def compute_per_line_token_advantages(
+    breakdowns: list[RewardBreakdown],
+    comp_token_ids: list[list[int]],
+    tokenizer,
+    line_credit_weight: float = 0.50,
+    eps: float = 1e-6,
+) -> tuple[list[mx.array], bool]:
+    """Build per-token advantage vectors blending global & line-level group advantages.
+
+    When `line_credit_weight > 0`, tokens belonging to Line k (k in 0..2) receive:
+        (1 - w) * A_global[i] + w * A_line[k][i]
+    so an exact Line 2/3 in a (6, 7, 5) haiku is reinforced while Line 1 is pushed down.
+    """
+    rewards = [b.total_reward for b in breakdowns]
+    global_advs, has_global_var = compute_group_advantages(rewards, eps=eps)
+
+    w = max(0.0, min(1.0, line_credit_weight))
+    line_advs_by_idx: list[list[float]] = []
+    has_any_line_var = False
+
+    if w > 0.0:
+        for line_k in range(3):
+            line_scores = [
+                b.line_rewards[line_k]
+                if (b.is_valid_format and len(b.line_rewards) > line_k)
+                else 0.0
+                for b in breakdowns
+            ]
+            l_adv, l_var = compute_group_advantages(line_scores, eps=eps)
+            line_advs_by_idx.append(l_adv)
+            if l_var:
+                has_any_line_var = True
+
+    has_variance = has_global_var or has_any_line_var
+    token_advs: list[mx.array] = []
+
+    for i, (bd, tids) in enumerate(zip(breakdowns, comp_token_ids)):
+        if not tids:
+            token_advs.append(mx.array([], dtype=mx.float32))
+            continue
+        g_adv = global_advs[i]
+        if w <= 0.0 or (not bd.is_valid_format):
+            token_advs.append(mx.full((len(tids),), g_adv, dtype=mx.float32))
+            continue
+
+        line_map = map_tokens_to_lines(tids, tokenizer)
+        per_tok = [
+            (1.0 - w) * g_adv + w * line_advs_by_idx[lk][i]
+            if 0 <= lk < 3
+            else g_adv
+            for lk in line_map
+        ]
+        token_advs.append(mx.array(per_tok, dtype=mx.float32))
+
+    return token_advs, has_variance
+
+
 def kl_k3(new_logprobs: mx.array, ref_logprobs: mx.array) -> mx.array:
     """Unbiased, non-negative Schulman k3 KL estimator: exp(r) - r - 1, r = log(p_ref / p_new)."""
     log_ratio = mx.clip(ref_logprobs - new_logprobs, -20.0, 20.0)
@@ -68,14 +152,18 @@ def grpo_token_loss(
     new_logprobs: mx.array,
     old_logprobs: mx.array,
     ref_logprobs: mx.array,
-    advantage: float,
+    advantage: float | mx.array,
     kl_beta: float = 0.04,
     clip_eps: float = 0.2,
 ) -> tuple[mx.array, mx.array]:
     """Compute mean per-token GRPO clipped surrogate + k3 KL loss and mean KL."""
     log_ratio = mx.clip(new_logprobs - old_logprobs, -20.0, 20.0)
     ratio = mx.exp(log_ratio)
-    adv = mx.array(advantage, dtype=mx.float32)
+    adv = (
+        advantage.astype(mx.float32)
+        if isinstance(advantage, mx.array)
+        else mx.array(advantage, dtype=mx.float32)
+    )
 
     surr1 = ratio * adv
     surr2 = mx.clip(ratio, 1.0 - clip_eps, 1.0 + clip_eps) * adv
@@ -104,6 +192,46 @@ def no_lora(model: nn.Module) -> Iterator[None]:
     finally:
         for module, orig_scale in saved:
             module.scale = orig_scale
+
+
+def snapshot_lora_weights(model: nn.Module) -> list[tuple[str, mx.array]]:
+    """Capture a detached in-memory copy of trainable LoRA tensors (~10-20 MB)."""
+    flat = tree_flatten(model.trainable_parameters())
+    snap = [(k, mx.array(v)) for k, v in flat]
+    if snap:
+        mx.eval([v for _, v in snap])
+    return snap
+
+
+def load_lora_weights_into_model(model: nn.Module, adapter_path: str | Path) -> None:
+    """Load saved LoRA weights into an already LoRA-wrapped model."""
+    weights_path = Path(adapter_path) / "adapters.safetensors"
+    if not weights_path.exists():
+        raise FileNotFoundError(f"Adapter weights not found: {weights_path}")
+    weights = mx.load(str(weights_path))
+    model.load_weights(list(weights.items()), strict=False)
+    mx.eval(model.trainable_parameters())
+
+
+@contextlib.contextmanager
+def reference_policy(
+    model: nn.Module,
+    ref_lora_weights: list[tuple[str, mx.array]] | None,
+) -> Iterator[None]:
+    """Evaluate ref log-probs against an SFT LoRA snapshot (or base model if None)."""
+    if ref_lora_weights is None:
+        with no_lora(model):
+            yield
+        return
+
+    current = snapshot_lora_weights(model)
+    model.load_weights(ref_lora_weights, strict=False)
+    mx.eval(model.trainable_parameters())
+    try:
+        yield
+    finally:
+        model.load_weights(current, strict=False)
+        mx.eval(model.trainable_parameters())
 
 
 @contextlib.contextmanager
@@ -331,6 +459,12 @@ def train_grpo(
     print(f"Loading model: {model_cfg.model_name}")
     model, tokenizer = build_lora_model(model_cfg)
 
+    ref_lora_weights: list[tuple[str, mx.array]] | None = None
+    if grpo_cfg.resume_adapter:
+        print(f"Resuming LoRA weights from: {grpo_cfg.resume_adapter} (anchoring KL to resumed adapter)")
+        load_lora_weights_into_model(model, grpo_cfg.resume_adapter)
+        ref_lora_weights = snapshot_lora_weights(model)
+
     relevance_scorer: RelevanceScorer | None = None
     if reward_cfg.relevance_weight > 0.0:
         print(f"Loading local MLX relevance embedder: {reward_cfg.embedding_model}")
@@ -349,7 +483,7 @@ def train_grpo(
         completion_ids: list[int],
         old_lp: mx.array,
         ref_lp: mx.array,
-        advantage: float,
+        advantage: mx.array,
     ) -> tuple[mx.array, mx.array]:
         new_lp = sequence_completion_logprobs(model_arg, prompt_ids, completion_ids)
         return grpo_token_loss(
@@ -370,7 +504,8 @@ def train_grpo(
 
     print(
         f"Starting GRPO training: steps={grpo_cfg.num_steps}, G={grpo_cfg.group_size}, "
-        f"kl_beta={grpo_cfg.kl_beta}, relevance_w={reward_cfg.relevance_weight}, "
+        f"lr={grpo_cfg.learning_rate}, kl_beta={grpo_cfg.kl_beta}, "
+        f"line_credit_w={grpo_cfg.line_credit_weight}, relevance_w={reward_cfg.relevance_weight}, "
         f"max_tokens={grpo_cfg.max_completion_tokens}"
     )
 
@@ -404,7 +539,7 @@ def train_grpo(
             tokenizer.encode(txt, add_special_tokens=False) for txt in rollout.texts
         ]
 
-        # 2. Deterministic verifiable reward + semantic relevance scoring
+        # 2. Deterministic verifiable reward + per-line token credit assignment
         breakdowns = score_group(
             topic=ex.topic,
             completions=completions,
@@ -412,7 +547,13 @@ def train_grpo(
             relevance_scorer=relevance_scorer,
         )
         rewards = [b.total_reward for b in breakdowns]
-        advantages, has_variance = compute_group_advantages(rewards, eps=grpo_cfg.adv_eps)
+        token_advantages, has_variance = compute_per_line_token_advantages(
+            breakdowns=breakdowns,
+            comp_token_ids=comp_token_ids,
+            tokenizer=tokenizer,
+            line_credit_weight=grpo_cfg.line_credit_weight,
+            eps=grpo_cfg.adv_eps,
+        )
 
         # Filter out degenerate empty token rollouts
         valid_indices = [i for i, tids in enumerate(comp_token_ids) if len(tids) > 0]
@@ -423,9 +564,9 @@ def train_grpo(
         skipped_update = (not has_variance) or (len(valid_indices) == 0)
 
         if not skipped_update:
-            # 3. Zero-copy reference log-probs (LoRA scale temporarily set to 0.0)
+            # 3. Reference log-probs (anchored to SFT snapshot if resumed, else base model)
             ref_logprobs_list: dict[int, mx.array] = {}
-            with no_lora(model):
+            with reference_policy(model, ref_lora_weights):
                 for idx in valid_indices:
                     ref_lp = mx.stop_gradient(
                         sequence_completion_logprobs(model, prompt_ids, comp_token_ids[idx])
@@ -460,7 +601,7 @@ def train_grpo(
                             comp_token_ids[idx],
                             old_logprobs_list[idx],
                             ref_logprobs_list[idx],
-                            advantages[idx],
+                            token_advantages[idx],
                         )
                         scaled_grads = tree_map(lambda g: g * inv_n, grads)
                         if accum_grads is None:
@@ -582,6 +723,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", type=str, default=ModelConfig.model_name)
     parser.add_argument("--train-file", type=str, default=GRPOConfig.train_file)
     parser.add_argument("--eval-file", type=str, default=GRPOConfig.eval_file)
+    parser.add_argument("--resume-adapter", type=str, default=GRPOConfig.resume_adapter)
     parser.add_argument("--run-name", type=str, default=GRPOConfig.run_name)
     parser.add_argument("--runs-dir", type=str, default=GRPOConfig.runs_dir)
     parser.add_argument("--steps", type=int, default=GRPOConfig.num_steps)
@@ -592,6 +734,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--top-p", type=float, default=GRPOConfig.top_p)
     parser.add_argument("--lr", type=float, default=GRPOConfig.learning_rate)
     parser.add_argument("--kl-beta", type=float, default=GRPOConfig.kl_beta)
+    parser.add_argument("--line-credit-weight", type=float, default=GRPOConfig.line_credit_weight)
     parser.add_argument("--relevance-weight", type=float, default=RewardConfig.relevance_weight)
     parser.add_argument("--lora-rank", type=int, default=ModelConfig.lora_rank)
     parser.add_argument("--lora-scale", type=float, default=ModelConfig.lora_scale)
@@ -618,6 +761,7 @@ def main() -> None:
     grpo_cfg = GRPOConfig(
         train_file=args.train_file,
         eval_file=args.eval_file,
+        resume_adapter=args.resume_adapter,
         run_name=args.run_name,
         runs_dir=args.runs_dir,
         num_steps=args.steps,
@@ -628,6 +772,7 @@ def main() -> None:
         top_p=args.top_p,
         learning_rate=args.lr,
         kl_beta=args.kl_beta,
+        line_credit_weight=args.line_credit_weight,
         eval_every=args.eval_every,
         eval_subset_size=args.eval_subset,
         save_every=args.save_every,

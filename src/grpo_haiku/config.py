@@ -69,6 +69,7 @@ class GRPOConfig:
 
     train_file: str = "data/train.jsonl"
     eval_file: str = "data/eval.jsonl"
+    resume_adapter: str | None = None
     run_name: str = "qwen3_1.7b_direct_v3"
     runs_dir: str = "runs"
 
@@ -85,6 +86,7 @@ class GRPOConfig:
     clip_eps: float = 0.2
     grad_clip_norm: float = 1.0
     adv_eps: float = 1e-6
+    line_credit_weight: float = 0.50  # Blend of per-line vs global advantage per token
 
     # Checkpointing, logging, and memory limits
     eval_every: int = 50

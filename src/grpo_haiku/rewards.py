@@ -41,6 +41,7 @@ class RewardBreakdown:
     is_exact_575: bool
     line_counts: tuple[int, ...]
     line_distances: tuple[int, ...]
+    line_rewards: tuple[float, ...]
     oov_words: tuple[str, ...]
     haiku_lines: tuple[str, ...]
 
@@ -117,6 +118,7 @@ def score_completion(
             is_exact_575=False,
             line_counts=(),
             line_distances=(),
+            line_rewards=(),
             oov_words=(),
             haiku_lines=(),
         )
@@ -146,6 +148,7 @@ def score_completion(
     syllable_reward = 0.0
     line_counts: list[int] = []
     line_distances: list[int] = []
+    line_rewards: list[float] = []
     all_lines_exact = is_valid_format
 
     for analysis, target in scored_pairs:
@@ -156,6 +159,9 @@ def score_completion(
         if is_valid_format:
             line_score = cfg.line_max_reward * max(0.0, 1.0 - cfg.syllable_error_slope * dist)
             syllable_reward += line_score
+            line_rewards.append(round(line_score, 6))
+        else:
+            line_rewards.append(0.0)
         if not analysis.matches_exact(target):
             all_lines_exact = False
 
@@ -221,6 +227,7 @@ def score_completion(
         is_exact_575=is_exact_575,
         line_counts=tuple(line_counts),
         line_distances=tuple(line_distances),
+        line_rewards=tuple(line_rewards),
         oov_words=all_oov,
         haiku_lines=parsed.lines,
     )

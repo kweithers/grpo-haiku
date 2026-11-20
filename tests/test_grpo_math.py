@@ -12,13 +12,19 @@ from grpo_haiku.config import ModelConfig
 from grpo_haiku.grpo import (
     clip_grad_norm,
     compute_group_advantages,
+    compute_per_line_token_advantages,
     gradient_checkpointing,
     grpo_token_loss,
     kl_k3,
+    load_lora_weights_into_model,
+    map_tokens_to_lines,
     no_lora,
     normalize_completion_text,
+    reference_policy,
     save_adapter,
+    snapshot_lora_weights,
 )
+from grpo_haiku.rewards import score_completion
 
 
 def test_group_advantages_zero_mean_and_zero_variance_skip():
@@ -136,3 +142,87 @@ def test_scoped_gradient_checkpointing_and_save_adapter(tmp_path):
 
 def test_normalize_completion_text_strips_whitespace():
     assert normalize_completion_text("prompt", "  Line one\nLine two\nLine three  ") == "Line one\nLine two\nLine three"
+
+
+class _MockPieceTokenizer:
+    def __init__(self, pieces: list[str]) -> None:
+        self._pieces = pieces
+
+    def decode(self, ids: list[int]) -> str:
+        return "".join(self._pieces[i] for i in ids)
+
+
+def test_per_line_token_credit_assignment_rewards_good_lines_independently():
+    # Tokens: [0:"Silver", 1:" frosted", 2:" branches\n", 3:"Quiet", 4:" snow\n", 5:"Dawn", 6:" breaks"]
+    tok = _MockPieceTokenizer(["Silver", " frosted", " branches\n", "Quiet", " snow\n", "Dawn", " breaks"])
+    line_map = map_tokens_to_lines([0, 1, 2, 3, 4, 5, 6], tok)
+    assert line_map == [0, 0, 0, 1, 1, 2, 2]
+
+    # Completion A: (6, 7, 5) -> Line 1 wrong, Line 2 exact, Line 3 exact
+    # Completion B: (5, 5, 4) -> Line 1 exact, Line 2 wrong, Line 3 wrong
+    bd_a = score_completion(
+        "winter snow",
+        "Silver frosted branches\nQuiet snowflakes drift below\nDawn breaks pale and still",
+    )
+    bd_b = score_completion(
+        "winter snow",
+        "Frosted cedar branch\nCold snow falls below\nDawn breaks still",
+    )
+
+    tids = [[0, 1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6]]
+    advs, has_var = compute_per_line_token_advantages(
+        [bd_a, bd_b], tids, tok, line_credit_weight=0.5
+    )
+    mx.eval(advs)
+    assert has_var
+    a_vals = advs[0].tolist()
+    b_vals = advs[1].tolist()
+
+    # In A: Line 2 (idx 3,4) and Line 3 (idx 5,6) were exact while Line 1 (idx 0..2) missed -> higher adv on L2/L3 than L1!
+    assert a_vals[3] > a_vals[0]
+    assert a_vals[5] > a_vals[0]
+    # In B: Line 1 was exact while Line 2 & 3 missed -> higher adv on L1 than L2/L3!
+    assert b_vals[0] > b_vals[3]
+    assert b_vals[0] > b_vals[5]
+
+    # Vector advantage passes cleanly through grpo_token_loss
+    lp = mx.array([-1.0] * 7)
+    loss, kl = grpo_token_loss(lp, lp, lp, advantage=advs[0], kl_beta=0.05)
+    mx.eval(loss, kl)
+    assert abs(float(kl.item())) < 1e-6
+
+
+def test_reference_policy_swaps_and_restores_sft_lora_snapshot(tmp_path):
+    model = _TinyModel(8)
+    model.freeze()
+    for layer in model.layers:
+        layer.proj.unfreeze(keys=["lora_a", "lora_b"])
+        layer.proj.lora_b = mx.ones_like(layer.proj.lora_b) * 0.25
+
+    saved = save_adapter(model, ModelConfig(lora_rank=2, lora_scale=2.0, lora_layers=2), tmp_path / "sft")
+
+    # Reload into a fresh model, snapshot SFT weights, then mutate training weights
+    model2 = _TinyModel(8)
+    model2.freeze()
+    for layer in model2.layers:
+        layer.proj.unfreeze(keys=["lora_a", "lora_b"])
+    load_lora_weights_into_model(model2, saved)
+    sft_snap = snapshot_lora_weights(model2)
+
+    x = mx.ones((1, 8))
+    y_sft = model2(x)
+
+    # Simulate GRPO drift away from SFT
+    for layer in model2.layers:
+        layer.proj.lora_b = mx.ones_like(layer.proj.lora_b) * 0.9
+    y_grpo = model2(x)
+
+    with reference_policy(model2, sft_snap):
+        y_ref = model2(x)
+
+    y_after = model2(x)
+    mx.eval(y_sft, y_grpo, y_ref, y_after)
+
+    assert bool(mx.allclose(y_ref, y_sft, atol=1e-5).item())
+    assert bool(mx.allclose(y_after, y_grpo, atol=1e-5).item())
+    assert not bool(mx.allclose(y_grpo, y_sft, atol=1e-3).item())
