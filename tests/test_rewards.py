@@ -87,6 +87,25 @@ def test_wrong_line_count_and_stray_tags_penalized():
     assert not res4.is_valid_format
     assert not res4.is_exact_575
     assert res4.format_reward == -0.35
+    assert res4.syllable_reward == 0.0
+    assert res4.total_reward <= -0.35
+
+    # Exact v2 hack: 4-line poem with "5-7-5 syllable haiku:" preamble must get negative reward
+    v2_hack = (
+        "5-7-5 syllable haiku:\n"
+        "Whispers of dawn in the breeze,\n"
+        "lightning in the mist,\n"
+        "night returns."
+    )
+    res_hack = score_completion(
+        topic="a sun-warmed glass marble catching sunlight",
+        completion=v2_hack,
+        relevance_scorer=DummyRelevanceScorer(0.50),
+    )
+    assert not res_hack.is_valid_format
+    assert not res_hack.is_exact_575
+    assert res_hack.syllable_reward == 0.0
+    assert res_hack.total_reward <= -0.60
 
     stray_tags = (
         "<haiku>\n"

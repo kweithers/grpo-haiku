@@ -9,8 +9,9 @@ from grpo_haiku.config import RewardConfig
 from grpo_haiku.relevance import RelevanceScorer, has_prompt_echo
 from grpo_haiku.syllables import LineSyllableAnalysis, analyze_line, tokenize_words
 
-# Detect stray XML/markdown/think artifacts if the model emits them unexpectedly
+# Detect stray XML/markdown/think artifacts or digits (e.g. "5-7-5 syllable haiku:")
 _STRAY_TAG_RE = re.compile(r"</?(?:think|haiku)\b[^>]*>", re.IGNORECASE)
+_DIGIT_RE = re.compile(r"\d")
 
 
 @dataclass(frozen=True)
@@ -20,6 +21,7 @@ class ParsedCompletion:
     haiku_text: str
     lines: tuple[str, ...]
     has_stray_tags: bool
+    has_digits: bool
 
 
 @dataclass(frozen=True)
@@ -46,12 +48,14 @@ class RewardBreakdown:
 def parse_completion(text: str) -> ParsedCompletion:
     """Parse raw completion directly into non-empty lines (no tag extraction bonus)."""
     has_stray_tags = bool(_STRAY_TAG_RE.search(text))
+    has_digits = bool(_DIGIT_RE.search(text))
     cleaned = text.strip()
     lines = tuple(line.strip() for line in cleaned.splitlines() if line.strip())
     return ParsedCompletion(
         haiku_text="\n".join(lines),
         lines=lines,
         has_stray_tags=has_stray_tags,
+        has_digits=has_digits,
     )
 
 
@@ -117,8 +121,8 @@ def score_completion(
             haiku_lines=(),
         )
 
-    # No positive tag/format reward: 0.0 when cleanly 3 lines with no stray tags,
-    # penalty only when line count is wrong or stray tags appear.
+    # No positive tag/format reward: 0.0 when cleanly 3 lines with no stray tags or digits,
+    # penalty only when line count is wrong, stray tags appear, or digits appear.
     has_three_lines = len(parsed.lines) == len(cfg.line_targets)
     format_reward = 0.0
     if not has_three_lines:
@@ -129,10 +133,13 @@ def score_completion(
         )
     if parsed.has_stray_tags:
         format_reward += -0.25
+    if parsed.has_digits:
+        format_reward += -0.25
 
-    is_valid_format = has_three_lines and (not parsed.has_stray_tags)
+    is_valid_format = has_three_lines and (not parsed.has_stray_tags) and (not parsed.has_digits)
 
-    # Sharpened per-line syllable shaping
+    # Sharpened per-line syllable shaping (gated on valid 3-line format so 4-line
+    # preambles like "5-7-5 syllable haiku:\n..." cannot farm partial syllable credit!)
     analyses = [analyze_line(line) for line in parsed.lines]
     scored_pairs = list(zip(analyses, cfg.line_targets))
 
@@ -146,8 +153,9 @@ def score_completion(
         closest = analysis.closest_count(target)
         line_counts.append(closest)
         line_distances.append(dist)
-        line_score = cfg.line_max_reward * max(0.0, 1.0 - cfg.syllable_error_slope * dist)
-        syllable_reward += line_score
+        if is_valid_format:
+            line_score = cfg.line_max_reward * max(0.0, 1.0 - cfg.syllable_error_slope * dist)
+            syllable_reward += line_score
         if not analysis.matches_exact(target):
             all_lines_exact = False
 
@@ -232,7 +240,7 @@ def score_group(
     if cfg.relevance_weight > 0.0 and relevance_scorer is not None:
         haiku_texts = [
             p.haiku_text
-            if (len(p.lines) == len(cfg.line_targets) and not p.has_stray_tags)
+            if (len(p.lines) == len(cfg.line_targets) and not p.has_stray_tags and not p.has_digits)
             else ""
             for p in parsed_list
         ]
