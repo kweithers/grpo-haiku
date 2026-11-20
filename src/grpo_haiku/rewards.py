@@ -71,36 +71,136 @@ def extract_content_bigrams(
     return bigrams
 
 
-class ClicheTracker:
-    """Sliding-window tracker of recent cross-prompt content bigrams to deter phrase collapse."""
+def extract_content_words(
+    text: str, exclude_words: set[str] | frozenset[str] = frozenset()
+) -> set[str]:
+    """Extract unique non-function, non-topic content words."""
+    return {
+        w
+        for w in tokenize_words(text)
+        if (w not in _FUNCTION_WORDS) and (w not in exclude_words) and len(w) >= 3
+    }
 
-    def __init__(self, window: int = 64, min_count: int = 3) -> None:
+
+def extract_line_starters(
+    lines: tuple[str, ...] | list[str],
+    exclude_words: set[str] | frozenset[str] = frozenset(),
+) -> tuple[set[str], set[tuple[str, str]]]:
+    """Extract 1-word and 2-word non-topic line openers from haiku lines."""
+    starters1: set[str] = set()
+    starters2: set[tuple[str, str]] = set()
+    for line in lines:
+        words = tokenize_words(line)
+        if not words:
+            continue
+        w0 = words[0]
+        if w0 not in _FUNCTION_WORDS and w0 not in exclude_words and len(w0) >= 3:
+            starters1.add(w0)
+        if len(words) >= 2:
+            w1 = words[1]
+            if not (w0 in _FUNCTION_WORDS and w1 in _FUNCTION_WORDS):
+                if (w0 not in exclude_words) and (w1 not in exclude_words):
+                    starters2.add((w0, w1))
+    return starters1, starters2
+
+
+class ClicheTracker:
+    """Sliding-window tracker of recent cross-prompt starters, bigrams, and content words."""
+
+    def __init__(
+        self,
+        window: int = 64,
+        bigram_min_count: int = 3,
+        starter1_min_count: int = 5,
+        starter2_min_count: int = 3,
+        unigram_min_count: int = 8,
+    ) -> None:
         self.window = max(1, window)
-        self.min_count = max(1, min_count)
-        self._history: deque[set[tuple[str, str]]] = deque()
-        self._counts: Counter[tuple[str, str]] = Counter()
+        self.bigram_min_count = max(1, bigram_min_count)
+        self.starter1_min_count = max(1, starter1_min_count)
+        self.starter2_min_count = max(1, starter2_min_count)
+        self.unigram_min_count = max(1, unigram_min_count)
+        self._history: deque[
+            tuple[set[tuple[str, str]], set[str], set[tuple[str, str]], set[str]]
+        ] = deque()
+        self._bigram_counts: Counter[tuple[str, str]] = Counter()
+        self._starter1_counts: Counter[str] = Counter()
+        self._starter2_counts: Counter[tuple[str, str]] = Counter()
+        self._unigram_counts: Counter[str] = Counter()
+
+    def _extract_features(
+        self, haiku_text: str, topic: str
+    ) -> tuple[set[tuple[str, str]], set[str], set[tuple[str, str]], set[str]]:
+        topic_words = set(tokenize_words(topic))
+        lines = [ln.strip() for ln in haiku_text.splitlines() if ln.strip()]
+        bigrams = extract_content_bigrams(haiku_text, exclude_words=topic_words)
+        starters1, starters2 = extract_line_starters(lines, exclude_words=topic_words)
+        unigrams = extract_content_words(haiku_text, exclude_words=topic_words)
+        return bigrams, starters1, starters2, unigrams
+
+    def cliche_hits(self, haiku_text: str, topic: str = "") -> list[str]:
+        """Return deduplicated list of overused starter/bigram/unigram hits."""
+        bigrams, starters1, starters2, unigrams = self._extract_features(haiku_text, topic)
+        hits: list[str] = []
+        for s2 in sorted(starters2):
+            if self._starter2_counts.get(s2, 0) >= self.starter2_min_count:
+                hits.append(f"start2:{s2[0]} {s2[1]}")
+        for bg in sorted(bigrams):
+            if self._bigram_counts.get(bg, 0) >= self.bigram_min_count:
+                label = f"{bg[0]} {bg[1]}"
+                if f"start2:{label}" not in hits:
+                    hits.append(f"bg:{label}")
+        for s1 in sorted(starters1):
+            if self._starter1_counts.get(s1, 0) >= self.starter1_min_count:
+                hits.append(f"start1:{s1}")
+        for u in sorted(unigrams):
+            if self._unigram_counts.get(u, 0) >= self.unigram_min_count:
+                if f"start1:{u}" not in hits:
+                    hits.append(f"word:{u}")
+        return hits
 
     def overused_bigrams(
         self, haiku_text: str, topic: str = ""
     ) -> list[tuple[str, str]]:
-        """Return content bigrams in `haiku_text` already seen >= `min_count` times recently."""
+        """Return content bigrams in `haiku_text` already seen >= `bigram_min_count` times."""
         topic_words = set(tokenize_words(topic))
         bigrams = extract_content_bigrams(haiku_text, exclude_words=topic_words)
-        return sorted(bg for bg in bigrams if self._counts.get(bg, 0) >= self.min_count)
+        return sorted(
+            bg for bg in bigrams if self._bigram_counts.get(bg, 0) >= self.bigram_min_count
+        )
 
     def record(self, haiku_text: str, topic: str = "") -> None:
-        """Record one completed haiku's non-topic content bigrams into the rolling window."""
-        topic_words = set(tokenize_words(topic))
-        bigrams = extract_content_bigrams(haiku_text, exclude_words=topic_words)
+        """Record one completed haiku's non-topic features into the rolling window."""
+        feats = self._extract_features(haiku_text, topic)
         if len(self._history) >= self.window:
-            oldest = self._history.popleft()
-            for bg in oldest:
-                self._counts[bg] -= 1
-                if self._counts[bg] <= 0:
-                    del self._counts[bg]
-        self._history.append(bigrams)
-        for bg in bigrams:
-            self._counts[bg] += 1
+            old_bg, old_s1, old_s2, old_u = self._history.popleft()
+            for k in old_bg:
+                self._bigram_counts[k] -= 1
+                if self._bigram_counts[k] <= 0:
+                    del self._bigram_counts[k]
+            for k in old_s1:
+                self._starter1_counts[k] -= 1
+                if self._starter1_counts[k] <= 0:
+                    del self._starter1_counts[k]
+            for k in old_s2:
+                self._starter2_counts[k] -= 1
+                if self._starter2_counts[k] <= 0:
+                    del self._starter2_counts[k]
+            for k in old_u:
+                self._unigram_counts[k] -= 1
+                if self._unigram_counts[k] <= 0:
+                    del self._unigram_counts[k]
+
+        self._history.append(feats)
+        bg, s1, s2, u = feats
+        for k in bg:
+            self._bigram_counts[k] += 1
+        for k in s1:
+            self._starter1_counts[k] += 1
+        for k in s2:
+            self._starter2_counts[k] += 1
+        for k in u:
+            self._unigram_counts[k] += 1
 
 
 @dataclass(frozen=True)
@@ -295,14 +395,17 @@ def score_completion(
         else 0.0
     )
 
-    # Cross-step cliche phrase penalty (active during GRPO when tracker is provided)
+    # Cross-step cliche novelty gate & penalty (active during GRPO when tracker is provided)
     cliche_penalty = 0.0
     if cliche_tracker is not None and is_valid_format:
-        overused = cliche_tracker.overused_bigrams(haiku_plain, topic=topic)
-        if overused:
+        hits = cliche_tracker.cliche_hits(haiku_plain, topic=topic)
+        if hits:
+            # Strongly discount the exact 5-7-5 jackpot so templates can't outscore fresh 5-7-5s
+            if exact_bonus > 0.0:
+                exact_bonus = exact_bonus * (cfg.cliche_jackpot_decay ** len(hits))
             cliche_penalty = max(
                 cfg.cliche_penalty_cap,
-                cfg.cliche_penalty_per_bigram * len(overused),
+                cfg.cliche_penalty_per_hit * len(hits),
             )
 
     total_reward = (
@@ -337,12 +440,86 @@ def score_completion(
     )
 
 
+def _apply_fitness_sharing(
+    topic: str,
+    breakdowns: list[RewardBreakdown],
+    cfg: RewardConfig,
+) -> list[RewardBreakdown]:
+    """Within-group niching: divide `exact_bonus` among near-duplicate templates in the group.
+
+    Two valid rollouts are treated as template peers if they share a non-topic 2-word
+    line opener (e.g. "Nightfall claims...") OR have non-topic content-word Jaccard
+    similarity >= `cfg.fitness_sharing_jaccard`. Solitary fresh exact 5-7-5 poems keep
+    100% of `exact_bonus`, while herds of template copies split it.
+    """
+    if (not cfg.fitness_sharing) or len(breakdowns) <= 1:
+        return breakdowns
+
+    topic_words = set(tokenize_words(topic))
+    feats: list[tuple[set[tuple[str, str]], set[str]]] = []
+    for bd in breakdowns:
+        if bd.is_valid_format and bd.haiku_lines:
+            _, s2 = extract_line_starters(bd.haiku_lines, exclude_words=topic_words)
+            cwords = extract_content_words("\n".join(bd.haiku_lines), exclude_words=topic_words)
+            feats.append((s2, cwords))
+        else:
+            feats.append((set(), set()))
+
+    adjusted: list[RewardBreakdown] = []
+    for i, bd in enumerate(breakdowns):
+        if bd.exact_bonus <= 0.0 or not bd.is_valid_format:
+            adjusted.append(bd)
+            continue
+
+        s2_i, cw_i = feats[i]
+        cluster_size = 1
+        for j, other in enumerate(breakdowns):
+            if j == i or not other.is_valid_format:
+                continue
+            s2_j, cw_j = feats[j]
+            shared_opener = bool(s2_i and s2_j and (s2_i & s2_j))
+            union = cw_i | cw_j
+            jaccard = (len(cw_i & cw_j) / len(union)) if union else 0.0
+            if shared_opener or jaccard >= cfg.fitness_sharing_jaccard:
+                cluster_size += 1
+
+        if cluster_size == 1:
+            adjusted.append(bd)
+            continue
+
+        new_exact = round(bd.exact_bonus / (cluster_size ** cfg.fitness_sharing_exponent), 6)
+        delta = new_exact - bd.exact_bonus
+        adjusted.append(
+            RewardBreakdown(
+                total_reward=round(bd.total_reward + delta, 6),
+                format_reward=bd.format_reward,
+                syllable_reward=bd.syllable_reward,
+                exact_bonus=new_exact,
+                relevance_reward=bd.relevance_reward,
+                oov_penalty=bd.oov_penalty,
+                repetition_penalty=bd.repetition_penalty,
+                echo_penalty=bd.echo_penalty,
+                cliche_penalty=bd.cliche_penalty,
+                raw_cosine_sim=bd.raw_cosine_sim,
+                is_valid_format=bd.is_valid_format,
+                is_exact_575=bd.is_exact_575,
+                line_counts=bd.line_counts,
+                line_distances=bd.line_distances,
+                line_rewards=bd.line_rewards,
+                oov_words=bd.oov_words,
+                haiku_lines=bd.haiku_lines,
+            )
+        )
+    return adjusted
+
+
 def score_group(
     topic: str,
     completions: list[str],
     cfg: RewardConfig | None = None,
     relevance_scorer: RelevanceScorer | None = None,
     cliche_tracker: ClicheTracker | None = None,
+    apply_fitness_sharing: bool = False,
 ) -> list[RewardBreakdown]:
     """Batch-score a group of completions for the same topic (batches embedding calls)."""
     cfg = cfg or RewardConfig()
@@ -359,7 +536,7 @@ def score_group(
         batch_sims = relevance_scorer.batch_similarity(topic, haiku_texts)
         sims = [float(s) for s in batch_sims]
 
-    return [
+    breakdowns = [
         score_completion(
             topic=topic,
             completion=comp,
@@ -370,3 +547,6 @@ def score_group(
         )
         for comp, sim in zip(completions, sims)
     ]
+    if apply_fitness_sharing:
+        breakdowns = _apply_fitness_sharing(topic, breakdowns, cfg)
+    return breakdowns

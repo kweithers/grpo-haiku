@@ -508,7 +508,10 @@ def train_grpo(
     metrics_path = run_dir / "metrics.jsonl"
     cliche_tracker = ClicheTracker(
         window=reward_cfg.cliche_window,
-        min_count=reward_cfg.cliche_min_count,
+        bigram_min_count=reward_cfg.cliche_bigram_min_count,
+        starter1_min_count=reward_cfg.cliche_starter1_min_count,
+        starter2_min_count=reward_cfg.cliche_starter2_min_count,
+        unigram_min_count=reward_cfg.cliche_unigram_min_count,
     )
 
     rng = random.Random(grpo_cfg.seed)
@@ -560,13 +563,14 @@ def train_grpo(
             tokenizer.encode(txt, add_special_tokens=False) for txt in rollout.texts
         ]
 
-        # 2. Deterministic verifiable reward + per-line token credit assignment
+        # 2. Deterministic verifiable reward + fitness sharing + per-line credit assignment
         breakdowns = score_group(
             topic=ex.topic,
             completions=completions,
             cfg=reward_cfg,
             relevance_scorer=relevance_scorer,
             cliche_tracker=cliche_tracker,
+            apply_fitness_sharing=True,
         )
         rewards = [b.total_reward for b in breakdowns]
 

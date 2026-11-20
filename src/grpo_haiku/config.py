@@ -62,11 +62,20 @@ class RewardConfig:
     prompt_echo_ngram: int = 3
     prompt_echo_penalty: float = -0.35
 
-    # Cross-step cliche bigram guardrail (prevents phrase collapse like "silence holds")
+    # Cross-step cliche guardrail (line starters + content bigrams + overused content words)
     cliche_window: int = 64
-    cliche_min_count: int = 3
-    cliche_penalty_per_bigram: float = -0.15
+    cliche_bigram_min_count: int = 3
+    cliche_starter1_min_count: int = 5
+    cliche_starter2_min_count: int = 3
+    cliche_unigram_min_count: int = 8
+    cliche_jackpot_decay: float = 0.45  # Each cliche hit multiplies exact_bonus by 0.45x
+    cliche_penalty_per_hit: float = -0.15
     cliche_penalty_cap: float = -0.45
+
+    # Within-group fitness sharing (niching): split exact jackpot among near-duplicate templates
+    fitness_sharing: bool = True
+    fitness_sharing_jaccard: float = 0.45
+    fitness_sharing_exponent: float = 0.85
 
 
 @dataclass

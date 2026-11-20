@@ -226,13 +226,19 @@ def test_score_group_batches_cleanly():
     assert len(parse_completion(completions[0]).lines) == 3
 
 
-def test_cliche_tracker_penalizes_overused_non_topic_bigrams_and_expires():
-    tracker = ClicheTracker(window=4, min_count=2)
-    # Record two unrelated haikus that both lean on "silence holds"
+def test_cliche_tracker_discounts_jackpot_for_overused_starters_bigrams_and_words():
+    tracker = ClicheTracker(
+        window=4,
+        bigram_min_count=2,
+        starter1_min_count=2,
+        starter2_min_count=2,
+        unigram_min_count=2,
+    )
+    # Record two unrelated haikus that both lean on "Silence holds..."
     tracker.record("Wind cools the harbor\nLanterns sway above the pier\nSilence holds the dusk", topic="a harbor at dusk")
     tracker.record("Coffee cools in glass\nRain taps on the brick window\nSilence holds the night", topic="rainy coffee shop")
 
-    # On a third unrelated topic, "silence holds" is flagged as a cliche
+    # On a third unrelated topic, "Silence holds" triggers both starter/bigram hits -> heavy jackpot discount
     cliche_haiku = "Frosted cedar branch\nQuiet snowflakes drift below\nSilence holds the dawn"
     fresh_haiku = "Frosted cedar branch\nQuiet snowflakes drift below\nDawn breaks pale and still"
 
@@ -248,14 +254,17 @@ def test_cliche_tracker_penalizes_overused_non_topic_bigrams_and_expires():
         relevance_scorer=DummyRelevanceScorer(0.75),
         cliche_tracker=tracker,
     )
-    assert res_cliche.cliche_penalty == RewardConfig().cliche_penalty_per_bigram
+    assert res_cliche.cliche_penalty < 0.0
+    assert res_cliche.exact_bonus < RewardConfig().exact_575_bonus * 0.5
     assert res_fresh.cliche_penalty == 0.0
-    assert res_fresh.total_reward > res_cliche.total_reward
+    assert res_fresh.exact_bonus == RewardConfig().exact_575_bonus
+    assert res_fresh.total_reward - res_cliche.total_reward > 1.5
 
-    # If the topic itself asks for "silence", topic words are excluded from cliche penalty
+    # If the topic itself asks for "silence", using "silence" with a fresh verb is NOT penalized
+    topic_silence_haiku = "Frosted cedar branch\nQuiet snowflakes drift below\nSilence fills the dawn"
     res_topic_ok = score_completion(
         "a glacier valley in silence",
-        cliche_haiku,
+        topic_silence_haiku,
         relevance_scorer=DummyRelevanceScorer(0.75),
         cliche_tracker=tracker,
     )
@@ -263,6 +272,26 @@ def test_cliche_tracker_penalizes_overused_non_topic_bigrams_and_expires():
 
     # Window eviction: push 4 fresh haikus -> "silence holds" expires cleanly
     for i in range(4):
-        tracker.record(f"Bright sun warms the hill\nBees hum over clover fields\nMeadow wakes at noon", topic=f"topic {i}")
-    assert tracker.overused_bigrams(cliche_haiku, topic="a winter snowy morning") == []
+        tracker.record("Bright sun warms the hill\nBees hum over clover fields\nMeadow wakes at noon", topic=f"topic {i}")
+    assert tracker.cliche_hits(cliche_haiku, topic="a winter snowy morning") == []
     assert ("in", "the") not in extract_content_bigrams("Wind blows in the trees")
+
+
+def test_fitness_sharing_rewards_unique_exact_haiku_over_template_herd():
+    # Three exact 5-7-5 haikus sharing the "Nightfall claims..." template + one fresh exact 5-7-5
+    herd_1 = "Nightfall claims the snow\nQuiet snowflakes drift below\nDawn breaks pale and still"
+    herd_2 = "Nightfall claims the frost\nSilver branches bend in wind\nMorning wakes the pines"
+    herd_3 = "Nightfall claims the hill\nFrozen footprints line the road\nWinter breathes out cold"
+    fresh = "Cedar boughs hold white\nCrisp air wakes the sleeping pines\nSunlight melts the rime"
+
+    results = score_group(
+        topic="a winter snowy morning",
+        completions=[herd_1, herd_2, herd_3, fresh],
+        relevance_scorer=DummyRelevanceScorer(0.75),
+        apply_fitness_sharing=True,
+    )
+    # Fresh haiku keeps the full unshared jackpot; herd copies split it
+    assert results[3].exact_bonus == RewardConfig().exact_575_bonus
+    for i in range(3):
+        assert results[i].exact_bonus < RewardConfig().exact_575_bonus * 0.5
+        assert results[3].total_reward > results[i].total_reward + 1.0
