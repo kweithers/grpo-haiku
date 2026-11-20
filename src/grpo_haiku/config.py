@@ -62,12 +62,12 @@ class RewardConfig:
     prompt_echo_ngram: int = 3
     prompt_echo_penalty: float = -0.35
 
-    # Cross-step cliche guardrail (line starters + content bigrams + overused content words)
+    # Cross-step cliche guardrail (line starters + content bigrams; unigram <= 0 disables word cap)
     cliche_window: int = 64
     cliche_bigram_min_count: int = 3
     cliche_starter1_min_count: int = 5
     cliche_starter2_min_count: int = 3
-    cliche_unigram_min_count: int = 8
+    cliche_unigram_min_count: int = 0
     cliche_jackpot_decay: float = 0.45  # Each cliche hit multiplies exact_bonus by 0.45x
     cliche_penalty_per_hit: float = -0.15
     cliche_penalty_cap: float = -0.45
@@ -99,7 +99,7 @@ class GRPOConfig:
     learning_rate: float = 3e-6
     min_learning_rate: float = 3e-7
     weight_decay: float = 0.01
-    kl_beta: float = 0.05
+    kl_beta: float = 0.02
     clip_eps: float = 0.2
     clip_eps_high: float = 0.28  # DAPO Clip-Higher: lets rare creative tokens climb faster
     entropy_coef: float = 0.01  # Mild token entropy bonus to deter greedy template lock-in

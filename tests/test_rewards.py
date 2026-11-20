@@ -295,3 +295,40 @@ def test_fitness_sharing_rewards_unique_exact_haiku_over_template_herd():
     for i in range(3):
         assert results[i].exact_bonus < RewardConfig().exact_575_bonus * 0.5
         assert results[3].total_reward > results[i].total_reward + 1.0
+
+
+def test_cliche_tracker_disables_unigrams_when_threshold_zero():
+    cfg = RewardConfig()
+    assert cfg.cliche_unigram_min_count == 0
+    tracker = ClicheTracker(
+        window=16,
+        bigram_min_count=2,
+        starter1_min_count=2,
+        starter2_min_count=2,
+        unigram_min_count=cfg.cliche_unigram_min_count,
+    )
+    # Use common poetic word "light" in mid-line positions across several unrelated poems
+    tracker.record("Boats rock near the light\nTides pull pebbles off the shore\nGulls call from the dock", topic="a coastal pier")
+    tracker.record("Steam curls in the light\nKettle hums above the stove\nToast warms on a plate", topic="a morning kitchen")
+    tracker.record("Leaves shine in the light\nBreezes rock the maple crown\nGrass bends near the fence", topic="a windy park")
+
+    # Mid-line reuse of "light" with fresh starter & bigrams must NOT trigger any cliche penalty
+    fresh_with_light = "Cedar boughs hold light\nQuiet snowflakes drift below\nDawn breaks pale and still"
+    res = score_completion(
+        "a winter snowy morning",
+        fresh_with_light,
+        cfg=cfg,
+        relevance_scorer=DummyRelevanceScorer(0.75),
+        cliche_tracker=tracker,
+    )
+    assert tracker.cliche_hits(fresh_with_light, topic="a winter snowy morning") == []
+    assert res.cliche_penalty == 0.0
+    assert res.exact_bonus == cfg.exact_575_bonus
+
+    # Meanwhile, repeating a 2-word starter or content bigram still triggers cleanly
+    tracker.record("Nightfall claims the pier\nCold spray settles on the wood\nLanterns blink at dusk", topic="a foggy dock")
+    tracker.record("Nightfall claims the road\nHeadlights vanish past the bend\nCrickets start to sing", topic="a highway")
+    cliche_starter = "Nightfall claims the snow\nQuiet snowflakes drift below\nDawn breaks pale and still"
+    hits = tracker.cliche_hits(cliche_starter, topic="a winter snowy morning")
+    assert any(h.startswith("start2:") or h.startswith("bg:") for h in hits)
+    assert not any(h.startswith("word:") for h in hits)

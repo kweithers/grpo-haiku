@@ -113,13 +113,13 @@ class ClicheTracker:
         bigram_min_count: int = 3,
         starter1_min_count: int = 5,
         starter2_min_count: int = 3,
-        unigram_min_count: int = 8,
+        unigram_min_count: int = 0,
     ) -> None:
         self.window = max(1, window)
-        self.bigram_min_count = max(1, bigram_min_count)
-        self.starter1_min_count = max(1, starter1_min_count)
-        self.starter2_min_count = max(1, starter2_min_count)
-        self.unigram_min_count = max(1, unigram_min_count)
+        self.bigram_min_count = max(0, bigram_min_count)
+        self.starter1_min_count = max(0, starter1_min_count)
+        self.starter2_min_count = max(0, starter2_min_count)
+        self.unigram_min_count = max(0, unigram_min_count)
         self._history: deque[
             tuple[set[tuple[str, str]], set[str], set[tuple[str, str]], set[str]]
         ] = deque()
@@ -142,27 +142,33 @@ class ClicheTracker:
         """Return deduplicated list of overused starter/bigram/unigram hits."""
         bigrams, starters1, starters2, unigrams = self._extract_features(haiku_text, topic)
         hits: list[str] = []
-        for s2 in sorted(starters2):
-            if self._starter2_counts.get(s2, 0) >= self.starter2_min_count:
-                hits.append(f"start2:{s2[0]} {s2[1]}")
-        for bg in sorted(bigrams):
-            if self._bigram_counts.get(bg, 0) >= self.bigram_min_count:
-                label = f"{bg[0]} {bg[1]}"
-                if f"start2:{label}" not in hits:
-                    hits.append(f"bg:{label}")
-        for s1 in sorted(starters1):
-            if self._starter1_counts.get(s1, 0) >= self.starter1_min_count:
-                hits.append(f"start1:{s1}")
-        for u in sorted(unigrams):
-            if self._unigram_counts.get(u, 0) >= self.unigram_min_count:
-                if f"start1:{u}" not in hits:
-                    hits.append(f"word:{u}")
+        if self.starter2_min_count > 0:
+            for s2 in sorted(starters2):
+                if self._starter2_counts.get(s2, 0) >= self.starter2_min_count:
+                    hits.append(f"start2:{s2[0]} {s2[1]}")
+        if self.bigram_min_count > 0:
+            for bg in sorted(bigrams):
+                if self._bigram_counts.get(bg, 0) >= self.bigram_min_count:
+                    label = f"{bg[0]} {bg[1]}"
+                    if f"start2:{label}" not in hits:
+                        hits.append(f"bg:{label}")
+        if self.starter1_min_count > 0:
+            for s1 in sorted(starters1):
+                if self._starter1_counts.get(s1, 0) >= self.starter1_min_count:
+                    hits.append(f"start1:{s1}")
+        if self.unigram_min_count > 0:
+            for u in sorted(unigrams):
+                if self._unigram_counts.get(u, 0) >= self.unigram_min_count:
+                    if f"start1:{u}" not in hits:
+                        hits.append(f"word:{u}")
         return hits
 
     def overused_bigrams(
         self, haiku_text: str, topic: str = ""
     ) -> list[tuple[str, str]]:
         """Return content bigrams in `haiku_text` already seen >= `bigram_min_count` times."""
+        if self.bigram_min_count <= 0:
+            return []
         topic_words = set(tokenize_words(topic))
         bigrams = extract_content_bigrams(haiku_text, exclude_words=topic_words)
         return sorted(
