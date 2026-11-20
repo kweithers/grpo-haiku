@@ -11,3 +11,7 @@
 - Run the unit test suite (`.venv/bin/pytest`) before committing code changes so every commit leaves the repository in a clean, passing state.
 - Use concise conventional commit messages matching this repo's history (`feat:`, `fix:`, `tune:`, `test:`, `docs:`).
 - Never commit untracked training outputs, checkpoints, or virtual environments (`runs/`, `.venv/`).
+
+## macOS Sleep Prevention (`caffeinate`)
+
+- Always run training runs (`grpo_haiku.grpo`, `grpo_haiku.sft`) and inference/evaluation runs (`grpo_haiku.eval`, `grpo_haiku.generate`) with `caffeinate -i` (e.g., `caffeinate -i .venv/bin/python -m grpo_haiku.grpo ...`) so the Mac does not sleep mid-run.
