@@ -25,8 +25,8 @@ def test_is_sft_worthy_accepts_only_clean_on_topic_exact_575():
     bd_good = score_completion("a winter snowy morning", good, relevance_scorer=_StubScorer(0.72))
     assert is_sft_worthy(bd_good)
 
-    # Off-topic exact 5-7-5 rejected
-    bd_off = score_completion("a winter snowy morning", good, relevance_scorer=_StubScorer(0.40))
+    # Off-topic exact 5-7-5 rejected (sim < 0.42)
+    bd_off = score_completion("a winter snowy morning", good, relevance_scorer=_StubScorer(0.35))
     assert not is_sft_worthy(bd_off)
 
     # Near-miss rejected

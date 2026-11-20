@@ -32,7 +32,8 @@ from grpo_haiku.grpo import (
     sequence_completion_logprobs,
 )
 from grpo_haiku.relevance import MLXEmbeddingRelevanceScorer, RelevanceScorer
-from grpo_haiku.rewards import RewardBreakdown, score_group
+from grpo_haiku.rewards import RewardBreakdown, extract_content_bigrams, score_group
+from grpo_haiku.syllables import tokenize_words
 
 
 def is_sft_worthy(bd: RewardBreakdown) -> bool:
@@ -59,6 +60,7 @@ def collect_sft_haikus(
     temp: float = 0.95,
     top_p: float = 0.95,
     max_line_repeats: int = 4,
+    max_bigram_repeats: int = 3,
     seed: int = 42,
     reward_cfg: RewardConfig | None = None,
     relevance_scorer: RelevanceScorer | None = None,
@@ -85,6 +87,7 @@ def collect_sft_haikus(
     accepted: list[dict] = []
     seen_haikus: set[str] = set()
     line_counts_seen: dict[str, int] = {}
+    bigram_counts_seen: dict[tuple[str, str], int] = {}
     total_candidates = 0
 
     for start in range(0, len(examples), prompt_batch_size):
@@ -140,9 +143,17 @@ def collect_sft_haikus(
                     line_counts_seen.get(ln, 0) >= max_line_repeats for ln in norm_lines
                 ):
                     continue
+                topic_words = set(tokenize_words(ex.topic))
+                bigrams = extract_content_bigrams(key, exclude_words=topic_words)
+                if max_bigram_repeats > 0 and any(
+                    bigram_counts_seen.get(bg, 0) >= max_bigram_repeats for bg in bigrams
+                ):
+                    continue
                 seen_haikus.add(key)
                 for ln in norm_lines:
                     line_counts_seen[ln] = line_counts_seen.get(ln, 0) + 1
+                for bg in bigrams:
+                    bigram_counts_seen[bg] = bigram_counts_seen.get(bg, 0) + 1
                 accepted.append(
                     {
                         "id": ex.id,
@@ -318,6 +329,7 @@ def main() -> None:
     parser.add_argument("--samples-per-prompt", type=int, default=8)
     parser.add_argument("--prompt-batch-size", type=int, default=8)
     parser.add_argument("--max-line-repeats", type=int, default=4)
+    parser.add_argument("--max-bigram-repeats", type=int, default=3)
     parser.add_argument("--run-name", type=str, default="sft_v1")
     parser.add_argument("--runs-dir", type=str, default="runs")
     parser.add_argument("--epochs", type=int, default=2)
@@ -339,6 +351,7 @@ def main() -> None:
             samples_per_prompt=args.samples_per_prompt,
             prompt_batch_size=args.prompt_batch_size,
             max_line_repeats=args.max_line_repeats,
+            max_bigram_repeats=args.max_bigram_repeats,
             seed=args.seed,
         )
 
