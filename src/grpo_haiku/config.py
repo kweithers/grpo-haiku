@@ -11,7 +11,7 @@ class ModelConfig:
 
     model_name: str = "mlx-community/Qwen3-1.7B-4bit"
     lora_rank: int = 8
-    lora_scale: float = 16.0
+    lora_scale: float = 8.0
     lora_dropout: float = 0.0
     lora_layers: int = 16  # Number of top transformer layers to adapt (-1 for all)
     lora_keys: list[str] = field(
@@ -69,19 +69,19 @@ class GRPOConfig:
 
     train_file: str = "data/train.jsonl"
     eval_file: str = "data/eval.jsonl"
-    run_name: str = "qwen3_1.7b_direct_v2"
+    run_name: str = "qwen3_1.7b_direct_v3"
     runs_dir: str = "runs"
 
     # GRPO rollout & optimization
-    num_steps: int = 250
+    num_steps: int = 200
     group_size: int = 8
     grpo_epochs: int = 1
     max_completion_tokens: int = 64
     temperature: float = 0.9
     top_p: float = 0.95
-    learning_rate: float = 1e-5
+    learning_rate: float = 2e-6
     weight_decay: float = 0.01
-    kl_beta: float = 0.02
+    kl_beta: float = 0.05
     clip_eps: float = 0.2
     grad_clip_norm: float = 1.0
     adv_eps: float = 1e-6
