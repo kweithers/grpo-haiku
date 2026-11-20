@@ -13,6 +13,7 @@ from grpo_haiku.grpo import (
     clip_grad_norm,
     compute_group_advantages,
     compute_per_line_token_advantages,
+    compute_quick_diversity,
     cosine_lr,
     gradient_checkpointing,
     grpo_token_loss,
@@ -291,3 +292,18 @@ def test_sequence_completion_logprobs_and_entropy_matches_cross_entropy():
     assert bool(mx.allclose(lp_ce, lp_ent, atol=1e-5).item())
     assert bool(mx.all(ent >= 0.0).item())
     assert ent.shape == (len(comp_ids),)
+
+
+def test_compute_quick_diversity_detects_collapse():
+    diverse = [
+        "Frosted cedar branch\nQuiet snowflakes drift below\nDawn breaks pale and still",
+        "Copper kettle hums\nWarm steam fogs the kitchen glass\nMorning wakes the room",
+    ]
+    collapsed = [
+        "Nightfall claims the snow\nSilence holds the winter sky\nShadow claims the night",
+        "Nightfall claims the snow\nSilence holds the winter sky\nShadow claims the night",
+    ]
+    u_div, d2_div = compute_quick_diversity(diverse)
+    u_col, d2_col = compute_quick_diversity(collapsed)
+    assert u_div == 1.0 and d2_div > 0.95
+    assert u_col == 0.5 and d2_col < 0.60

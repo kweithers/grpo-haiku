@@ -36,6 +36,7 @@ from grpo_haiku.config import GRPOConfig, ModelConfig, RewardConfig
 from grpo_haiku.data import HaikuPromptExample, format_chat_prompt, load_jsonl
 from grpo_haiku.relevance import MLXEmbeddingRelevanceScorer, RelevanceScorer
 from grpo_haiku.rewards import ClicheTracker, RewardBreakdown, score_group
+from grpo_haiku.syllables import tokenize_words
 
 _LORA_TYPES = (LoRALinear, LoRASwitchLinear, LoRAEmbedding)
 
@@ -411,6 +412,21 @@ def build_lora_model(model_cfg: ModelConfig):
     return model, tokenizer
 
 
+def compute_quick_diversity(haikus: list[str]) -> tuple[float, float]:
+    """Return `(unique_haiku_ratio, distinct_2)` across a list of generated haikus."""
+    non_empty = [h.strip().lower() for h in haikus if h.strip()]
+    if not non_empty:
+        return 0.0, 0.0
+    unique_ratio = len(set(non_empty)) / len(non_empty)
+    bigrams: list[tuple[str, str]] = []
+    for h in non_empty:
+        words = tokenize_words(h)
+        for i in range(len(words) - 1):
+            bigrams.append((words[i], words[i + 1]))
+    distinct_2 = (len(set(bigrams)) / len(bigrams)) if bigrams else 0.0
+    return unique_ratio, distinct_2
+
+
 def run_quick_eval(
     model: nn.Module,
     tokenizer,
@@ -418,44 +434,50 @@ def run_quick_eval(
     reward_cfg: RewardConfig,
     relevance_scorer: RelevanceScorer | None,
     max_tokens: int,
-    subset_size: int = 20,
+    subset_size: int = 50,
+    batch_size: int = 16,
 ) -> dict[str, float]:
-    """Run a fast greedy evaluation snapshot on a held-out subset."""
+    """Run a fast greedy evaluation snapshot on a held-out subset including distinct-2."""
     subset = eval_examples[:subset_size]
-    prompt_texts = [format_chat_prompt(tokenizer, ex.prompt) for ex in subset]
-    prompt_ids_list = [
-        tokenizer.encode(pt, add_special_tokens=False) for pt in prompt_texts
-    ]
+    breakdowns: list[RewardBreakdown] = []
 
     model.eval()
-    resp = batch_generate(
-        model,
-        tokenizer,
-        prompts=prompt_ids_list,
-        max_tokens=max_tokens,
-        sampler=make_sampler(temp=0.0),
-        return_token_ids=False,
-    )
+    for start in range(0, len(subset), batch_size):
+        chunk = subset[start : start + batch_size]
+        prompt_texts = [format_chat_prompt(tokenizer, ex.prompt) for ex in chunk]
+        prompt_ids_list = [
+            tokenizer.encode(pt, add_special_tokens=False) for pt in prompt_texts
+        ]
+        resp = batch_generate(
+            model,
+            tokenizer,
+            prompts=prompt_ids_list,
+            max_tokens=max_tokens,
+            sampler=make_sampler(temp=0.0),
+            return_token_ids=False,
+        )
+        for ex, pt, raw_text in zip(chunk, prompt_texts, resp.texts):
+            full_text = normalize_completion_text(pt, raw_text)
+            bd = score_group(
+                topic=ex.topic,
+                completions=[full_text],
+                cfg=reward_cfg,
+                relevance_scorer=relevance_scorer,
+            )[0]
+            breakdowns.append(bd)
     model.train()
 
-    breakdowns: list[RewardBreakdown] = []
-    for ex, pt, raw_text in zip(subset, prompt_texts, resp.texts):
-        full_text = normalize_completion_text(pt, raw_text)
-        bd = score_group(
-            topic=ex.topic,
-            completions=[full_text],
-            cfg=reward_cfg,
-            relevance_scorer=relevance_scorer,
-        )[0]
-        breakdowns.append(bd)
-
     n = max(1, len(breakdowns))
+    haiku_texts = ["\n".join(b.haiku_lines) for b in breakdowns]
+    unique_ratio, distinct_2 = compute_quick_diversity(haiku_texts)
     return {
         "eval_reward": sum(b.total_reward for b in breakdowns) / n,
         "eval_exact_575": sum(1 for b in breakdowns if b.is_exact_575) / n,
         "eval_valid_format": sum(1 for b in breakdowns if b.is_valid_format) / n,
         "eval_relevance": sum(b.raw_cosine_sim for b in breakdowns) / n,
         "eval_oov_rate": sum(1 for b in breakdowns if b.oov_words) / n,
+        "eval_unique_ratio": unique_ratio,
+        "eval_distinct_2": distinct_2,
     }
 
 
@@ -801,6 +823,7 @@ def train_grpo(
                 f"  ★ Eval@{step} ({min(len(eval_examples), grpo_cfg.eval_subset_size)} held-out): "
                 f"r={eval_stats['eval_reward']:+.3f} | "
                 f"575={eval_stats['eval_exact_575']*100:.1f}% | "
+                f"d2={eval_stats['eval_distinct_2']:.3f} uniq={eval_stats['eval_unique_ratio']*100:.0f}% | "
                 f"fmt={eval_stats['eval_valid_format']*100:.1f}% | "
                 f"rel={eval_stats['eval_relevance']:.2f}"
             )
