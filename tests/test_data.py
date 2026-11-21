@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from collections import Counter
 
-from grpo_haiku.data import DOMAIN_SPECS, generate_dataset, load_jsonl, save_jsonl
+from grpo_haiku.data import (
+    DOMAIN_SPECS,
+    THINK_SYSTEM_PROMPT,
+    format_chat_prompt,
+    generate_dataset,
+    load_jsonl,
+    save_jsonl,
+)
 
 
 def test_dataset_sizes_determinism_and_no_leakage():
@@ -40,3 +47,29 @@ def test_jsonl_roundtrip(tmp_path):
     save_jsonl(eval_set, p)
     loaded = load_jsonl(p)
     assert loaded == eval_set
+
+
+def test_format_chat_prompt_thinking_mode_strips_empty_qwen_stub():
+    class FakeQwenTokenizer:
+        chat_template = "qwen3"
+
+        def apply_chat_template(
+            self, messages, tokenize=False, add_generation_prompt=True, enable_thinking=False
+        ):
+            assert enable_thinking is False
+            sys_txt = messages[0]["content"]
+            usr_txt = messages[1]["content"]
+            return (
+                f"<|im_start|>system\n{sys_txt}<|im_end|>\n"
+                f"<|im_start|>user\n{usr_txt}<|im_end|>\n"
+                f"<|im_start|>assistant\n<think>\n\n</think>\n\n"
+            )
+
+    tok = FakeQwenTokenizer()
+    direct = format_chat_prompt(tok, "Write a haiku about snow.", thinking_mode=False)
+    assert direct.endswith("<think>\n\n</think>\n\n")
+
+    think = format_chat_prompt(tok, "Write a haiku about snow.", thinking_mode=True)
+    assert THINK_SYSTEM_PROMPT in think
+    assert think.endswith("<|im_start|>assistant\n")
+    assert "<think>\n\n</think>" not in think

@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -15,6 +16,16 @@ SYSTEM_PROMPT = (
     "Use standard English words, avoid repeating words or copying the prompt verbatim, "
     "and output nothing besides the 3 lines of the haiku (no title, no commentary, no tags)."
 )
+
+THINK_SYSTEM_PROMPT = (
+    "You are a skilled haiku poet. First, briefly count each word's syllables inside "
+    "<think>...</think> (format: `1: word(n) ... = 5`, revising any line that is not "
+    "5, 7, or 5 using `->`). Immediately after </think>, output ONLY the final 3-line "
+    "English haiku (no title, no tags, no extra text). Use standard English words and "
+    "avoid cliches or copying the prompt verbatim."
+)
+
+_EMPTY_THINK_SUFFIX_RE = re.compile(r"<think>\s*</think>\s*$", re.IGNORECASE)
 
 PROMPT_TEMPLATES = (
     "Write a haiku about {topic}.",
@@ -363,16 +374,28 @@ def load_jsonl(path: str | Path) -> list[HaikuPromptExample]:
     return examples
 
 
-def format_chat_prompt(tokenizer, user_prompt: str, system_prompt: str = SYSTEM_PROMPT) -> str:
-    """Format prompt for direct 3-line haiku generation with thinking disabled."""
+def format_chat_prompt(
+    tokenizer,
+    user_prompt: str,
+    system_prompt: str | None = None,
+    thinking_mode: bool = False,
+) -> str:
+    """Format prompt for direct 3-line haiku or grounded `<think>` haiku generation."""
+    sys_prompt = (
+        system_prompt
+        if system_prompt is not None
+        else (THINK_SYSTEM_PROMPT if thinking_mode else SYSTEM_PROMPT)
+    )
     messages = [
-        {"role": "system", "content": system_prompt},
+        {"role": "system", "content": sys_prompt},
         {"role": "user", "content": user_prompt},
     ]
+    rendered: str
     if hasattr(tokenizer, "apply_chat_template") and getattr(tokenizer, "chat_template", None):
         try:
-            # For Qwen3, `enable_thinking=False` cleanly disables thinking mode.
-            return tokenizer.apply_chat_template(
+            # Always keep `enable_thinking=False` so Qwen3 never enters its verbose
+            # native math-CoT persona; in thinking_mode we strip the empty stub below.
+            rendered = tokenizer.apply_chat_template(
                 messages,
                 tokenize=False,
                 add_generation_prompt=True,
@@ -381,20 +404,25 @@ def format_chat_prompt(tokenizer, user_prompt: str, system_prompt: str = SYSTEM_
         except TypeError:
             # Gemma and older templates do not accept enable_thinking
             try:
-                return tokenizer.apply_chat_template(
+                rendered = tokenizer.apply_chat_template(
                     messages,
                     tokenize=False,
                     add_generation_prompt=True,
                 )
             except Exception:
                 # Some templates (e.g. Gemma) merge system into user message
-                merged = [{"role": "user", "content": f"{system_prompt}\n\n{user_prompt}"}]
-                return tokenizer.apply_chat_template(
+                merged = [{"role": "user", "content": f"{sys_prompt}\n\n{user_prompt}"}]
+                rendered = tokenizer.apply_chat_template(
                     merged,
                     tokenize=False,
                     add_generation_prompt=True,
                 )
-    return f"{system_prompt}\n\nUser: {user_prompt}\nAssistant:\n"
+    else:
+        rendered = f"{sys_prompt}\n\nUser: {user_prompt}\nAssistant:\n"
+
+    if thinking_mode:
+        rendered = _EMPTY_THINK_SUFFIX_RE.sub("", rendered)
+    return rendered
 
 
 def main() -> None:

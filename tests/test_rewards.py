@@ -6,6 +6,8 @@ from grpo_haiku.config import RewardConfig
 from grpo_haiku.relevance import has_prompt_echo
 from grpo_haiku.rewards import (
     ClicheTracker,
+    analyze_think_counts,
+    compute_think_grounding,
     extract_content_bigrams,
     parse_completion,
     score_completion,
@@ -332,3 +334,105 @@ def test_cliche_tracker_disables_unigrams_when_threshold_zero():
     hits = tracker.cliche_hits(cliche_starter, topic="a winter snowy morning")
     assert any(h.startswith("start2:") or h.startswith("bg:") for h in hits)
     assert not any(h.startswith("word:") for h in hits)
+
+
+def test_grounded_think_mode_rewards_honest_trace_and_blocks_fake_boilerplate():
+    cfg = RewardConfig(thinking_mode=True)
+
+    honest = (
+        "<think>\n"
+        "1: Frosted(2) cedar(2) branch(1) = 5\n"
+        "2: Quiet(2) snowflakes(2) drift(1) slow(1) = 6 -> Quiet(2) snowflakes(2) drift(1) below(2) = 7\n"
+        "3: Dawn(1) breaks(1) pale(1) and(1) still(1) = 5\n"
+        "</think>\n"
+        "Frosted cedar branch\n"
+        "Quiet snowflakes drift below\n"
+        "Dawn breaks pale and still"
+    )
+    res_honest = score_completion(
+        topic="a quiet winter snowy morning",
+        completion=honest,
+        cfg=cfg,
+        relevance_scorer=DummyRelevanceScorer(0.78),
+    )
+    assert res_honest.is_valid_format
+    assert res_honest.is_exact_575
+    assert res_honest.format_reward == 0.0
+    assert res_honest.think_grounding == 1.0
+    assert res_honest.think_penalty == 0.0
+    assert res_honest.exact_bonus == cfg.exact_575_bonus
+    assert res_honest.total_reward == 4.50
+
+    diag = analyze_think_counts(res_honest.think_text)
+    assert diag["all_lines_present"]
+    assert diag["counts_valid_cmudict"]
+    assert diag["sums_match_target"]
+    assert diag["is_honest_575"]
+    assert diag["has_revision"]
+
+    # Fake Run-1 style autumn-leaves copy hack inside <think> must forfeit the jackpot!
+    fake_think = (
+        "<think>\n"
+        "1: Autumn(2) leaves(1) drift(1) down(1) = 5\n"
+        "2: Crimson(2) maples(2) paint(1) the(1) ground(1) = 7\n"
+        "3: Cold(1) wind(1) calls(1) the(1) night(1) = 5\n"
+        "</think>\n"
+        "Frosted cedar branch\n"
+        "Quiet snowflakes drift below\n"
+        "Dawn breaks pale and still"
+    )
+    res_fake = score_completion(
+        topic="a quiet winter snowy morning",
+        completion=fake_think,
+        cfg=cfg,
+        relevance_scorer=DummyRelevanceScorer(0.78),
+    )
+    assert res_fake.is_valid_format
+    assert res_fake.think_grounding < cfg.grounding_min_overlap
+    assert res_fake.exact_bonus == 0.0
+    assert res_fake.think_penalty == cfg.ungrounded_think_penalty
+    assert res_honest.total_reward > res_fake.total_reward + 2.5
+
+    # Missing or unclosed <think> gets missing_think_penalty and zero syllable credit
+    truncated = "<think>\n1: Frosted(2) cedar(2) branch(1) = 5\n2: Quiet(2) snowflakes(2)"
+    res_trunc = score_completion(
+        topic="a quiet winter snowy morning",
+        completion=truncated,
+        cfg=cfg,
+        relevance_scorer=DummyRelevanceScorer(0.78),
+    )
+    assert not res_trunc.is_valid_format
+    assert not res_trunc.is_exact_575
+    assert res_trunc.format_reward == cfg.missing_think_penalty
+    assert res_trunc.syllable_reward == 0.0
+    assert res_trunc.haiku_lines == ()
+
+    # Digits after </think> are still rejected even though digits inside <think> are allowed
+    digits_after = (
+        "<think>\n"
+        "1: Frosted(2) cedar(2) branch(1) = 5\n"
+        "2: Quiet(2) snowflakes(2) drift(1) below(2) = 7\n"
+        "3: Dawn(1) breaks(1) pale(1) and(1) still(1) = 5\n"
+        "</think>\n"
+        "1: Frosted cedar branch\n"
+        "2: Quiet snowflakes drift below\n"
+        "3: Dawn breaks pale and still"
+    )
+    res_digits = score_completion(
+        topic="a quiet winter snowy morning",
+        completion=digits_after,
+        cfg=cfg,
+        relevance_scorer=DummyRelevanceScorer(0.78),
+    )
+    assert not res_digits.is_valid_format
+    assert res_digits.syllable_reward == 0.0
+    assert res_digits.exact_bonus == 0.0
+
+    # Grounding helper direct check
+    assert (
+        compute_think_grounding(
+            "frosted cedar branch quiet snowflakes drift below dawn breaks pale still",
+            res_honest.haiku_lines,
+        )
+        == 1.0
+    )

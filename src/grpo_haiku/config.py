@@ -77,6 +77,12 @@ class RewardConfig:
     fitness_sharing_jaccard: float = 0.45
     fitness_sharing_exponent: float = 0.85
 
+    # Grounded <think> scratchpad mode (opt-in; direct mode keeps thinking_mode=False)
+    thinking_mode: bool = False
+    grounding_min_overlap: float = 0.70  # Fraction of final haiku content words required in <think>
+    ungrounded_think_penalty: float = -0.35  # Plus forfeits exact_575_bonus
+    missing_think_penalty: float = -0.50
+
 
 @dataclass
 class GRPOConfig:
@@ -88,6 +94,7 @@ class GRPOConfig:
     kl_ref_adapter: str | None = None  # "base" for base model, adapter path, or None (=resume_adapter)
     run_name: str = "direct_clean_grpo"
     runs_dir: str = "runs"
+    thinking_mode: bool = False
 
     # GRPO rollout & optimization
     num_steps: int = 500

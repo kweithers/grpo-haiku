@@ -8,10 +8,19 @@ from dataclasses import dataclass
 
 from grpo_haiku.config import RewardConfig
 from grpo_haiku.relevance import RelevanceScorer, has_prompt_echo
-from grpo_haiku.syllables import LineSyllableAnalysis, analyze_line, tokenize_words
+from grpo_haiku.syllables import (
+    LineSyllableAnalysis,
+    analyze_line,
+    lookup_word_syllables,
+    tokenize_words,
+)
 
 # Detect stray XML/markdown/think artifacts or digits (e.g. "5-7-5 syllable haiku:")
 _STRAY_TAG_RE = re.compile(r"</?(?:think|haiku)\b[^>]*>", re.IGNORECASE)
+_THINK_BLOCK_RE = re.compile(r"^\s*<think>(.*?)</think>(.*)$", re.DOTALL | re.IGNORECASE)
+_THINK_LINE_RE = re.compile(r"^\s*([123])\s*:\s*(.+)$")
+_WORD_COUNT_RE = re.compile(r"([A-Za-z]+(?:['’-][A-Za-z]+)*)\s*\((\d+)\)")
+_TRAIL_EQ_RE = re.compile(r"=\s*(\d+)\s*$")
 _DIGIT_RE = re.compile(r"\d")
 _FUNCTION_WORDS = frozenset(
     {
@@ -211,12 +220,14 @@ class ClicheTracker:
 
 @dataclass(frozen=True)
 class ParsedCompletion:
-    """Structured parse of a direct 3-line haiku completion."""
+    """Structured parse of a direct 3-line or grounded `<think>` haiku completion."""
 
     haiku_text: str
     lines: tuple[str, ...]
     has_stray_tags: bool
     has_digits: bool
+    think_text: str = ""
+    has_valid_think: bool = False
 
 
 @dataclass(frozen=True)
@@ -240,20 +251,145 @@ class RewardBreakdown:
     line_rewards: tuple[float, ...]
     oov_words: tuple[str, ...]
     haiku_lines: tuple[str, ...]
+    think_grounding: float = 1.0
+    think_penalty: float = 0.0
+    think_text: str = ""
 
 
-def parse_completion(text: str) -> ParsedCompletion:
-    """Parse raw completion directly into non-empty lines (no tag extraction bonus)."""
-    has_stray_tags = bool(_STRAY_TAG_RE.search(text))
-    has_digits = bool(_DIGIT_RE.search(text))
+def parse_completion(text: str, thinking_mode: bool = False) -> ParsedCompletion:
+    """Parse raw completion into non-empty haiku lines (and optional `<think>` body)."""
+    if not thinking_mode:
+        has_stray_tags = bool(_STRAY_TAG_RE.search(text))
+        has_digits = bool(_DIGIT_RE.search(text))
+        cleaned = text.strip()
+        lines = tuple(line.strip() for line in cleaned.splitlines() if line.strip())
+        return ParsedCompletion(
+            haiku_text="\n".join(lines),
+            lines=lines,
+            has_stray_tags=has_stray_tags,
+            has_digits=has_digits,
+            think_text="",
+            has_valid_think=False,
+        )
+
+    match = _THINK_BLOCK_RE.match(text)
+    if match:
+        think_text = match.group(1).strip()
+        after_think = match.group(2).strip()
+        has_valid_think = bool(think_text)
+        has_stray_tags = bool(_STRAY_TAG_RE.search(after_think)) or bool(
+            _STRAY_TAG_RE.search(think_text)
+        )
+        # Digits are expected inside <think>, but forbidden in the final haiku after </think>
+        has_digits = bool(_DIGIT_RE.search(after_think))
+        lines = tuple(line.strip() for line in after_think.splitlines() if line.strip())
+        return ParsedCompletion(
+            haiku_text="\n".join(lines),
+            lines=lines,
+            has_stray_tags=has_stray_tags,
+            has_digits=has_digits,
+            think_text=think_text,
+            has_valid_think=has_valid_think,
+        )
+
+    # Missing or unclosed <think> block
     cleaned = text.strip()
+    if "<think" in cleaned.lower():
+        # Truncated/unclosed thinking block: never award haiku lines from raw scratchpad
+        return ParsedCompletion(
+            haiku_text="",
+            lines=(),
+            has_stray_tags=True,
+            has_digits=False,
+            think_text="",
+            has_valid_think=False,
+        )
+
     lines = tuple(line.strip() for line in cleaned.splitlines() if line.strip())
     return ParsedCompletion(
         haiku_text="\n".join(lines),
         lines=lines,
-        has_stray_tags=has_stray_tags,
-        has_digits=has_digits,
+        has_stray_tags=bool(_STRAY_TAG_RE.search(cleaned)),
+        has_digits=bool(_DIGIT_RE.search(cleaned)),
+        think_text="",
+        has_valid_think=False,
     )
+
+
+def compute_think_grounding(think_text: str, haiku_lines: tuple[str, ...]) -> float:
+    """Fraction of final haiku content words that appear inside `<think>`."""
+    if not haiku_lines or not think_text.strip():
+        return 0.0
+    haiku_plain = "\n".join(haiku_lines)
+    haiku_words = extract_content_words(haiku_plain)
+    if not haiku_words:
+        haiku_words = set(tokenize_words(haiku_plain))
+    if not haiku_words:
+        return 0.0
+    think_words = set(tokenize_words(think_text))
+    return len(haiku_words & think_words) / len(haiku_words)
+
+
+def analyze_think_counts(
+    think_text: str,
+    targets: tuple[int, int, int] = (5, 7, 5),
+) -> dict[str, bool]:
+    """Diagnostic: check if `<think>` numbered lines honestly count CMUdict syllables to 5-7-5."""
+    if not think_text.strip():
+        return {
+            "all_lines_present": False,
+            "counts_valid_cmudict": False,
+            "sums_match_target": False,
+            "is_honest_575": False,
+            "has_revision": False,
+        }
+
+    found: dict[int, str] = {}
+    has_revision = "->" in think_text
+    for raw_line in think_text.splitlines():
+        m = _THINK_LINE_RE.match(raw_line)
+        if m:
+            found[int(m.group(1))] = m.group(2).strip()
+
+    if set(found.keys()) != {1, 2, 3}:
+        return {
+            "all_lines_present": False,
+            "counts_valid_cmudict": False,
+            "sums_match_target": False,
+            "is_honest_575": False,
+            "has_revision": has_revision,
+        }
+
+    counts_valid = True
+    sums_match = True
+    for idx, target in enumerate(targets, start=1):
+        body = found[idx]
+        final_seg = body.split("->")[-1].strip()
+        pairs = _WORD_COUNT_RE.findall(final_seg)
+        if not pairs:
+            counts_valid = False
+            sums_match = False
+            continue
+        seg_sum = 0
+        for word, count_str in pairs:
+            c = int(count_str)
+            seg_sum += c
+            valid_counts = lookup_word_syllables(word)
+            if valid_counts is None or c not in valid_counts:
+                counts_valid = False
+        eq_m = _TRAIL_EQ_RE.search(final_seg)
+        if eq_m is not None and int(eq_m.group(1)) != seg_sum:
+            sums_match = False
+        if seg_sum != target:
+            sums_match = False
+
+    return {
+        "all_lines_present": True,
+        "counts_valid_cmudict": counts_valid,
+        "sums_match_target": sums_match,
+        "is_honest_575": counts_valid and sums_match,
+        "has_revision": has_revision,
+    }
 
 
 def _compute_repetition_penalty(
@@ -296,14 +432,19 @@ def score_completion(
     precomputed_sim: float | None = None,
     cliche_tracker: ClicheTracker | None = None,
 ) -> RewardBreakdown:
-    """Compute shaped RLVR reward for a direct 3-line haiku (zero tag rewards)."""
+    """Compute shaped RLVR reward for a direct 3-line or grounded `<think>` haiku."""
     cfg = cfg or RewardConfig()
-    parsed = parse_completion(completion)
+    parsed = parse_completion(completion, thinking_mode=cfg.thinking_mode)
 
     if not parsed.lines:
+        pen = (
+            cfg.missing_think_penalty
+            if (cfg.thinking_mode and not parsed.has_valid_think and completion.strip())
+            else cfg.empty_output_penalty
+        )
         return RewardBreakdown(
-            total_reward=cfg.empty_output_penalty,
-            format_reward=cfg.empty_output_penalty,
+            total_reward=round(pen, 6),
+            format_reward=round(pen, 6),
             syllable_reward=0.0,
             exact_bonus=0.0,
             relevance_reward=0.0,
@@ -319,12 +460,17 @@ def score_completion(
             line_rewards=(),
             oov_words=(),
             haiku_lines=(),
+            think_grounding=0.0 if cfg.thinking_mode else 1.0,
+            think_penalty=0.0,
+            think_text=parsed.think_text,
         )
 
-    # No positive tag/format reward: 0.0 when cleanly 3 lines with no stray tags or digits,
-    # penalty only when line count is wrong, stray tags appear, or digits appear.
+    # No positive tag/format reward: 0.0 when cleanly 3 lines with no stray tags or digits
+    # (and a valid <think>...</think> block when thinking_mode=True).
     has_three_lines = len(parsed.lines) == len(cfg.line_targets)
     format_reward = 0.0
+    if cfg.thinking_mode and not parsed.has_valid_think:
+        format_reward += cfg.missing_think_penalty
     if not has_three_lines:
         line_diff = abs(len(parsed.lines) - len(cfg.line_targets))
         format_reward += max(
@@ -336,7 +482,12 @@ def score_completion(
     if parsed.has_digits:
         format_reward += -0.25
 
-    is_valid_format = has_three_lines and (not parsed.has_stray_tags) and (not parsed.has_digits)
+    is_valid_format = (
+        has_three_lines
+        and (not parsed.has_stray_tags)
+        and (not parsed.has_digits)
+        and ((not cfg.thinking_mode) or parsed.has_valid_think)
+    )
 
     # Sharpened per-line syllable shaping (gated on valid 3-line format so 4-line
     # preambles like "5-7-5 syllable haiku:\n..." cannot farm partial syllable credit!)
@@ -394,6 +545,17 @@ def score_completion(
     on_topic_for_bonus = (not sim_evaluated) or (raw_sim >= cfg.exact_bonus_min_sim)
     exact_bonus = cfg.exact_575_bonus if (is_exact_575 and on_topic_for_bonus) else 0.0
 
+    # Grounded <think> check: prevent fake/boilerplate <think> from collecting exact jackpot
+    think_grounding = (
+        compute_think_grounding(parsed.think_text, parsed.lines)
+        if (cfg.thinking_mode and parsed.has_valid_think)
+        else (0.0 if cfg.thinking_mode else 1.0)
+    )
+    think_penalty = 0.0
+    if cfg.thinking_mode and is_valid_format and think_grounding < cfg.grounding_min_overlap:
+        think_penalty = cfg.ungrounded_think_penalty
+        exact_bonus = 0.0
+
     # Prompt-echo guardrail
     echo_penalty = (
         cfg.prompt_echo_penalty
@@ -423,6 +585,7 @@ def score_completion(
         + repetition_penalty
         + echo_penalty
         + cliche_penalty
+        + think_penalty
     )
 
     return RewardBreakdown(
@@ -443,6 +606,9 @@ def score_completion(
         line_rewards=tuple(line_rewards),
         oov_words=all_oov,
         haiku_lines=parsed.lines,
+        think_grounding=round(think_grounding, 6),
+        think_penalty=round(think_penalty, 6),
+        think_text=parsed.think_text,
     )
 
 
@@ -514,6 +680,9 @@ def _apply_fitness_sharing(
                 line_rewards=bd.line_rewards,
                 oov_words=bd.oov_words,
                 haiku_lines=bd.haiku_lines,
+                think_grounding=bd.think_grounding,
+                think_penalty=bd.think_penalty,
+                think_text=bd.think_text,
             )
         )
     return adjusted
@@ -529,13 +698,18 @@ def score_group(
 ) -> list[RewardBreakdown]:
     """Batch-score a group of completions for the same topic (batches embedding calls)."""
     cfg = cfg or RewardConfig()
-    parsed_list = [parse_completion(c) for c in completions]
+    parsed_list = [parse_completion(c, thinking_mode=cfg.thinking_mode) for c in completions]
 
     sims: list[float | None] = [None] * len(completions)
     if cfg.relevance_weight > 0.0 and relevance_scorer is not None:
         haiku_texts = [
             p.haiku_text
-            if (len(p.lines) == len(cfg.line_targets) and not p.has_stray_tags and not p.has_digits)
+            if (
+                len(p.lines) == len(cfg.line_targets)
+                and not p.has_stray_tags
+                and not p.has_digits
+                and ((not cfg.thinking_mode) or p.has_valid_think)
+            )
             else ""
             for p in parsed_list
         ]
