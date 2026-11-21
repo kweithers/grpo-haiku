@@ -2,11 +2,19 @@
 
 from __future__ import annotations
 
+import random
+
 import mlx.core as mx
 import mlx.nn as nn
 
-from grpo_haiku.rewards import score_completion
-from grpo_haiku.sft import is_sft_worthy, sft_sequence_loss
+from grpo_haiku.config import RewardConfig
+from grpo_haiku.rewards import analyze_think_counts, score_completion
+from grpo_haiku.sft import (
+    format_line_syllable_trace,
+    is_sft_worthy,
+    sft_sequence_loss,
+    synthesize_think_trace,
+)
 
 
 class _StubScorer:
@@ -70,3 +78,68 @@ def test_sft_sequence_loss_runs_and_decreases_with_gradient_step():
     l1 = sft_sequence_loss(lm, prompt_ids, comp_ids)
     mx.eval(l1)
     assert float(l1.item()) < float(l0.item())
+
+
+def test_synthesize_think_trace_exact_and_multi_pronunciation():
+    # "fire" can be 1 or 2 syllables; in "Warm fire glows at dusk" -> Warm(1) fire(1) glows(1) at(1) dusk(1) = 5
+    # In "Cold fire burns bright" -> Cold(1) fire(2) burns(1) bright(1) = 5
+    tr1 = format_line_syllable_trace("Warm fire glows at dusk", target=5)
+    tr2 = format_line_syllable_trace("Cold fire burns bright", target=5)
+    assert tr1 is not None and tr1[1] == 5 and "fire(1)" in tr1[0]
+    assert tr2 is not None and tr2[1] == 5 and "fire(2)" in tr2[0]
+
+    lines = (
+        "Frost bites the cold air",
+        "Soft snowflakes drift to the ground",
+        "Dawn breaks pale and still",
+    )
+    out = synthesize_think_trace(lines, revision_prob=0.0, rng=random.Random(1))
+    assert "snowflakes(2)" in out
+    assert "snow-flakes" not in out
+
+    cfg = RewardConfig(thinking_mode=True)
+    bd = score_completion("a winter snowy morning", out, cfg=cfg, relevance_scorer=_StubScorer(0.75))
+    assert bd.is_valid_format
+    assert bd.is_exact_575
+    assert bd.think_grounding == 1.0
+    assert bd.exact_bonus == cfg.exact_575_bonus
+
+    diag = analyze_think_counts(bd.think_text)
+    assert diag["is_honest_575"]
+    assert not diag["has_revision"]
+
+
+def test_synthesize_think_trace_revisions_from_real_draft_and_perturbation():
+    lines = (
+        "Frost bites the cold air",
+        "Soft snowflakes drift to the ground",
+        "Dawn breaks pale and still",
+    )
+    # 1) Real near-miss line (6 syllables -> 7 syllables)
+    out_real = synthesize_think_trace(
+        lines,
+        draft_miss_lines={1: "Soft snowflakes drift down slow"},
+        revision_prob=1.0,
+        rng=random.Random(7),
+    )
+    assert "->" in out_real
+    assert "= 6 ->" in out_real
+    assert "= 7" in out_real
+    cfg = RewardConfig(thinking_mode=True)
+    bd_real = score_completion("a winter snowy morning", out_real, cfg=cfg, relevance_scorer=_StubScorer(0.75))
+    assert bd_real.is_exact_575 and bd_real.think_grounding == 1.0
+    diag_real = analyze_think_counts(bd_real.think_text)
+    assert diag_real["is_honest_575"] and diag_real["has_revision"]
+
+    # 2) Fallback deterministic perturbation (no real near-miss passed)
+    out_pert = synthesize_think_trace(
+        lines,
+        draft_miss_lines=None,
+        revision_prob=1.0,
+        rng=random.Random(3),
+    )
+    assert "->" in out_pert
+    bd_pert = score_completion("a winter snowy morning", out_pert, cfg=cfg, relevance_scorer=_StubScorer(0.75))
+    assert bd_pert.is_exact_575 and bd_pert.think_grounding == 1.0
+    diag_pert = analyze_think_counts(bd_pert.think_text)
+    assert diag_pert["is_honest_575"] and diag_pert["has_revision"]
