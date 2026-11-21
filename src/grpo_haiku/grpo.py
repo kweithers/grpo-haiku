@@ -18,6 +18,7 @@ import contextlib
 import json
 import math
 import random
+import re
 import time
 from dataclasses import asdict
 from pathlib import Path
@@ -68,31 +69,101 @@ def compute_group_advantages(
     return [(r - mean_r) / (std_r + eps) for r in rewards], True
 
 
-def map_tokens_to_lines(completion_ids: list[int], tokenizer) -> list[int]:
-    """Map each completion token to its 0-based non-empty haiku line index."""
-    line_indices: list[int] = []
-    line_idx = 0
-    seen_content = False
-    for tid in completion_ids:
-        piece = tokenizer.decode([tid])
-        if "\n" not in piece:
-            line_indices.append(line_idx)
-            if piece.strip():
-                seen_content = True
-        else:
-            before_nl, after_nl = piece.split("\n", 1)
-            if not before_nl.strip() and after_nl.strip() and seen_content:
-                line_idx += 1
+_THINK_OPEN_RE = re.compile(r"<think>", re.IGNORECASE)
+_THINK_CLOSE_RE = re.compile(r"</think>", re.IGNORECASE)
+_THINK_LINE_PREFIX_RE = re.compile(r"^\s*([123])\s*:")
+
+
+def map_tokens_to_lines(
+    completion_ids: list[int],
+    tokenizer,
+    thinking_mode: bool = False,
+) -> list[int]:
+    """Map each completion token to its 0-based haiku line index (`0..2`, or `-1` for tags/meta).
+
+    In `thinking_mode=True`, both numbered scratchpad drafting lines (`1:`, `2:`, `3:`)
+    inside `<think>...</think>` AND the 3 final haiku lines after `</think>` map to
+    `0, 1, 2` so per-line syllable credit reaches the drafting/revision tokens directly,
+    while `<think>` / `</think>` tags and unprefixed lines map to `-1` (pure `A_global`).
+    """
+    if not thinking_mode:
+        line_indices: list[int] = []
+        line_idx = 0
+        seen_content = False
+        for tid in completion_ids:
+            piece = tokenizer.decode([tid])
+            if "\n" not in piece:
                 line_indices.append(line_idx)
-                seen_content = True
-            else:
-                line_indices.append(line_idx)
-                if before_nl.strip():
+                if piece.strip():
                     seen_content = True
-                if seen_content:
+            else:
+                before_nl, after_nl = piece.split("\n", 1)
+                if not before_nl.strip() and after_nl.strip() and seen_content:
                     line_idx += 1
-                    seen_content = bool(after_nl.strip())
-    return line_indices
+                    line_indices.append(line_idx)
+                    seen_content = True
+                else:
+                    line_indices.append(line_idx)
+                    if before_nl.strip():
+                        seen_content = True
+                    if seen_content:
+                        line_idx += 1
+                        seen_content = bool(after_nl.strip())
+        return line_indices
+
+    pieces = [tokenizer.decode([tid]) for tid in completion_ids]
+    spans: list[tuple[int, int]] = []
+    pos = 0
+    for p in pieces:
+        spans.append((pos, pos + len(p)))
+        pos += len(p)
+    full_text = "".join(pieces)
+
+    close_m = _THINK_CLOSE_RE.search(full_text)
+    if close_m is None:
+        return [-1] * len(completion_ids)
+
+    char_label = [-1] * len(full_text)
+
+    # 1. Inside <think>...</think>: label numbered drafting lines 1:, 2:, 3: -> 0, 1, 2
+    open_m = _THINK_OPEN_RE.search(full_text, 0, close_m.start())
+    think_start = open_m.end() if open_m is not None else 0
+    think_end = close_m.start()
+    cursor = think_start
+    for raw_ln in full_text[think_start:think_end].splitlines(keepends=True):
+        ln_end = cursor + len(raw_ln)
+        m = _THINK_LINE_PREFIX_RE.match(raw_ln)
+        if m is not None:
+            k = int(m.group(1)) - 1
+            for ci in range(cursor, ln_end):
+                char_label[ci] = k
+        cursor = ln_end
+
+    # 2. After </think>: label each non-empty haiku line -> 0, 1, 2, ...
+    after_start = close_m.end()
+    cursor = after_start
+    haiku_line_idx = 0
+    for raw_ln in full_text[after_start:].splitlines(keepends=True):
+        ln_end = cursor + len(raw_ln)
+        if raw_ln.strip():
+            for ci in range(cursor, ln_end):
+                char_label[ci] = haiku_line_idx
+            haiku_line_idx += 1
+        cursor = ln_end
+
+    # Assign each token the label of its first non-whitespace char (or start char if whitespace)
+    out: list[int] = []
+    for start, end in spans:
+        if start >= end:
+            out.append(-1)
+            continue
+        chosen = char_label[start]
+        for ci in range(start, end):
+            if not full_text[ci].isspace():
+                chosen = char_label[ci]
+                break
+        out.append(chosen)
+    return out
 
 
 def compute_per_line_token_advantages(
@@ -101,6 +172,7 @@ def compute_per_line_token_advantages(
     tokenizer,
     line_credit_weight: float = 0.50,
     eps: float = 1e-6,
+    thinking_mode: bool = False,
 ) -> tuple[list[mx.array], bool]:
     """Build per-token advantage vectors blending global & line-level group advantages.
 
@@ -140,7 +212,7 @@ def compute_per_line_token_advantages(
             token_advs.append(mx.full((len(tids),), g_adv, dtype=mx.float32))
             continue
 
-        line_map = map_tokens_to_lines(tids, tokenizer)
+        line_map = map_tokens_to_lines(tids, tokenizer, thinking_mode=thinking_mode)
         per_tok = [
             (1.0 - w) * g_adv + w * line_advs_by_idx[lk][i]
             if 0 <= lk < 3
@@ -444,7 +516,10 @@ def run_quick_eval(
     model.eval()
     for start in range(0, len(subset), batch_size):
         chunk = subset[start : start + batch_size]
-        prompt_texts = [format_chat_prompt(tokenizer, ex.prompt) for ex in chunk]
+        prompt_texts = [
+            format_chat_prompt(tokenizer, ex.prompt, thinking_mode=reward_cfg.thinking_mode)
+            for ex in chunk
+        ]
         prompt_ids_list = [
             tokenizer.encode(pt, add_special_tokens=False) for pt in prompt_texts
         ]
@@ -470,7 +545,7 @@ def run_quick_eval(
     n = max(1, len(breakdowns))
     haiku_texts = ["\n".join(b.haiku_lines) for b in breakdowns]
     unique_ratio, distinct_2 = compute_quick_diversity(haiku_texts)
-    return {
+    stats = {
         "eval_reward": sum(b.total_reward for b in breakdowns) / n,
         "eval_exact_575": sum(1 for b in breakdowns if b.is_exact_575) / n,
         "eval_valid_format": sum(1 for b in breakdowns if b.is_valid_format) / n,
@@ -479,6 +554,9 @@ def run_quick_eval(
         "eval_unique_ratio": unique_ratio,
         "eval_distinct_2": distinct_2,
     }
+    if reward_cfg.thinking_mode:
+        stats["eval_grounding"] = sum(b.think_grounding for b in breakdowns) / n
+    return stats
 
 
 def train_grpo(
@@ -600,10 +678,11 @@ def train_grpo(
 
     print(
         f"Starting GRPO training: steps={grpo_cfg.num_steps}, G={grpo_cfg.group_size}, "
+        f"thinking={grpo_cfg.thinking_mode}, "
         f"lr={grpo_cfg.learning_rate}->{grpo_cfg.min_learning_rate}, kl_beta={grpo_cfg.kl_beta}, "
         f"clip=[{grpo_cfg.clip_eps},{grpo_cfg.clip_eps_high}], ent_coef={grpo_cfg.entropy_coef}, "
         f"line_credit_w={grpo_cfg.line_credit_weight}, relevance_w={reward_cfg.relevance_weight}, "
-        f"max_tokens={grpo_cfg.max_completion_tokens}"
+        f"exact_min_sim={reward_cfg.exact_bonus_min_sim}, max_tokens={grpo_cfg.max_completion_tokens}"
     )
 
     for step in range(1, grpo_cfg.num_steps + 1):
@@ -623,7 +702,9 @@ def train_grpo(
         if step % len(order) == 0:
             rng.shuffle(order)
 
-        prompt_text = format_chat_prompt(tokenizer, ex.prompt)
+        prompt_text = format_chat_prompt(
+            tokenizer, ex.prompt, thinking_mode=grpo_cfg.thinking_mode
+        )
         prompt_ids = tokenizer.encode(prompt_text, add_special_tokens=False)
 
         # 1. Parallel batched rollout of G completions (no grad checkpointing during KV decode!)
@@ -666,6 +747,7 @@ def train_grpo(
             tokenizer=tokenizer,
             line_credit_weight=grpo_cfg.line_credit_weight,
             eps=grpo_cfg.adv_eps,
+            thinking_mode=grpo_cfg.thinking_mode,
         )
 
         # Filter out degenerate empty token rollouts
@@ -762,6 +844,7 @@ def train_grpo(
         rel_mean = sum(b.raw_cosine_sim for b in breakdowns) / n_g
         oov_rate = sum(1 for b in breakdowns if b.oov_words) / n_g
         cliche_rate = sum(1 for b in breakdowns if b.cliche_penalty < 0.0) / n_g
+        grounding_mean = sum(b.think_grounding for b in breakdowns) / n_g
         avg_comp_len = sum(len(t) for t in comp_token_ids) / n_g
 
         row = {
@@ -774,6 +857,7 @@ def train_grpo(
             "relevance_sim": round(rel_mean, 4),
             "oov_rate": round(oov_rate, 4),
             "cliche_rate": round(cliche_rate, 4),
+            "grounding": round(grounding_mean, 4),
             "loss": round(loss_val, 5),
             "kl": round(kl_val, 5),
             "entropy": round(ent_val, 4),
@@ -785,10 +869,11 @@ def train_grpo(
             "step_sec": round(step_sec, 2),
         }
 
+        gnd_str = f" gnd={grounding_mean:.2f}" if grpo_cfg.thinking_mode else ""
         print(
             f"[step {step:04d}/{grpo_cfg.num_steps}] "
             f"r={reward_mean:+.3f} (max={reward_max:+.3f}) | "
-            f"575={exact_rate*100:5.1f}% fmt={format_rate*100:5.1f}% rel={rel_mean:.2f} cl={cliche_rate*100:4.0f}% | "
+            f"575={exact_rate*100:5.1f}% fmt={format_rate*100:5.1f}% rel={rel_mean:.2f} cl={cliche_rate*100:4.0f}%{gnd_str} | "
             f"kl={kl_val:.4f} ent={ent_val:.2f} gnorm={grad_norm_val:.2f} | "
             f"toks={avg_comp_len:5.1f} mem={peak_mem_gb:.2f}GB ({step_sec:.1f}s)"
             + (" [skip:0var]" if skipped_update else "")
@@ -798,6 +883,9 @@ def train_grpo(
             best_idx = max(range(n_g), key=lambda i: rewards[i])
             best = breakdowns[best_idx]
             print(f"  ── Sample (topic: {ex.topic!r}, counts={best.line_counts}, r={best.total_reward:+.2f}) ──")
+            if grpo_cfg.thinking_mode and best.think_text:
+                for tl in best.think_text.splitlines():
+                    print(f"    [think] {tl}")
             if best.haiku_lines:
                 for line in best.haiku_lines:
                     print(f"    {line}")
@@ -819,13 +907,18 @@ def train_grpo(
                 subset_size=grpo_cfg.eval_subset_size,
             )
             row.update({k: round(v, 4) for k, v in eval_stats.items()})
+            eval_gnd = (
+                f" | gnd={eval_stats['eval_grounding']:.2f}"
+                if "eval_grounding" in eval_stats
+                else ""
+            )
             print(
                 f"  ★ Eval@{step} ({min(len(eval_examples), grpo_cfg.eval_subset_size)} held-out): "
                 f"r={eval_stats['eval_reward']:+.3f} | "
                 f"575={eval_stats['eval_exact_575']*100:.1f}% | "
                 f"d2={eval_stats['eval_distinct_2']:.3f} uniq={eval_stats['eval_unique_ratio']*100:.0f}% | "
                 f"fmt={eval_stats['eval_valid_format']*100:.1f}% | "
-                f"rel={eval_stats['eval_relevance']:.2f}"
+                f"rel={eval_stats['eval_relevance']:.2f}{eval_gnd}"
             )
             if hasattr(mx, "clear_cache"):
                 mx.clear_cache()
@@ -854,7 +947,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--steps", type=int, default=GRPOConfig.num_steps)
     parser.add_argument("--group-size", type=int, default=GRPOConfig.group_size)
     parser.add_argument("--grpo-epochs", type=int, default=GRPOConfig.grpo_epochs)
-    parser.add_argument("--max-tokens", type=int, default=GRPOConfig.max_completion_tokens)
+    parser.add_argument("--thinking-mode", action="store_true")
+    parser.add_argument("--max-tokens", type=int, default=None)
     parser.add_argument("--temp", type=float, default=GRPOConfig.temperature)
     parser.add_argument("--top-p", type=float, default=GRPOConfig.top_p)
     parser.add_argument("--lr", type=float, default=GRPOConfig.learning_rate)
@@ -864,6 +958,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--entropy-coef", type=float, default=GRPOConfig.entropy_coef)
     parser.add_argument("--line-credit-weight", type=float, default=GRPOConfig.line_credit_weight)
     parser.add_argument("--relevance-weight", type=float, default=RewardConfig.relevance_weight)
+    parser.add_argument("--exact-min-sim", type=float, default=RewardConfig.exact_bonus_min_sim)
     parser.add_argument("--lora-rank", type=int, default=ModelConfig.lora_rank)
     parser.add_argument("--lora-scale", type=float, default=ModelConfig.lora_scale)
     parser.add_argument("--lora-layers", type=int, default=ModelConfig.lora_layers)
@@ -878,6 +973,11 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    max_tokens = (
+        args.max_tokens
+        if args.max_tokens is not None
+        else (224 if args.thinking_mode else GRPOConfig.max_completion_tokens)
+    )
     model_cfg = ModelConfig(
         model_name=args.model,
         lora_rank=args.lora_rank,
@@ -885,7 +985,11 @@ def main() -> None:
         lora_layers=args.lora_layers,
         grad_checkpoint=not args.no_grad_checkpoint,
     )
-    reward_cfg = RewardConfig(relevance_weight=args.relevance_weight)
+    reward_cfg = RewardConfig(
+        relevance_weight=args.relevance_weight,
+        exact_bonus_min_sim=args.exact_min_sim,
+        thinking_mode=args.thinking_mode,
+    )
     grpo_cfg = GRPOConfig(
         train_file=args.train_file,
         eval_file=args.eval_file,
@@ -893,10 +997,11 @@ def main() -> None:
         kl_ref_adapter=args.kl_ref_adapter,
         run_name=args.run_name,
         runs_dir=args.runs_dir,
+        thinking_mode=args.thinking_mode,
         num_steps=args.steps,
         group_size=args.group_size,
         grpo_epochs=args.grpo_epochs,
-        max_completion_tokens=args.max_tokens,
+        max_completion_tokens=max_tokens,
         temperature=args.temp,
         top_p=args.top_p,
         learning_rate=args.lr,

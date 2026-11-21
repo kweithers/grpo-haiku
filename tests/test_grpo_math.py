@@ -307,3 +307,69 @@ def test_compute_quick_diversity_detects_collapse():
     u_col, d2_col = compute_quick_diversity(collapsed)
     assert u_div == 1.0 and d2_div > 0.95
     assert u_col == 0.5 and d2_col < 0.60
+
+
+def test_thinking_mode_per_line_credit_inside_and_after_think():
+    from grpo_haiku.config import RewardConfig
+
+    pieces = [
+        "<think>\n",             # 0 -> -1 (tag)
+        "1: Silver(2) ",         # 1 -> 0 (think line 1)
+        "branches(2) = 6\n",     # 2 -> 0 (think line 1)
+        "2: Quiet(2) ",          # 3 -> 1 (think line 2)
+        "snowflakes(2) = 7\n",   # 4 -> 1 (think line 2)
+        "3: Dawn(1) = 5\n",      # 5 -> 2 (think line 3)
+        "</think>\n",            # 6 -> -1 (tag)
+        "Silver branches\n",     # 7 -> 0 (haiku line 1)
+        "Quiet snowflakes\n",    # 8 -> 1 (haiku line 2)
+        "Dawn breaks",           # 9 -> 2 (haiku line 3)
+    ]
+    tok = _MockPieceTokenizer(pieces)
+    tids = list(range(len(pieces)))
+    line_map = map_tokens_to_lines(tids, tok, thinking_mode=True)
+    assert line_map == [-1, 0, 0, 1, 1, 2, -1, 0, 1, 2]
+
+    cfg = RewardConfig(thinking_mode=True)
+    # Completion A: (6, 7, 5) -> L1 off by 1, L2 exact, L3 exact
+    comp_a = (
+        "<think>\n"
+        "1: Silver(2) frosted(2) branches(2) = 6\n"
+        "2: Quiet(2) snowflakes(2) drift(1) below(2) = 7\n"
+        "3: Dawn(1) breaks(1) pale(1) and(1) still(1) = 5\n"
+        "</think>\n"
+        "Silver frosted branches\n"
+        "Quiet snowflakes drift below\n"
+        "Dawn breaks pale and still"
+    )
+    # Completion B: (5, 5, 4) -> L1 exact, L2 wrong, L3 wrong
+    comp_b = (
+        "<think>\n"
+        "1: Frosted(2) cedar(2) branch(1) = 5\n"
+        "2: Cold(1) snow(1) falls(1) below(2) = 5\n"
+        "3: Dawn(1) breaks(1) still(1) = 3\n"
+        "</think>\n"
+        "Frosted cedar branch\n"
+        "Cold snow falls below\n"
+        "Dawn breaks still"
+    )
+    bd_a = score_completion("winter snow", comp_a, cfg=cfg)
+    bd_b = score_completion("winter snow", comp_b, cfg=cfg)
+
+    advs, has_var = compute_per_line_token_advantages(
+        [bd_a, bd_b], [tids, tids], tok, line_credit_weight=0.5, thinking_mode=True
+    )
+    mx.eval(advs)
+    assert has_var
+    a_vals = advs[0].tolist()
+    b_vals = advs[1].tolist()
+
+    # Tags (<think>, </think>) get pure global advantage (equal to each other)
+    assert abs(a_vals[0] - a_vals[6]) < 1e-6
+    # Inside <think> AND in final haiku, Line 2 tokens match each other and beat Line 1 in A!
+    assert abs(a_vals[3] - a_vals[8]) < 1e-6
+    assert a_vals[3] > a_vals[1]
+    assert a_vals[8] > a_vals[7]
+    # In B, Line 1 inside <think> and after </think> beat Line 2!
+    assert abs(b_vals[1] - b_vals[7]) < 1e-6
+    assert b_vals[1] > b_vals[3]
+    assert b_vals[7] > b_vals[8]
