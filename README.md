@@ -77,39 +77,43 @@ Clean, from-scratch post-training runs incorporating every Phase 1 lesson from S
 | Track / Checkpoint | Exact 5-7-5 | Line 1 / 2 / 3 | Valid Fmt | Relevance | OOV / Echo | Unique | Distinct-2 |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Base (Direct, Step 0)** | `3.0%` | `29 / 32 / 39%` | `100%` | `0.704` | `6% / 5%` | `100%` | `0.762` |
-| **Track A — Clean Direct SFT** *(all 28L, `r=16`, 229 base haikus)* | `12.0%` | `57 / 38 / 55%` | `100%` | `0.692` | `3% / 0%` | `100%` | `0.719` |
-| **Track A — Clean Direct GRPO** *(500 steps, `G=8`, anti-collapse)* | **`31.0%`** | **`74 / 59 / 75%`** | **`100%`** | `0.658` | **`2% / 0%`** | **`100%`** | **`0.714`** |
+| **Track A R1 — Direct SFT** *(all 28L, `r=16`, 229 base haikus)* | `12.0%` | `57 / 38 / 55%` | `100%` | `0.692` | `3% / 0%` | `100%` | `0.719` |
+| **Track A R1 — Direct GRPO** *(500 steps, `kl=0.05`, unigram cap on)* | `31.0%` | `74 / 59 / 75%` | `100%` | `0.658` | `2% / 0%` | `100%` | `0.714` |
+| **Track A R2 — Direct SFT** *(fresh base LoRA, 547 R1-sampled haikus)* | `50.0%` | `77 / 72 / 81%` | `100%` | `0.665` | `3% / 0%` | `100%` | `0.728` |
+| **Track A R2 — Direct GRPO (`@200`, Pareto best)** *(`kl=0.02`, no unigram cap)* | **`74.0%`** | **`85 / 89 / 94%`** | **`100%`** | `0.638` | **`0% / 0%`** | **`99%`** | **`0.684`** |
+| **Track A R2 — Direct GRPO (`@300`)** | `73.0%` | `87 / 90 / 91%` | `100%` | `0.640` | `1% / 0%` | `100%` | `0.671` |
+| **Track A R2 — Direct GRPO (`@500` final)** | `70.0%` | `86 / 87 / 94%` | `100%` | `0.631` | `4% / 0%` | `100%` | `0.666` |
 | **Track B — Grounded `<think>` SFT** | *pending* | *pending* | *pending* | *pending* | *pending* | *pending* | *pending* |
 | **Track B — Grounded `<think>` GRPO** | *pending* | *pending* | *pending* | *pending* | *pending* | *pending* | *pending* |
 
-#### Track A Findings (500-Step Full-Depth LoRA Direct GRPO)
+#### Track A Findings (Full-Depth LoRA, Two-Round Direct SFT → GRPO)
 
-- **Zero template collapse over 500 steps:** Exact 5-7-5 climbed monotonically across checkpoints (`3.0%` Base → `12.0%` SFT → `21.0%` @200 → `28.0%` @350 → **`31.0%` @500**) while `distinct_2` held steady at **`0.714`** (virtually unchanged from SFT's `0.719`, vs. Phase 1 `v7`'s collapse to `0.357`). `unique_haiku_ratio` remained **`100%`**, `echo_rate` dropped to **`0.0%`**, peak Metal RAM stayed at **`2.71 GB`**, and no Line-1 starter word appeared more than **8%** of the time across all 100 unseen prompts.
-- **Genuine meter learning, mostly off by ±1 syllable:** Per-line accuracy reached **`74% / 59% / 75%`** (`0.74 × 0.59 × 0.75 = 32.7% ≈ 31.0%`, confirming independent line composition rather than memorized frames), with **80%** of all unseen haikus landing within ±1 total syllable across the entire 17-syllable poem (`31%` exact + `49%` off by 1).
-- **Why Track A plateaued around 31% (next lever):** Even with `distinct_2 > 0.71`, the rolling unigram cliché tracker (`min_count = 8` per 64 rollouts) fired on **74%–88%** of steps on common poetic words (*wind*, *light*, *night*, *still*), dampening the `+2.50` exact-575 jackpot, while `kl_beta = 0.05` permanently pinned `kl ≈ 0.23` near the 12%-accuracy SFT anchor. Relaxing unigram cliché thresholds (keeping starter/bigram decay), running a clean Round 2 rejection-sampling SFT from this uncollapsed `31%` policy, or testing Track B (Grounded `<think>`) are the clearest paths beyond 55% at `distinct_2 >= 0.70`.
+- **Round 1 solved template collapse completely (`3% → 12% → 31%`, `distinct_2 = 0.714`):** Full-depth LoRA (`all 28 layers, rank=16`), clean base SFT, permanently locked KL, fitness sharing, cliché decay, DAPO Clip-Higher, and entropy bonus lifted exact 5-7-5 monotonically across 500 steps while keeping `distinct_2 = 0.714` (`100%` unique, peak `2.71 GB` Metal RAM). However, the rolling unigram cliché cap (`min_count = 8` per 64 rollouts) fired on **74%–88%** of steps on normal poetic words (*wind*, *light*, *night*), while `kl_beta = 0.05` pinned the policy near the 12%-accuracy R1 SFT anchor.
+- **Round 2 SFT jumped to `50.0%` exact while *increasing* diversity (`distinct_2 = 0.728`):** Rejection-sampling `7,200` candidates from the uncollapsed Round 1 GRPO model with strict deduplication (`max_line_repeats = 2`, `max_bigram_repeats = 3`) yielded **547** balanced, verified 5-7-5 haikus across all 10 domains (no starter > `4.4%`). Training a fresh full-depth LoRA from base on those 547 haikus alone jumped exact 5-7-5 from `31% → 50%` (Line 2: `59% → 72%`) and lifted `distinct_2` to **`0.728`** — providing a far stronger, uncollapsed KL anchor.
+- **Round 2 GRPO (`kl_beta = 0.02`, unigram cap disabled) hit `74.0%` exact 5-7-5 at `distinct_2 = 0.684`:** Keeping starter/bigram cliché decay + fitness sharing while removing the unigram cap dropped cliché trigger rate from `~84%` to a healthy `~55%`, driving held-out accuracy to **`74.0%`** (**+71.0%** over base) with **`85% / 89% / 94%`** per-line accuracy, **`0.0%` OOV**, **`0.0%` echo**, **`99%` unique haikus**, **`94%` within ±1 total syllable**, and **no Line-1 starter word over `10%`** — nearly **double** the lexical diversity of Phase 1 `v7` (`0.684` vs. `0.357`) at essentially the same accuracy.
 
-### Selected Held-Out Samples (Phase 2 — Track A, `final`)
+### Selected Held-Out Samples (Phase 2 — Track A R2, `step_0200`)
 
-- **a quiet autumn rainstorm on glass** *(5-7-5, relevance `0.81`)*
-  > Rain dashes on glass,
-  > silver threads in trembling air,
-  > quiet as a sigh.
-- **a coastal ferry cutting silver wake** *(5-7-5, relevance `0.77`)*
-  > Ferry glides through mist,
+- **a sudden gratitude at sunset** *(5-7-5, relevance `0.81`)*
+  > Sunset breaks the sky,
+  > Gold and sorrow in the air,
+  > Gratitude takes flight.
+- **a coastal ferry cutting silver wake** *(5-7-5, relevance `0.78`)*
+  > Wave cuts through the mist,
   > Silver wake a fleeting light,
-  > Sea whispers its night.
+  > Ferry glides in night.
+- **a quiet autumn rainstorm on glass** *(5-7-5, relevance `0.74`)*
+  > Rain taps on the pane,
+  > Silver threads in trembling air,
+  > Darkness drinks the light.
 - **a sunlit pigeon strutting on brick** *(5-7-5, relevance `0.74`)*
   > Sunlit wings on brick,
-  > Shadow stretches, bold and bright,
-  > Feathers catch the light.
-- **a rugged granite ridge above clouds** *(5-7-5, relevance `0.73`)*
-  > Rock crests pierce the sky,
-  > Whispers of wind in the stone,
-  > Clouds bow to the height.
-- **a simmering loaf of sourdough cooling** *(5-7-5, relevance `0.70`)*
-  > Bread rises in heat,
-  > Flour dreams in golden sleep,
-  > Steam slips like a sigh.
+  > Shadow swings in golden light,
+  > Feathers catch the day.
+- **a departing footbridge over a creek** *(5-7-5, relevance `0.71`)*
+  > Bridge leans over stream,
+  > Whispers of the water's swing,
+  > Footsteps fade in time.
 
 ---
 
