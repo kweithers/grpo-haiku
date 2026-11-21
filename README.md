@@ -83,8 +83,10 @@ Clean, from-scratch post-training runs incorporating every Phase 1 lesson from S
 | **Track A R2 — Direct GRPO (`@200`, Pareto best)** *(`kl=0.02`, no unigram cap)* | **`74.0%`** | **`85 / 89 / 94%`** | **`100%`** | `0.638` | **`0% / 0%`** | **`99%`** | **`0.684`** |
 | **Track A R2 — Direct GRPO (`@300`)** | `73.0%` | `87 / 90 / 91%` | `100%` | `0.640` | `1% / 0%` | `100%` | `0.671` |
 | **Track A R2 — Direct GRPO (`@500` final)** | `70.0%` | `86 / 87 / 94%` | `100%` | `0.631` | `4% / 0%` | `100%` | `0.666` |
-| **Track B — Grounded `<think>` SFT** | *pending* | *pending* | *pending* | *pending* | *pending* | *pending* | *pending* |
-| **Track B — Grounded `<think>` GRPO** | *pending* | *pending* | *pending* | *pending* | *pending* | *pending* | *pending* |
+| **Track B — Grounded `<think>` SFT** *(all 28L, `r=16`, 498 CMUdict traces)* | `61.0%` | `87 / 75 / 87%` | `100%` | **`0.690`** | **`0% / 0%`** | **`100%`** | **`0.706`** |
+| **Track B — Grounded `<think>` GRPO (`@50`)** | `82.0%` | `90 / 87 / 98%` | `99%` | `0.650` | `0% / 0%` | `99%` | `0.628` |
+| **Track B — Grounded `<think>` GRPO (`@250`, Best Exact)** | **`86.0%`** | **`97 / 90 / 96%`** | `99%` | `0.654` | **`0% / 0%`** | **`100%`** | `0.637` |
+| **Track B — Grounded `<think>` GRPO (`@300` final)** | `84.0%` | **`99 / 85 / 99%`** | **`100%`** | `0.664` | **`0% / 0%`** | **`100%`** | `0.644` |
 
 #### Track A Findings (Full-Depth LoRA, Two-Round Direct SFT → GRPO)
 
@@ -92,7 +94,15 @@ Clean, from-scratch post-training runs incorporating every Phase 1 lesson from S
 - **Round 2 SFT jumped to `50.0%` exact while *increasing* diversity (`distinct_2 = 0.728`):** Rejection-sampling `7,200` candidates from the uncollapsed Round 1 GRPO model with strict deduplication (`max_line_repeats = 2`, `max_bigram_repeats = 3`) yielded **547** balanced, verified 5-7-5 haikus across all 10 domains (no starter > `4.4%`). Training a fresh full-depth LoRA from base on those 547 haikus alone jumped exact 5-7-5 from `31% → 50%` (Line 2: `59% → 72%`) and lifted `distinct_2` to **`0.728`** — providing a far stronger, uncollapsed KL anchor.
 - **Round 2 GRPO (`kl_beta = 0.02`, unigram cap disabled) hit `74.0%` exact 5-7-5 at `distinct_2 = 0.684`:** Keeping starter/bigram cliché decay + fitness sharing while removing the unigram cap dropped cliché trigger rate from `~84%` to a healthy `~55%`, driving held-out accuracy to **`74.0%`** (**+71.0%** over base) with **`85% / 89% / 94%`** per-line accuracy, **`0.0%` OOV**, **`0.0%` echo**, **`99%` unique haikus**, **`94%` within ±1 total syllable**, and **no Line-1 starter word over `10%`** — nearly **double** the lexical diversity of Phase 1 `v7` (`0.684` vs. `0.357`) at essentially the same accuracy.
 
-### Selected Held-Out Samples (Phase 2 — Track A R2, `step_0200`)
+#### Track B Findings (Full-Depth LoRA, Grounded `<think>` SFT → GRPO)
+
+- **Programmatic CMUdict cold-start SFT beat its own donor by `+11%` before a single RL step (`50% → 61%` exact):** Sampling `7,200` candidates from `direct_r2_sft` with strict relevance and starter caps (`min_sim >= 0.60`, `max_starter_repeats = 8`, `max_line_repeats = 2`, `max_bigram_repeats = 2`) yielded **498** balanced exact 5-7-5 haikus (`mean_sim = 0.698`), programmatically wrapped in exact CMUdict word-count traces with **40.8%** (`203/498`) real off-by-1/2 self-revisions (`draft = 6 -> final = 7`). Training a fresh full-depth LoRA from untouched base weights hit **`61.0%` exact 5-7-5**, **`0.690` relevance**, **`0.706` distinct-2**, **`0%` OOV/echo**, and **`99.0%` grounding** (`avg 84.5` `<think>` tokens) out of the box.
+- **Grounded Think-GRPO surged to `86.0%` exact 5-7-5 (`97 / 90 / 96%` per line) with genuine phonetic self-correction:** Applying per-line credit assignment directly inside `<think>` (`1:/2:/3:` drafting lines) as well as on the final haiku — alongside `grounding >= 0.70` jackpot gating, `exact_min_sim = 0.48`, `kl_beta = 0.02` locked to `think_sft_v1`, and the Track A R2 anti-collapse stack — lifted exact 5-7-5 from **`61% → 86.0%`** (**+80.0%** over base `<think>`, **+12.0%** over Track A Direct) at just **`2.71 GB`** peak Metal RAM (`~13s/step`).
+- **Honest counting & diversity recovery:** Without rewarding scratchpad arithmetic explicitly, **honest CMUdict 5-7-5 count accuracy inside `<think>` climbed from `58.0%` (SFT) → `84.0%` (`@250`)**, grounding stayed at **`99.7%–100.0%`**, `0%` OOV/echo, `100%` unique haikus, `96–97%` within ±1 total syllable, no Line-1 starter exceeded `7–8%`, and `distinct_2` + `relevance` both *climbed* from step 50 (`0.628 / 0.650`) to step 300 (`0.644 / 0.664`).
+
+### Selected Held-Out Samples
+
+#### Track A R2 Direct (`step_0200`)
 
 - **a sudden gratitude at sunset** *(5-7-5, relevance `0.81`)*
   > Sunset breaks the sky,
@@ -106,14 +116,39 @@ Clean, from-scratch post-training runs incorporating every Phase 1 lesson from S
   > Rain taps on the pane,
   > Silver threads in trembling air,
   > Darkness drinks the light.
-- **a sunlit pigeon strutting on brick** *(5-7-5, relevance `0.74`)*
-  > Sunlit wings on brick,
-  > Shadow swings in golden light,
-  > Feathers catch the day.
-- **a departing footbridge over a creek** *(5-7-5, relevance `0.71`)*
-  > Bridge leans over stream,
-  > Whispers of the water's swing,
-  > Footsteps fade in time.
+
+#### Track B Grounded `<think>` (`step_0250`, with live self-revisions)
+
+- **a misty autumn rainstorm on glass** *(5-7-5, relevance `0.75`, Line 3 self-revised `6 -> 5`)*
+  ```text
+  <think>
+  1: Rain(1) lashes(2) the(1) glass(1) = 5
+  2: Silver(2) trembling(2) in(1) the(1) air(1) = 7
+  3: Darkness(2) holds(1) the(1) glass(1) fast(1) = 6 -> Silent(2) cold(1) and(1) still(1) = 5
+  </think>
+  Rain lashes the glass,
+  Silver trembling in the air,
+  Silent, cold, and still.
+  ```
+- **a crowded corner bookstore window** *(5-7-5, relevance `0.65`, Line 2 self-revised `6 -> 7`)*
+  ```text
+  <think>
+  1: Sunlit(2) shelves(1) press(1) tight(1) = 5
+  2: Books(1) hum(1) in(1) silent(2) fight(1) = 6 -> Pages(2) flutter(2) in(1) the(1) breeze(1) = 7
+  3: Shadowed(2) silence(2) tight(1) = 5
+  </think>
+  Sunlit shelves press tight,
+  Pages flutter in the breeze,
+  Shadowed silence, tight.
+  ```
+- **a sudden gratitude at sunset** *(5-7-5, relevance `0.87`)*
+  > Sunset paints the sky,
+  > A moment of quiet joy,
+  > Gratitude takes flight.
+- **a windblown cedar cliff overlooking sea** *(5-7-5, relevance `0.77`)*
+  > Cedar sways in air,
+  > Sea's blue breath on trembling grass,
+  > Shadowed cliff remains.
 
 ---
 
