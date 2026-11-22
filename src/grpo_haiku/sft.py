@@ -38,11 +38,14 @@ from grpo_haiku.rewards import (
     RewardBreakdown,
     extract_content_bigrams,
     extract_line_starters,
+    parse_completion,
     score_group,
 )
 from grpo_haiku.syllables import LineSyllableAnalysis, analyze_line, tokenize_words
 
 _SURFACE_WORD_RE = re.compile(r"[A-Za-z]+(?:['’-][A-Za-z]+)*")
+_TRACE_LINE_RE = re.compile(r"^\s*([123])\s*:\s*(.+)$")
+_TRACE_WORD_RE = re.compile(r"([A-Za-z]+(?:['’-][A-Za-z]+)*)\s*\(\d+\)")
 _DROPPABLE_ONE_SYL = frozenset(
     {"the", "a", "an", "and", "in", "on", "of", "to", "at", "by", "for", "with", "its", "their"}
 )
@@ -111,8 +114,9 @@ def format_line_syllable_trace(
     line: str,
     target: int | None = None,
     avoid_target: int | None = None,
+    think_format: str = "sum",
 ) -> tuple[str, int] | None:
-    """Format a single line as `Word(c) word(c) ... = sum` using exact CMUdict counts."""
+    """Format a single line using exact CMUdict counts in `sum` or `cumulative` format."""
     analysis: LineSyllableAnalysis = analyze_line(line)
     surface_words = _extract_surface_words(line)
     if analysis.has_oov or not surface_words or len(surface_words) != len(analysis.words):
@@ -120,6 +124,13 @@ def format_line_syllable_trace(
     counts = _solve_word_counts(analysis.word_counts, target=target, avoid_target=avoid_target)
     if counts is None:
         return None
+    if think_format == "cumulative":
+        running = 0
+        parts: list[str] = []
+        for w, c in zip(surface_words, counts):
+            running += c
+            parts.append(f"{w}({c})={running}")
+        return " ".join(parts), running
     total = sum(counts)
     body = " ".join(f"{w}({c})" for w, c in zip(surface_words, counts))
     return f"{body} = {total}", total
@@ -158,12 +169,14 @@ def synthesize_think_trace(
     targets: tuple[int, int, int] = (5, 7, 5),
     draft_miss_lines: dict[int, str] | None = None,
     revision_prob: float = 0.40,
+    think_format: str = "sum",
+    forced_rev_line: int | None = None,
     rng: random.Random | None = None,
 ) -> str:
     """Synthesize a concise CMUdict `<think>...</think>` trace + final 3-line haiku.
 
     Uses exact surface words (no invented hyphenation) and optionally injects a realistic
-    off-by-1/2 self-revision (`draft = 6 -> final = 7`) on one line.
+    off-by-1/2 self-revision (`draft -> final`) on one line.
     """
     if len(haiku_lines) != len(targets):
         raise ValueError(f"Expected {len(targets)} haiku lines, got {len(haiku_lines)}")
@@ -171,7 +184,7 @@ def synthesize_think_trace(
 
     exact_traces: list[str] = []
     for k, (line, target) in enumerate(zip(haiku_lines, targets)):
-        formatted = format_line_syllable_trace(line, target=target)
+        formatted = format_line_syllable_trace(line, target=target, think_format=think_format)
         if formatted is None:
             raise ValueError(f"Line {k + 1} cannot be traced cleanly to {target} syllables: {line!r}")
         exact_traces.append(formatted[0])
@@ -179,13 +192,16 @@ def synthesize_think_trace(
     # Optionally augment one line with a realistic off-by-1/2 self-revision
     rev_idx: int | None = None
     rev_draft_trace: str | None = None
-    if revision_prob > 0.0 and rng.random() < revision_prob:
-        # Weight toward Line 2 (7 syllables is hardest), preferring real near-miss drafts
-        weighted_order = [1, 0, 2]
-        if rng.random() < 0.5:
-            weighted_order = [1, 2, 0]
-        if rng.random() < 0.35:
-            rng.shuffle(weighted_order)
+    if revision_prob > 0.0 and (forced_rev_line is not None or rng.random() < revision_prob):
+        if forced_rev_line is not None:
+            weighted_order = [forced_rev_line]
+        else:
+            # Weight toward Line 2 (7 syllables is hardest), preferring real near-miss drafts
+            weighted_order = [1, 0, 2]
+            if rng.random() < 0.5:
+                weighted_order = [1, 2, 0]
+            if rng.random() < 0.35:
+                rng.shuffle(weighted_order)
 
         # First pass: try real near-miss lines collected from the same prompt
         if draft_miss_lines:
@@ -193,7 +209,12 @@ def synthesize_think_trace(
                 cand = draft_miss_lines.get(k)
                 if not cand or cand.strip().lower() == haiku_lines[k].strip().lower():
                     continue
-                draft_fmt = format_line_syllable_trace(cand, target=None, avoid_target=targets[k])
+                draft_fmt = format_line_syllable_trace(
+                    cand,
+                    target=None,
+                    avoid_target=targets[k],
+                    think_format=think_format,
+                )
                 if draft_fmt is not None and 1 <= abs(draft_fmt[1] - targets[k]) <= 2:
                     rev_idx = k
                     rev_draft_trace = draft_fmt[0]
@@ -205,7 +226,12 @@ def synthesize_think_trace(
                 perturbed = _make_perturbed_draft(haiku_lines[k], targets[k], rng)
                 if not perturbed:
                     continue
-                draft_fmt = format_line_syllable_trace(perturbed, target=None, avoid_target=targets[k])
+                draft_fmt = format_line_syllable_trace(
+                    perturbed,
+                    target=None,
+                    avoid_target=targets[k],
+                    think_format=think_format,
+                )
                 if draft_fmt is not None and 1 <= abs(draft_fmt[1] - targets[k]) <= 2:
                     rev_idx = k
                     rev_draft_trace = draft_fmt[0]
@@ -220,6 +246,94 @@ def synthesize_think_trace(
 
     haiku_block = "\n".join(ln.strip() for ln in haiku_lines)
     return "<think>\n" + "\n".join(think_lines) + "\n</think>\n" + haiku_block
+
+
+def _extract_existing_draft_revisions(completion: str) -> dict[int, str]:
+    """Extract any pre-`->` draft lines from an existing `<think>` SFT completion."""
+    parsed = parse_completion(completion, thinking_mode=True)
+    if not parsed.has_valid_think:
+        return {}
+    drafts: dict[int, str] = {}
+    for raw_line in parsed.think_text.splitlines():
+        m = _TRACE_LINE_RE.match(raw_line)
+        if not m or "->" not in m.group(2):
+            continue
+        line_idx = int(m.group(1)) - 1
+        draft_seg = m.group(2).split("->", 1)[0]
+        words = _TRACE_WORD_RE.findall(draft_seg)
+        if words:
+            drafts[line_idx] = " ".join(words)
+    return drafts
+
+
+def reformat_think_sft_jsonl(
+    src_file: str,
+    out_file: str,
+    think_format: str = "cumulative",
+    targets: tuple[int, int, int] = (5, 7, 5),
+    seed: int = 42,
+) -> list[dict]:
+    """Re-wrap an existing verified SFT JSONL into a new `<think>` format (exact 1:1 A/B).
+
+    Preserves the exact same haikus and any existing real near-miss drafts before `->`.
+    """
+    rng = random.Random(seed)
+    reformatted: list[dict] = []
+    revisions = 0
+
+    with Path(src_file).open("r", encoding="utf-8") as f:
+        rows = [json.loads(line) for line in f if line.strip()]
+
+    for row in rows:
+        haiku_text = row.get("haiku")
+        if not haiku_text:
+            parsed = parse_completion(row["completion"], thinking_mode=bool(row.get("thinking_mode")))
+            haiku_lines = parsed.lines
+        else:
+            haiku_lines = tuple(ln.strip() for ln in haiku_text.splitlines() if ln.strip())
+
+        existing_drafts = _extract_existing_draft_revisions(row.get("completion", ""))
+        if existing_drafts:
+            rev_k = next(iter(existing_drafts))
+            new_completion = synthesize_think_trace(
+                haiku_lines=haiku_lines,
+                targets=targets,
+                draft_miss_lines=existing_drafts,
+                revision_prob=1.0,
+                think_format=think_format,
+                forced_rev_line=rev_k,
+                rng=rng,
+            )
+        else:
+            new_completion = synthesize_think_trace(
+                haiku_lines=haiku_lines,
+                targets=targets,
+                revision_prob=0.0,
+                think_format=think_format,
+                rng=rng,
+            )
+        if "->" in new_completion:
+            revisions += 1
+
+        updated = dict(row)
+        updated["completion"] = new_completion
+        updated["haiku"] = "\n".join(haiku_lines)
+        updated["thinking_mode"] = True
+        updated["think_format"] = think_format
+        reformatted.append(updated)
+
+    out_path = Path(out_file)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with out_path.open("w", encoding="utf-8") as f:
+        for row in reformatted:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+    mean_sim = sum(r.get("raw_cosine_sim", 0.0) for r in reformatted) / max(1, len(reformatted))
+    print(
+        f"Reformatted {len(reformatted)} SFT examples ({src_file} -> {out_path}) "
+        f"[think_format={think_format}, mean_sim={mean_sim:.3f}, revisions={revisions}/{len(reformatted)}]"
+    )
+    return reformatted
 
 
 def is_sft_worthy(bd: RewardBreakdown) -> bool:
@@ -250,6 +364,7 @@ def collect_sft_haikus(
     max_starter_repeats: int = 0,
     min_sim: float = 0.0,
     thinking_mode: bool = False,
+    think_format: str = "sum",
     revision_prob: float = 0.40,
     seed: int = 42,
     reward_cfg: RewardConfig | None = None,
@@ -382,6 +497,7 @@ def collect_sft_haikus(
                             targets=donor_reward_cfg.line_targets,
                             draft_miss_lines=draft_misses,
                             revision_prob=revision_prob,
+                            think_format=think_format,
                             rng=rng,
                         )
                     except ValueError:
@@ -469,6 +585,7 @@ def train_sft(
     grad_accum_steps: int = 4,
     grad_clip_norm: float = 1.0,
     thinking_mode: bool = False,
+    think_format: str = "sum",
     seed: int = 42,
 ) -> Path:
     """Run memory-safe LoRA SFT on verified exact 5-7-5 haikus using identical LoRA layers."""
@@ -492,7 +609,7 @@ def train_sft(
 
     print(
         f"Loading model for LoRA SFT: {model_cfg.model_name} "
-        f"({len(rows)} examples, {epochs} epochs, thinking_mode={thinking_mode})"
+        f"({len(rows)} examples, {epochs} epochs, thinking_mode={thinking_mode}, think_format={think_format})"
     )
     model, tokenizer = build_lora_model(model_cfg)
 
@@ -500,7 +617,12 @@ def train_sft(
     eos_id = tokenizer.eos_token_id
     tokenized: list[tuple[list[int], list[int]]] = []
     for row in rows:
-        pt = format_chat_prompt(tokenizer, row["prompt"], thinking_mode=thinking_mode)
+        pt = format_chat_prompt(
+            tokenizer,
+            row["prompt"],
+            thinking_mode=thinking_mode,
+            think_format=think_format,
+        )
         pids = tokenizer.encode(pt, add_special_tokens=False)
         cids = tokenizer.encode(row["completion"], add_special_tokens=False)
         if eos_id is not None and (not cids or cids[-1] != eos_id):
@@ -593,6 +715,8 @@ def main() -> None:
     parser.add_argument("--max-starter-repeats", type=int, default=0)
     parser.add_argument("--min-sim", type=float, default=0.0)
     parser.add_argument("--thinking-mode", action="store_true")
+    parser.add_argument("--think-format", type=str, default="sum", choices=["sum", "cumulative"])
+    parser.add_argument("--reformat-from", type=str, default=None, help="Re-wrap existing SFT JSONL into --think-format without re-sampling.")
     parser.add_argument("--revision-prob", type=float, default=0.40)
     parser.add_argument("--run-name", type=str, default="sft_v1")
     parser.add_argument("--runs-dir", type=str, default="runs")
@@ -605,7 +729,14 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
-    if not args.skip_collect:
+    if args.reformat_from:
+        reformat_think_sft_jsonl(
+            src_file=args.reformat_from,
+            out_file=args.sft_file,
+            think_format=args.think_format,
+            seed=args.seed,
+        )
+    elif not args.skip_collect:
         collect_sft_haikus(
             model_name=args.model,
             train_file=args.train_file,
@@ -619,6 +750,7 @@ def main() -> None:
             max_starter_repeats=args.max_starter_repeats,
             min_sim=args.min_sim,
             thinking_mode=args.thinking_mode,
+            think_format=args.think_format,
             revision_prob=args.revision_prob,
             seed=args.seed,
         )
@@ -639,6 +771,7 @@ def main() -> None:
             learning_rate=args.lr,
             grad_accum_steps=args.grad_accum,
             thinking_mode=args.thinking_mode,
+            think_format=args.think_format,
             seed=args.seed,
         )
 
