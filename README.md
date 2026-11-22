@@ -4,6 +4,16 @@ Training a small, quantized open-weights LLM (**Qwen3-1.7B, 4-bit**) via **RLVR 
 
 ![Exact 5-7-5 Accuracy vs. Lexical Diversity across Phase 1 and Phase 2 Tracks A, B, and C](docs/assets/accuracy_vs_diversity.svg)
 
+## TL;DR
+
+Fine-tuned a local 4-bit **Qwen3-1.7B** from **3% → 99% exact 5-7-5 haikus** on 100 unseen topics (in <3 GB RAM on a MacBook). Early RL hit 80% by collapsing into repetitive templates; locking KL to a diverse SFT baseline and penalizing repeated line starters and bigrams preserved lexical diversity. Having the model track a running syllable total while drafting eliminated counting errors and pushed accuracy to **99/100**.
+
+**Example:** *"Write a haiku about a rainy evening under the stars."*
+
+| Base Model *(5-5-5 ✗)* | Final Post-Trained Model *(5-7-5 ✓)* |
+| :--- | :--- |
+| Rain taps the window, *(5)*<br>Night breathes in silver, *(5 ✗)*<br>Stars whisper in rain. *(5)* | Midnight rain on glass, *(5)*<br>Stars hum in the fog's soft breath, *(7 ✓)*<br>Shadowed silence falls. *(5)* |
+
 ---
 
 ## Why Haikus for RLVR?
