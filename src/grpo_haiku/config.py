@@ -79,9 +79,11 @@ class RewardConfig:
 
     # Grounded <think> scratchpad mode (opt-in; direct mode keeps thinking_mode=False)
     thinking_mode: bool = False
+    think_format: str = "sum"  # "sum" (end-of-line total) or "cumulative" (word(c)=cum)
     grounding_min_overlap: float = 0.70  # Fraction of final haiku content words required in <think>
     ungrounded_think_penalty: float = -0.35  # Plus forfeits exact_575_bonus
     missing_think_penalty: float = -0.50
+    think_arith_penalty: float = 0.0  # Optional penalty when <think> running/line arithmetic is wrong
 
 
 @dataclass
@@ -95,6 +97,7 @@ class GRPOConfig:
     run_name: str = "direct_clean_grpo"
     runs_dir: str = "runs"
     thinking_mode: bool = False
+    think_format: str = "sum"
 
     # GRPO rollout & optimization
     num_steps: int = 500

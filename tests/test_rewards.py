@@ -436,3 +436,90 @@ def test_grounded_think_mode_rewards_honest_trace_and_blocks_fake_boilerplate():
         )
         == 1.0
     )
+
+
+def test_cumulative_think_counts_and_arithmetic_penalty():
+    cfg = RewardConfig(
+        thinking_mode=True,
+        think_format="cumulative",
+        think_arith_penalty=-0.20,
+    )
+
+    honest_cum = (
+        "<think>\n"
+        "1: Frosted(2)=2 cedar(2)=4 branch(1)=5\n"
+        "2: Quiet(2)=2 snowflakes(2)=4 drift(1)=5 slow(1)=6 -> "
+        "Quiet(2)=2 snowflakes(2)=4 drift(1)=5 below(2)=7\n"
+        "3: Dawn(1)=1 breaks(1)=2 pale(1)=3 and(1)=4 still(1)=5\n"
+        "</think>\n"
+        "Frosted cedar branch\n"
+        "Quiet snowflakes drift below\n"
+        "Dawn breaks pale and still"
+    )
+    res_ok = score_completion(
+        topic="a quiet winter snowy morning",
+        completion=honest_cum,
+        cfg=cfg,
+        relevance_scorer=DummyRelevanceScorer(0.78),
+    )
+    assert res_ok.is_valid_format
+    assert res_ok.is_exact_575
+    assert res_ok.think_grounding == 1.0
+    assert res_ok.think_penalty == 0.0
+    assert res_ok.total_reward == 4.50
+
+    diag_ok = analyze_think_counts(res_ok.think_text, think_format="cumulative")
+    assert diag_ok["all_lines_present"]
+    assert diag_ok["arith_consistent"]
+    assert diag_ok["counts_valid_cmudict"]
+    assert diag_ok["sums_match_target"]
+    assert diag_ok["is_honest_575"]
+    assert diag_ok["has_revision"]
+
+    # Broken running total step (2+2=5 instead of 4) triggers -0.20 penalty
+    broken_step = (
+        "<think>\n"
+        "1: Frosted(2)=2 cedar(2)=4 branch(1)=5\n"
+        "2: Quiet(2)=2 snowflakes(2)=5 drift(1)=6 below(2)=8\n"
+        "3: Dawn(1)=1 breaks(1)=2 pale(1)=3 and(1)=4 still(1)=5\n"
+        "</think>\n"
+        "Frosted cedar branch\n"
+        "Quiet snowflakes drift below\n"
+        "Dawn breaks pale and still"
+    )
+    res_bad = score_completion(
+        topic="a quiet winter snowy morning",
+        completion=broken_step,
+        cfg=cfg,
+        relevance_scorer=DummyRelevanceScorer(0.78),
+    )
+    diag_bad = analyze_think_counts(res_bad.think_text, think_format="cumulative")
+    assert not diag_bad["arith_consistent"]
+    assert not diag_bad["is_honest_575"]
+    assert res_bad.think_penalty == -0.20
+    assert abs(res_bad.total_reward - 4.30) < 1e-6
+
+    # Fake copy-and-relabel (...=6 -> ...=7 on same words) also violates running sum!
+    fake_relabel = (
+        "<think>\n"
+        "1: Frosted(2)=2 cedar(2)=4 branch(1)=5\n"
+        "2: Quiet(2)=2 snowflakes(2)=4 drift(1)=5 slow(1)=6 -> "
+        "Quiet(2)=2 snowflakes(2)=4 drift(1)=5 slow(1)=7\n"
+        "3: Dawn(1)=1 breaks(1)=2 pale(1)=3 and(1)=4 still(1)=5\n"
+        "</think>\n"
+        "Frosted cedar branch\n"
+        "Quiet snowflakes drift slow\n"
+        "Dawn breaks pale and still"
+    )
+    diag_fake = analyze_think_counts(
+        parse_completion(fake_relabel, thinking_mode=True).think_text,
+        think_format="cumulative",
+    )
+    assert not diag_fake["arith_consistent"]
+    res_fake = score_completion(
+        topic="a quiet winter snowy morning",
+        completion=fake_relabel,
+        cfg=cfg,
+        relevance_scorer=DummyRelevanceScorer(0.78),
+    )
+    assert res_fake.think_penalty == -0.20

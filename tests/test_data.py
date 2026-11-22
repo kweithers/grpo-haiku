@@ -6,6 +6,7 @@ from collections import Counter
 
 from grpo_haiku.data import (
     DOMAIN_SPECS,
+    THINK_CUMULATIVE_SYSTEM_PROMPT,
     THINK_SYSTEM_PROMPT,
     format_chat_prompt,
     generate_dataset,
@@ -73,3 +74,10 @@ def test_format_chat_prompt_thinking_mode_strips_empty_qwen_stub():
     assert THINK_SYSTEM_PROMPT in think
     assert think.endswith("<|im_start|>assistant\n")
     assert "<think>\n\n</think>" not in think
+
+    cum = format_chat_prompt(
+        tok, "Write a haiku about snow.", thinking_mode=True, think_format="cumulative"
+    )
+    assert THINK_CUMULATIVE_SYSTEM_PROMPT in cum
+    assert cum.endswith("<|im_start|>assistant\n")
+    assert "<think>\n\n</think>" not in cum

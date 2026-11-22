@@ -20,6 +20,7 @@ _STRAY_TAG_RE = re.compile(r"</?(?:think|haiku)\b[^>]*>", re.IGNORECASE)
 _THINK_BLOCK_RE = re.compile(r"^\s*<think>(.*?)</think>(.*)$", re.DOTALL | re.IGNORECASE)
 _THINK_LINE_RE = re.compile(r"^\s*([123])\s*:\s*(.+)$")
 _WORD_COUNT_RE = re.compile(r"([A-Za-z]+(?:['’-][A-Za-z]+)*)\s*\((\d+)\)")
+_WORD_CUM_RE = re.compile(r"([A-Za-z]+(?:['’-][A-Za-z]+)*)\s*\((\d+)\)\s*=\s*(\d+)")
 _TRAIL_EQ_RE = re.compile(r"=\s*(\d+)\s*$")
 _DIGIT_RE = re.compile(r"\d")
 _FUNCTION_WORDS = frozenset(
@@ -333,13 +334,20 @@ def compute_think_grounding(think_text: str, haiku_lines: tuple[str, ...]) -> fl
 def analyze_think_counts(
     think_text: str,
     targets: tuple[int, int, int] = (5, 7, 5),
+    think_format: str = "sum",
 ) -> dict[str, bool]:
-    """Diagnostic: check if `<think>` numbered lines honestly count CMUdict syllables to 5-7-5."""
+    """Diagnostic: check if `<think>` numbered lines honestly count CMUdict syllables to 5-7-5.
+
+    Supports both:
+    - `think_format == "sum"`: `1: Word(c) word(c) ... = 5`
+    - `think_format == "cumulative"`: `1: Word(c)=cum word(c)=cum ...`
+    """
     if not think_text.strip():
         return {
             "all_lines_present": False,
             "counts_valid_cmudict": False,
             "sums_match_target": False,
+            "arith_consistent": False,
             "is_honest_575": False,
             "has_revision": False,
         }
@@ -356,38 +364,92 @@ def analyze_think_counts(
             "all_lines_present": False,
             "counts_valid_cmudict": False,
             "sums_match_target": False,
+            "arith_consistent": False,
             "is_honest_575": False,
             "has_revision": has_revision,
         }
 
     counts_valid = True
     sums_match = True
+    arith_consistent = True
+
     for idx, target in enumerate(targets, start=1):
         body = found[idx]
-        final_seg = body.split("->")[-1].strip()
-        pairs = _WORD_COUNT_RE.findall(final_seg)
-        if not pairs:
+        segments = [seg.strip() for seg in body.split("->") if seg.strip()]
+        if not segments:
             counts_valid = False
             sums_match = False
+            arith_consistent = False
             continue
-        seg_sum = 0
-        for word, count_str in pairs:
-            c = int(count_str)
-            seg_sum += c
-            valid_counts = lookup_word_syllables(word)
-            if valid_counts is None or c not in valid_counts:
+
+        if think_format == "cumulative":
+            # Verify strict running-total arithmetic (cum_i == cum_{i-1} + c_i) on EVERY segment
+            for seg in segments:
+                triples = _WORD_CUM_RE.findall(seg)
+                pairs = _WORD_COUNT_RE.findall(seg)
+                if not triples or len(triples) != len(pairs):
+                    arith_consistent = False
+                    continue
+                running = 0
+                for _word, c_str, cum_str in triples:
+                    running += int(c_str)
+                    if int(cum_str) != running:
+                        arith_consistent = False
+
+            # Verify CMUdict counts and target match on the FINAL segment
+            final_seg = segments[-1]
+            final_triples = _WORD_CUM_RE.findall(final_seg)
+            final_pairs = _WORD_COUNT_RE.findall(final_seg)
+            if not final_triples or len(final_triples) != len(final_pairs):
                 counts_valid = False
-        eq_m = _TRAIL_EQ_RE.search(final_seg)
-        if eq_m is not None and int(eq_m.group(1)) != seg_sum:
-            sums_match = False
-        if seg_sum != target:
-            sums_match = False
+                sums_match = False
+                continue
+            running = 0
+            last_cum = 0
+            for word, c_str, cum_str in final_triples:
+                c = int(c_str)
+                last_cum = int(cum_str)
+                running += c
+                valid_counts = lookup_word_syllables(word)
+                if valid_counts is None or c not in valid_counts:
+                    counts_valid = False
+            if running != target or last_cum != target:
+                sums_match = False
+        else:
+            # Classic end-of-line sum format: `Word(c) word(c) = M`
+            for seg in segments:
+                seg_pairs = _WORD_COUNT_RE.findall(seg)
+                eq_m = _TRAIL_EQ_RE.search(seg)
+                if not seg_pairs or eq_m is None:
+                    arith_consistent = False
+                elif sum(int(c_str) for _, c_str in seg_pairs) != int(eq_m.group(1)):
+                    arith_consistent = False
+
+            final_seg = segments[-1]
+            pairs = _WORD_COUNT_RE.findall(final_seg)
+            if not pairs:
+                counts_valid = False
+                sums_match = False
+                continue
+            seg_sum = 0
+            for word, count_str in pairs:
+                c = int(count_str)
+                seg_sum += c
+                valid_counts = lookup_word_syllables(word)
+                if valid_counts is None or c not in valid_counts:
+                    counts_valid = False
+            eq_m = _TRAIL_EQ_RE.search(final_seg)
+            if eq_m is not None and int(eq_m.group(1)) != seg_sum:
+                sums_match = False
+            if seg_sum != target:
+                sums_match = False
 
     return {
         "all_lines_present": True,
         "counts_valid_cmudict": counts_valid,
         "sums_match_target": sums_match,
-        "is_honest_575": counts_valid and sums_match,
+        "arith_consistent": arith_consistent,
+        "is_honest_575": counts_valid and sums_match and arith_consistent,
         "has_revision": has_revision,
     }
 
@@ -555,6 +617,16 @@ def score_completion(
     if cfg.thinking_mode and is_valid_format and think_grounding < cfg.grounding_min_overlap:
         think_penalty = cfg.ungrounded_think_penalty
         exact_bonus = 0.0
+
+    # Optional pure-integer scratchpad arithmetic check (blocks broken running totals / fake relabels)
+    if cfg.thinking_mode and is_valid_format and cfg.think_arith_penalty < 0.0:
+        arith_diag = analyze_think_counts(
+            parsed.think_text,
+            targets=cfg.line_targets,
+            think_format=cfg.think_format,
+        )
+        if not arith_diag["arith_consistent"]:
+            think_penalty += cfg.think_arith_penalty
 
     # Prompt-echo guardrail
     echo_penalty = (

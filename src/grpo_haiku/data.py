@@ -25,6 +25,14 @@ THINK_SYSTEM_PROMPT = (
     "avoid cliches or copying the prompt verbatim."
 )
 
+THINK_CUMULATIVE_SYSTEM_PROMPT = (
+    "You are a skilled haiku poet. First, briefly count each word's syllables with a "
+    "running total inside <think>...</think> (format: `1: word(n)=cum ...` ending at "
+    "5, 7, or 5, revising any off-target line using `->`). Immediately after </think>, "
+    "output ONLY the final 3-line English haiku (no title, no tags, no extra text). "
+    "Use standard English words and avoid cliches or copying the prompt verbatim."
+)
+
 _EMPTY_THINK_SUFFIX_RE = re.compile(r"<think>\s*</think>\s*$", re.IGNORECASE)
 
 PROMPT_TEMPLATES = (
@@ -379,13 +387,19 @@ def format_chat_prompt(
     user_prompt: str,
     system_prompt: str | None = None,
     thinking_mode: bool = False,
+    think_format: str = "sum",
 ) -> str:
     """Format prompt for direct 3-line haiku or grounded `<think>` haiku generation."""
-    sys_prompt = (
-        system_prompt
-        if system_prompt is not None
-        else (THINK_SYSTEM_PROMPT if thinking_mode else SYSTEM_PROMPT)
-    )
+    if system_prompt is not None:
+        sys_prompt = system_prompt
+    elif thinking_mode:
+        sys_prompt = (
+            THINK_CUMULATIVE_SYSTEM_PROMPT
+            if think_format == "cumulative"
+            else THINK_SYSTEM_PROMPT
+        )
+    else:
+        sys_prompt = SYSTEM_PROMPT
     messages = [
         {"role": "system", "content": sys_prompt},
         {"role": "user", "content": user_prompt},
