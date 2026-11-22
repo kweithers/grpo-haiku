@@ -2,6 +2,8 @@
 
 Training a small, quantized open-weights LLM (**Qwen3-1.7B, 4-bit**) via **RLVR (GRPO)** and **LoRA** to write evocative, on-topic English **5-7-5 haikus** — entirely locally on an **Apple M5 MacBook Pro (16GB Unified Memory)** using Apple MLX.
 
+![Exact 5-7-5 Accuracy vs. Lexical Diversity across Phase 1 and Phase 2 Tracks A, B, and C](docs/assets/accuracy_vs_diversity.svg)
+
 ---
 
 ## Why Haikus for RLVR?
