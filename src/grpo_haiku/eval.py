@@ -50,20 +50,26 @@ def evaluate_model(
     limit: int | None = None,
     relevance_weight: float = RewardConfig.relevance_weight,
     thinking_mode: bool = False,
+    think_format: str = "sum",
 ) -> dict:
     """Evaluate base or LoRA-adapted model on held-out haiku prompts."""
     t0 = time.perf_counter()
-    resolved_max_tokens = max_tokens if max_tokens is not None else (224 if thinking_mode else 64)
+    default_max = (256 if think_format == "cumulative" else 224) if thinking_mode else 64
+    resolved_max_tokens = max_tokens if max_tokens is not None else default_max
     examples = load_jsonl(eval_file)
     if limit is not None and limit > 0:
         examples = examples[:limit]
 
     print(
         f"Evaluating model={model_name} adapter={adapter_path or 'NONE'} "
-        f"thinking={thinking_mode} max_tokens={resolved_max_tokens} on {len(examples)} prompts..."
+        f"thinking={thinking_mode} ({think_format}) max_tokens={resolved_max_tokens} on {len(examples)} prompts..."
     )
     model, tokenizer = load(model_name, adapter_path=adapter_path)
-    reward_cfg = RewardConfig(relevance_weight=relevance_weight, thinking_mode=thinking_mode)
+    reward_cfg = RewardConfig(
+        relevance_weight=relevance_weight,
+        thinking_mode=thinking_mode,
+        think_format=think_format,
+    )
     scorer = (
         MLXEmbeddingRelevanceScorer(reward_cfg.embedding_model)
         if relevance_weight > 0.0
@@ -75,12 +81,19 @@ def evaluate_model(
     breakdowns: list[RewardBreakdown] = []
     think_token_counts: list[int] = []
     think_honest_hits = 0
+    think_arith_hits = 0
     think_revision_hits = 0
 
     for start in range(0, len(examples), batch_size):
         chunk = examples[start : start + batch_size]
         prompt_texts = [
-            format_chat_prompt(tokenizer, ex.prompt, thinking_mode=thinking_mode) for ex in chunk
+            format_chat_prompt(
+                tokenizer,
+                ex.prompt,
+                thinking_mode=thinking_mode,
+                think_format=think_format,
+            )
+            for ex in chunk
         ]
         prompt_ids = [tokenizer.encode(pt, add_special_tokens=False) for pt in prompt_texts]
 
@@ -111,7 +124,11 @@ def evaluate_model(
                 "breakdown": asdict(bd),
             }
             if thinking_mode:
-                diag = analyze_think_counts(bd.think_text, targets=reward_cfg.line_targets)
+                diag = analyze_think_counts(
+                    bd.think_text,
+                    targets=reward_cfg.line_targets,
+                    think_format=think_format,
+                )
                 rec["think_diag"] = diag
                 think_toks = (
                     len(tokenizer.encode(bd.think_text, add_special_tokens=False))
@@ -121,6 +138,8 @@ def evaluate_model(
                 think_token_counts.append(think_toks)
                 if diag["is_honest_575"]:
                     think_honest_hits += 1
+                if diag["arith_consistent"]:
+                    think_arith_hits += 1
                 if diag["has_revision"]:
                     think_revision_hits += 1
             records.append(rec)
@@ -140,6 +159,7 @@ def evaluate_model(
         "model": model_name,
         "adapter_path": adapter_path,
         "thinking_mode": thinking_mode,
+        "think_format": think_format if thinking_mode else None,
         "num_examples": len(breakdowns),
         "elapsed_sec": round(time.perf_counter() - t0, 2),
         "exact_575_rate": round(sum(1 for b in breakdowns if b.is_exact_575) / n, 4),
@@ -165,6 +185,7 @@ def evaluate_model(
             sum(think_token_counts) / max(1, len(think_token_counts)), 1
         )
         summary["think_count_accuracy"] = round(think_honest_hits / n, 4)
+        summary["think_arith_consistency"] = round(think_arith_hits / n, 4)
         summary["think_revision_rate"] = round(think_revision_hits / n, 4)
     return {"summary": summary, "records": records}
 
@@ -203,8 +224,10 @@ def print_summary(result: dict, baseline: dict | None = None) -> None:
 
     if s.get("thinking_mode"):
         print(
-            f"\n  <think> diagnostics: grounding={s.get('mean_think_grounding', 0.0):.3f} | "
+            f"\n  <think> diagnostics ({s.get('think_format', 'sum')}): "
+            f"grounding={s.get('mean_think_grounding', 0.0):.3f} | "
             f"avg_think_tokens={s.get('mean_think_tokens', 0.0):.1f} | "
+            f"arith_ok={s.get('think_arith_consistency', 0.0)*100:.1f}% | "
             f"honest_575_counts={s.get('think_count_accuracy', 0.0)*100:.1f}% | "
             f"revision_rate={s.get('think_revision_rate', 0.0)*100:.1f}%"
         )
@@ -232,6 +255,7 @@ def main() -> None:
     parser.add_argument("--out", type=str, default=None, help="Path to write JSON eval results.")
     parser.add_argument("--compare-with", type=str, default=None, help="Path to baseline eval JSON.")
     parser.add_argument("--thinking-mode", action="store_true")
+    parser.add_argument("--think-format", type=str, default="sum", choices=["sum", "cumulative"])
     parser.add_argument("--max-tokens", type=int, default=None)
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--limit", type=int, default=None, help="Optional cap on number of eval prompts.")
@@ -247,6 +271,7 @@ def main() -> None:
         limit=args.limit,
         relevance_weight=args.relevance_weight,
         thinking_mode=args.thinking_mode,
+        think_format=args.think_format,
     )
 
     if args.out:

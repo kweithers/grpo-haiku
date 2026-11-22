@@ -373,3 +373,19 @@ def test_thinking_mode_per_line_credit_inside_and_after_think():
     assert abs(b_vals[1] - b_vals[7]) < 1e-6
     assert b_vals[1] > b_vals[3]
     assert b_vals[7] > b_vals[8]
+
+
+def test_cumulative_think_format_token_line_mapping():
+    pieces = [
+        "<think>\n",
+        "1: Frost(1)=1 bites(1)=2 the(1)=3 cold(1)=4 air(1)=5\n",
+        "2: Soft(1)=1 snowflakes(2)=3 drift(1)=4 -> Soft(1)=1 snowflakes(2)=3 drift(1)=4 to(1)=5 the(1)=6 ground(1)=7\n",
+        "3: Dawn(1)=1 breaks(1)=2 pale(1)=3 and(1)=4 still(1)=5\n",
+        "</think>\n",
+        "Frost bites the cold air\n",
+        "Soft snowflakes drift to the ground\n",
+        "Dawn breaks pale and still",
+    ]
+    tok = _MockPieceTokenizer(pieces)
+    line_map = map_tokens_to_lines(list(range(len(pieces))), tok, thinking_mode=True)
+    assert line_map == [-1, 0, 1, 2, -1, 0, 1, 2]

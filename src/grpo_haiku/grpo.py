@@ -517,7 +517,12 @@ def run_quick_eval(
     for start in range(0, len(subset), batch_size):
         chunk = subset[start : start + batch_size]
         prompt_texts = [
-            format_chat_prompt(tokenizer, ex.prompt, thinking_mode=reward_cfg.thinking_mode)
+            format_chat_prompt(
+                tokenizer,
+                ex.prompt,
+                thinking_mode=reward_cfg.thinking_mode,
+                think_format=reward_cfg.think_format,
+            )
             for ex in chunk
         ]
         prompt_ids_list = [
@@ -678,11 +683,12 @@ def train_grpo(
 
     print(
         f"Starting GRPO training: steps={grpo_cfg.num_steps}, G={grpo_cfg.group_size}, "
-        f"thinking={grpo_cfg.thinking_mode}, "
+        f"thinking={grpo_cfg.thinking_mode} ({grpo_cfg.think_format}), "
         f"lr={grpo_cfg.learning_rate}->{grpo_cfg.min_learning_rate}, kl_beta={grpo_cfg.kl_beta}, "
         f"clip=[{grpo_cfg.clip_eps},{grpo_cfg.clip_eps_high}], ent_coef={grpo_cfg.entropy_coef}, "
         f"line_credit_w={grpo_cfg.line_credit_weight}, relevance_w={reward_cfg.relevance_weight}, "
-        f"exact_min_sim={reward_cfg.exact_bonus_min_sim}, max_tokens={grpo_cfg.max_completion_tokens}"
+        f"exact_min_sim={reward_cfg.exact_bonus_min_sim}, arith_pen={reward_cfg.think_arith_penalty}, "
+        f"max_tokens={grpo_cfg.max_completion_tokens}"
     )
 
     for step in range(1, grpo_cfg.num_steps + 1):
@@ -703,7 +709,10 @@ def train_grpo(
             rng.shuffle(order)
 
         prompt_text = format_chat_prompt(
-            tokenizer, ex.prompt, thinking_mode=grpo_cfg.thinking_mode
+            tokenizer,
+            ex.prompt,
+            thinking_mode=grpo_cfg.thinking_mode,
+            think_format=grpo_cfg.think_format,
         )
         prompt_ids = tokenizer.encode(prompt_text, add_special_tokens=False)
 
@@ -948,6 +957,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--group-size", type=int, default=GRPOConfig.group_size)
     parser.add_argument("--grpo-epochs", type=int, default=GRPOConfig.grpo_epochs)
     parser.add_argument("--thinking-mode", action="store_true")
+    parser.add_argument("--think-format", type=str, default="sum", choices=["sum", "cumulative"])
+    parser.add_argument("--think-arith-penalty", type=float, default=RewardConfig.think_arith_penalty)
     parser.add_argument("--max-tokens", type=int, default=None)
     parser.add_argument("--temp", type=float, default=GRPOConfig.temperature)
     parser.add_argument("--top-p", type=float, default=GRPOConfig.top_p)
@@ -973,11 +984,12 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    max_tokens = (
-        args.max_tokens
-        if args.max_tokens is not None
-        else (224 if args.thinking_mode else GRPOConfig.max_completion_tokens)
+    default_max_tokens = (
+        (256 if args.think_format == "cumulative" else 224)
+        if args.thinking_mode
+        else GRPOConfig.max_completion_tokens
     )
+    max_tokens = args.max_tokens if args.max_tokens is not None else default_max_tokens
     model_cfg = ModelConfig(
         model_name=args.model,
         lora_rank=args.lora_rank,
@@ -989,6 +1001,8 @@ def main() -> None:
         relevance_weight=args.relevance_weight,
         exact_bonus_min_sim=args.exact_min_sim,
         thinking_mode=args.thinking_mode,
+        think_format=args.think_format,
+        think_arith_penalty=args.think_arith_penalty,
     )
     grpo_cfg = GRPOConfig(
         train_file=args.train_file,
@@ -998,6 +1012,7 @@ def main() -> None:
         run_name=args.run_name,
         runs_dir=args.runs_dir,
         thinking_mode=args.thinking_mode,
+        think_format=args.think_format,
         num_steps=args.steps,
         group_size=args.group_size,
         grpo_epochs=args.grpo_epochs,

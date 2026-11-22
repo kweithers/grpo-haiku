@@ -23,17 +23,22 @@ def main() -> None:
     parser.add_argument("--temp", type=float, default=0.7)
     parser.add_argument("--top-p", type=float, default=0.95)
     parser.add_argument("--thinking-mode", action="store_true")
+    parser.add_argument("--think-format", type=str, default="sum", choices=["sum", "cumulative"])
     parser.add_argument("--show-think", action="store_true")
     parser.add_argument("--max-tokens", type=int, default=None)
     parser.add_argument("--no-relevance", action="store_true")
     args = parser.parse_args()
 
-    max_tokens = (
-        args.max_tokens if args.max_tokens is not None else (224 if args.thinking_mode else 64)
-    )
+    default_max = (256 if args.think_format == "cumulative" else 224) if args.thinking_mode else 64
+    max_tokens = args.max_tokens if args.max_tokens is not None else default_max
     model, tokenizer = load(args.model, adapter_path=args.adapter_path)
     user_prompt = f"Write a haiku about {args.topic}."
-    prompt_text = format_chat_prompt(tokenizer, user_prompt, thinking_mode=args.thinking_mode)
+    prompt_text = format_chat_prompt(
+        tokenizer,
+        user_prompt,
+        thinking_mode=args.thinking_mode,
+        think_format=args.think_format,
+    )
 
     sampler = make_sampler(temp=args.temp, top_p=args.top_p)
     raw_out = generate(
@@ -49,6 +54,7 @@ def main() -> None:
     reward_cfg = RewardConfig(
         relevance_weight=0.0 if args.no_relevance else RewardConfig.relevance_weight,
         thinking_mode=args.thinking_mode,
+        think_format=args.think_format,
     )
     scorer = (
         None
@@ -59,9 +65,14 @@ def main() -> None:
 
     print(f"\n=== Prompt: {user_prompt} ===\n")
     if args.thinking_mode and args.show_think and bd.think_text:
-        diag = analyze_think_counts(bd.think_text, targets=reward_cfg.line_targets)
+        diag = analyze_think_counts(
+            bd.think_text,
+            targets=reward_cfg.line_targets,
+            think_format=args.think_format,
+        )
         print(
-            f"<think> [grounding={bd.think_grounding:.2f}, honest_counts={diag['is_honest_575']}, "
+            f"<think> [format={args.think_format}, grounding={bd.think_grounding:.2f}, "
+            f"arith_ok={diag['arith_consistent']}, honest_counts={diag['is_honest_575']}, "
             f"revised={diag['has_revision']}]"
         )
         for tl in bd.think_text.splitlines():
