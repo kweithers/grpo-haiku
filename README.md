@@ -70,7 +70,8 @@ Phase 1 explored thinking vs. direct generation, reward geometry, per-line credi
 Clean, from-scratch post-training runs incorporating every Phase 1 lesson from Step 1, evaluated apples-to-apples on the same 100 held-out topics.
 
 - **Track A — Clean From-Scratch Non-Thinking (Direct) Model:** Detailed protocol in [docs/direct_grpo_plan.md](docs/direct_grpo_plan.md).
-- **Track B — Grounded `<think>` Model:** Detailed protocol in [docs/think_grpo_plan.md](docs/think_grpo_plan.md).
+- **Track B — Grounded `<think>` Model (End-of-Line Sum):** Detailed protocol in [docs/think_grpo_plan.md](docs/think_grpo_plan.md).
+- **Track C — Grounded Cumulative `<think>` Model (`word(c)=cum`):** Clean 1:1 A/B upgrade replacing end-of-line mental sums with explicit running totals (`word(c)=cum`) + mild arithmetic consistency check (`-0.20`), trained from untouched base weights on the exact same 498 verified haikus.
 
 ### Held-Out Results Comparison (100 Unseen Topics)
 
@@ -80,13 +81,16 @@ Clean, from-scratch post-training runs incorporating every Phase 1 lesson from S
 | **Track A R1 — Direct SFT** *(all 28L, `r=16`, 229 base haikus)* | `12.0%` | `57 / 38 / 55%` | `100%` | `0.692` | `3% / 0%` | `100%` | `0.719` |
 | **Track A R1 — Direct GRPO** *(500 steps, `kl=0.05`, unigram cap on)* | `31.0%` | `74 / 59 / 75%` | `100%` | `0.658` | `2% / 0%` | `100%` | `0.714` |
 | **Track A R2 — Direct SFT** *(fresh base LoRA, 547 R1-sampled haikus)* | `50.0%` | `77 / 72 / 81%` | `100%` | `0.665` | `3% / 0%` | `100%` | `0.728` |
-| **Track A R2 — Direct GRPO (`@200`, Pareto best)** *(`kl=0.02`, no unigram cap)* | **`74.0%`** | **`85 / 89 / 94%`** | **`100%`** | `0.638` | **`0% / 0%`** | **`99%`** | **`0.684`** |
+| **Track A R2 — Direct GRPO (`@200`, Best Direct)** *(`kl=0.02`, no unigram cap)* | `74.0%` | `85 / 89 / 94%` | `100%` | `0.638` | `0% / 0%` | `99%` | `0.684` |
 | **Track A R2 — Direct GRPO (`@300`)** | `73.0%` | `87 / 90 / 91%` | `100%` | `0.640` | `1% / 0%` | `100%` | `0.671` |
 | **Track A R2 — Direct GRPO (`@500` final)** | `70.0%` | `86 / 87 / 94%` | `100%` | `0.631` | `4% / 0%` | `100%` | `0.666` |
-| **Track B — Grounded `<think>` SFT** *(all 28L, `r=16`, 498 CMUdict traces)* | `61.0%` | `87 / 75 / 87%` | `100%` | **`0.690`** | **`0% / 0%`** | **`100%`** | **`0.706`** |
+| **Track B — Grounded `<think>` SFT** *(all 28L, `r=16`, 498 sum traces)* | `61.0%` | `87 / 75 / 87%` | `100%` | `0.690` | `0% / 0%` | `100%` | `0.706` |
 | **Track B — Grounded `<think>` GRPO (`@50`)** | `82.0%` | `90 / 87 / 98%` | `99%` | `0.650` | `0% / 0%` | `99%` | `0.628` |
-| **Track B — Grounded `<think>` GRPO (`@250`, Best Exact)** | **`86.0%`** | **`97 / 90 / 96%`** | `99%` | `0.654` | **`0% / 0%`** | **`100%`** | `0.637` |
-| **Track B — Grounded `<think>` GRPO (`@300` final)** | `84.0%` | **`99 / 85 / 99%`** | **`100%`** | `0.664` | **`0% / 0%`** | **`100%`** | `0.644` |
+| **Track B — Grounded `<think>` GRPO (`@250`, Best Sum)** | `86.0%` | `97 / 90 / 96%` | `99%` | `0.654` | `0% / 0%` | `100%` | `0.637` |
+| **Track B — Grounded `<think>` GRPO (`@300` final)** | `84.0%` | `99 / 85 / 99%` | `100%` | `0.664` | `0% / 0%` | `100%` | `0.644` |
+| **Track C — Cumulative `<think>` SFT** *(same 498 haikus, `word(c)=cum`)* | `77.0%` | `93 / 89 / 92%` | `100%` | **`0.704`** | **`0% / 0%`** | `99%` | **`0.702`** |
+| **Track C — Cumulative `<think>` GRPO (`@150`, Best Diversity)** | `96.0%` | `99 / 99 / 97%` | `99%` | `0.685` | **`0% / 0%`** | `98%` | **`0.690`** |
+| **Track C — Cumulative `<think>` GRPO (`@300` final, Overall Best)** | **`99.0%`** | **`100 / 99 / 100%`** | **`100%`** | **`0.686`** | **`0% / 0%`** | `98%` | `0.673` |
 
 #### Track A Findings (Full-Depth LoRA, Two-Round Direct SFT → GRPO)
 
@@ -99,6 +103,12 @@ Clean, from-scratch post-training runs incorporating every Phase 1 lesson from S
 - **Programmatic CMUdict cold-start SFT beat its own donor by `+11%` before a single RL step (`50% → 61%` exact):** Sampling `7,200` candidates from `direct_r2_sft` with strict relevance and starter caps (`min_sim >= 0.60`, `max_starter_repeats = 8`, `max_line_repeats = 2`, `max_bigram_repeats = 2`) yielded **498** balanced exact 5-7-5 haikus (`mean_sim = 0.698`), programmatically wrapped in exact CMUdict word-count traces with **40.8%** (`203/498`) real off-by-1/2 self-revisions (`draft = 6 -> final = 7`). Training a fresh full-depth LoRA from untouched base weights hit **`61.0%` exact 5-7-5**, **`0.690` relevance**, **`0.706` distinct-2**, **`0%` OOV/echo**, and **`99.0%` grounding** (`avg 84.5` `<think>` tokens) out of the box.
 - **Grounded Think-GRPO surged to `86.0%` exact 5-7-5 (`97 / 90 / 96%` per line) with genuine phonetic self-correction:** Applying per-line credit assignment directly inside `<think>` (`1:/2:/3:` drafting lines) as well as on the final haiku — alongside `grounding >= 0.70` jackpot gating, `exact_min_sim = 0.48`, `kl_beta = 0.02` locked to `think_sft_v1`, and the Track A R2 anti-collapse stack — lifted exact 5-7-5 from **`61% → 86.0%`** (**+80.0%** over base `<think>`, **+12.0%** over Track A Direct) at just **`2.71 GB`** peak Metal RAM (`~13s/step`).
 - **Honest counting & diversity recovery:** Without rewarding scratchpad arithmetic explicitly, **honest CMUdict 5-7-5 count accuracy inside `<think>` climbed from `58.0%` (SFT) → `84.0%` (`@250`)**, grounding stayed at **`99.7%–100.0%`**, `0%` OOV/echo, `100%` unique haikus, `96–97%` within ±1 total syllable, no Line-1 starter exceeded `7–8%`, and `distinct_2` + `relevance` both *climbed* from step 50 (`0.628 / 0.650`) to step 300 (`0.644 / 0.664`).
+
+#### Track C Findings (Clean 1:1 A/B — Cumulative Running-Total `<think>` SFT → GRPO)
+
+- **Error analysis pinpointed Track B's bottleneck:** Across all 14 held-out misses in Track B `@250`, **9 of 14 (64%)** had 100% accurate CMUdict syllable counts per word and failed purely on **end-of-line multi-term mental addition** (e.g., summing 6 word counts to `= 7` when the true sum was `8`).
+- **Format alone jumped SFT by `+16.0%` (`61.0% → 77.0%`) on the exact same 498 haikus:** Re-wrapping the exact 498 Track B SFT haikus and 203 real near-miss drafts into running cumulative totals (`Word(c)=cum`) — adding just `+5.3` `<think>` tokens (`84.5 → 89.8`) — lifted SFT exact 5-7-5 from **`61.0% → 77.0%`** (Line 2: `75% → 89%`), honest 5-7-5 counts from **`58.0% → 80.0%`**, arithmetic consistency to **`100.0%`**, relevance to **`0.704`** (matching untouched base), and `distinct_2 = 0.702` — already Pareto-dominating the 2-round Direct GRPO champion (`74%`, `d2 = 0.684`, `rel = 0.638`) before a single step of RL.
+- **Cumulative Think-GRPO reached `99.0%` exact 5-7-5 (`100 / 99 / 100%` per line) while *expanding* the Pareto frontier:** Adding a mild pure-integer arithmetic penalty (`-0.20` whenever `cum_i != cum_{i-1} + c_i`) with KL locked to `think_cum_sft_v1` drove held-out accuracy to **`96.0%` at `distinct_2 = 0.690`** (`@150`) and **`99.0%` at `distinct_2 = 0.673`** (`@300` final, **`+4.408`** mean reward out of `+4.50` max, **`0.686`** relevance, **`0.0%`** OOV/echo, **`100.0%`** grounding, **`100.0%`** arithmetic consistency, **`100.0%`** honest CMUdict counts across all 100 prompts, no Line-1 starter > `7%`, peak `2.82 GB` Metal RAM). Even the single held-out miss out of 100 had a 100% accurate `<think>` trace (it simply dropped *"the"* when copying Line 2 out). Because reliable word-by-word counting removes the need to rely on safe syllable templates, Track C simultaneously beat Track B on **accuracy (`+13.0%`), diversity (`+0.036`–`+0.053`), and relevance (`+0.033`)**.
 
 ### Selected Held-Out Samples
 
@@ -149,6 +159,46 @@ Clean, from-scratch post-training runs incorporating every Phase 1 lesson from S
   > Cedar sways in air,
   > Sea's blue breath on trembling grass,
   > Shadowed cliff remains.
+
+#### Track C Cumulative `<think>` (`step_0300` final — 99/100 exact, live cumulative self-revisions)
+
+- **a patient heron beside still reeds** *(5-7-5, relevance `0.79`, Line 2 self-revised `8 -> 7`)*
+  ```text
+  <think>
+  1: Fleecy(2)=2 reeds(1)=3 hold(1)=4 still(1)=5
+  2: Sunlight(2)=2 bends(1)=3 through(1)=4 feathered(3)=7 stems(1)=8 -> A(1)=1 quiet(2)=3 breath(1)=4 in(1)=5 the(1)=6 air(1)=7
+  3: Heron(2)=2 still(1)=3 remains(2)=5
+  </think>
+  Fleecy reeds hold still,
+  A quiet breath in the air,
+  Heron still remains.
+  ```
+- **a moonlit canyon river at twilight** *(5-7-5, relevance `0.77`, Line 2 self-revised `6 -> 7`)*
+  ```text
+  <think>
+  1: Moonlit(2)=2 canyon(2)=4 gleams(1)=5
+  2: Whispers(2)=2 of(1)=3 dusk(1)=4 in(1)=5 stone(1)=6 -> Whispers(2)=2 of(1)=3 the(1)=4 river's(2)=6 song(1)=7
+  3: Shadowed(2)=2 dawn(1)=3 takes(1)=4 hold(1)=5
+  </think>
+  Moonlit canyon gleams,
+  Whispers of the river's song,
+  Shadowed dawn takes hold.
+  ```
+- **a night sailboat leaning into wind** *(5-7-5, relevance `0.77`, Line 3 self-revised `6 -> 5`)*
+  ```text
+  <think>
+  1: Sea(1)=1 wind(1)=2 bites(1)=3 the(1)=4 mast(1)=5
+  2: Shadow(2)=2 leans(1)=3 into(2)=5 the(1)=6 dark(1)=7
+  3: Stars(1)=1 catch(1)=2 the(1)=3 wind's(1)=4 last(1)=5 breath(1)=6 -> Night's(1)=1 soft(1)=2 breath(1)=3 in(1)=4 sail(1)=5
+  </think>
+  Sea wind bites the mast,
+  Shadow leans into the dark,
+  Night's soft breath in sail.
+  ```
+- **a moonlit granite ridge above clouds** *(5-7-5, relevance `0.81`)*
+  > Moonlit ridge pierces,
+  > Clouds weave silver threads and light,
+  > Silent vast above.
 
 ---
 
